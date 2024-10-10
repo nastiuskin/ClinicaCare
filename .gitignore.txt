@@ -1,0 +1,10 @@
+.vs/
+Application/bin/
+Application/obj/
+
+ClinicaCare/bin/
+ClinicaCare/.vs/
+ClinicaCare/obj/
+
+Domain/bin/
+Domain/obj/
