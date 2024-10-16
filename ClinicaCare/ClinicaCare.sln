@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API.csproj", "{09BCA31C-CF2A-4A6A-86AA-A50DD1EAD5D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API.csproj", "{09BCA31C-CF2A-4A6A-86AA-A50DD1EAD5D4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{57F7F91A-AE57-4FD6-AC9C-E8EE2CD171F1} = {57F7F91A-AE57-4FD6-AC9C-E8EE2CD171F1}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "..\Application\Application.csproj", "{57F7F91A-AE57-4FD6-AC9C-E8EE2CD171F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "..\Application\Application.csproj", "{57F7F91A-AE57-4FD6-AC9C-E8EE2CD171F1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8CDDEE78-E4B6-41C1-B0E2-64C5E77E770F} = {8CDDEE78-E4B6-41C1-B0E2-64C5E77E770F}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "..\Domain\Domain.csproj", "{8CDDEE78-E4B6-41C1-B0E2-64C5E77E770F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "..\Domain\Domain.csproj", "{8CDDEE78-E4B6-41C1-B0E2-64C5E77E770F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
