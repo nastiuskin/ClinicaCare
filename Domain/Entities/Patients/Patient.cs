@@ -1,6 +1,4 @@
-﻿using Domain.Entities.Aggregates.Appointment;
-
-namespace Domain.Entities.Aggregates.Appointment.Patient
+﻿namespace Domain.Entities.Patient
 {
     public class Patient : User
     {

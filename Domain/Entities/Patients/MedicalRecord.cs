@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities.Aggregates.Appointment.Patient
+namespace Domain.Entities.Patient
 {
     public class MedicalRecord
     {

@@ -1,8 +1,9 @@
-﻿using Domain.Entities.enums;
-using Domain.Entities.Aggregates.Appointment.Patient;
+﻿using Domain.Entities.Doctors;
+using Domain.Entities.enums;
+using Domain.Entities.MedicalServices;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Entities.Aggregates.Appointment
+namespace Domain.Entities.Appointment
 {
     public class Appointment
     {

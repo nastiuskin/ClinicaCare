@@ -1,8 +1,9 @@
-﻿using Domain.Entities.enums;
+﻿using Domain.Entities.Doctors;
+using Domain.Entities.enums;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Domain.Entities.Aggregates.Appointment
+namespace Domain.Entities.MedicalServices
 {
     public class MedicalService
     {
@@ -53,7 +54,7 @@ namespace Domain.Entities.Aggregates.Appointment
         }
 
         public void UpdateDuration(TimeOnly newDuration)
-        {   
+        {
             Duration = newDuration;
         }
 
