@@ -1,19 +1,19 @@
-﻿using Domain.Entities.Doctors;
-using Domain.Entities.enums;
+﻿using Domain.Doctors;
+using Domain.SeedWork;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Domain.Entities.MedicalServices
+namespace Domain.MedicalServices
 {
-    public class MedicalService
+    public class MedicalProcedure : IAgregateRoot
     {
         private readonly List<Doctor> _doctors;
 
         public int Id { get; private set; }
 
 
-        [Required(ErrorMessage = "Service type is required.")]
-        public ServiceType Type { get; private set; }
+        [Required(ErrorMessage = "Procedure type is required.")]
+        public MedicalProcedureType Type { get; private set; }
 
         public decimal Price { get; private set; }
 
@@ -23,7 +23,7 @@ namespace Domain.Entities.MedicalServices
 
         public IReadOnlyCollection<Doctor> Doctors => _doctors.AsReadOnly();
 
-        public MedicalService(ServiceType type, decimal price, TimeSpan duration)
+        public MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration)
         {
             Type = type;
             Price = price;
@@ -41,20 +41,33 @@ namespace Domain.Entities.MedicalServices
 
         public void RemoveDoctor(Doctor doctor)
         {
-            _doctors.Remove(doctor);
+            if (doctor == null)
+            {
+                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null.");
+            }
+
+            if (!_doctors.Contains(doctor))
+            {
+                throw new InvalidOperationException("Doctor not found in the list.");
+            }
         }
 
         public void UpdatePrice(decimal newPrice)
         {
-            if (newPrice < 0.01m) //no negative value
+            if (newPrice <= 0)
             {
                 throw new ArgumentException("Price must be greater than zero.", nameof(newPrice));
             }
+
             Price = newPrice;
         }
 
         public void UpdateDuration(TimeSpan newDuration)
         {
+            if (newDuration <= TimeSpan.Zero)
+            {
+                throw new ArgumentException("Duration must be a positive value.", nameof(newDuration));
+            }
             Duration = newDuration;
         }
 

@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\anastasia.gaidarli\\source\\repos\\ClinicaCareTests\\ClinicaCareTests.csproj": {}
+    "D:\\Internship_Test\\ClinicaCareTests\\ClinicaCareTests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\anastasia.gaidarli\\source\\repos\\ClinicaCareTests\\ClinicaCareTests.csproj": {
+    "D:\\Internship_Test\\ClinicaCareTests\\ClinicaCareTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anastasia.gaidarli\\source\\repos\\ClinicaCareTests\\ClinicaCareTests.csproj",
+        "projectUniqueName": "D:\\Internship_Test\\ClinicaCareTests\\ClinicaCareTests.csproj",
         "projectName": "ClinicaCareTests",
-        "projectPath": "C:\\Users\\anastasia.gaidarli\\source\\repos\\ClinicaCareTests\\ClinicaCareTests.csproj",
-        "packagesPath": "C:\\Users\\anastasia.gaidarli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anastasia.gaidarli\\source\\repos\\ClinicaCareTests\\obj\\",
+        "projectPath": "D:\\Internship_Test\\ClinicaCareTests\\ClinicaCareTests.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "D:\\Internship_Test\\ClinicaCareTests\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\anastasia.gaidarli\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -29,8 +33,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\anastasia.gaidarli\\source\\repos\\Domain\\Domain.csproj": {
-                "projectPath": "C:\\Users\\anastasia.gaidarli\\source\\repos\\Domain\\Domain.csproj"
+              "D:\\Internship_Test\\Domain\\Domain.csproj": {
+                "projectPath": "D:\\Internship_Test\\Domain\\Domain.csproj"
               }
             }
           }
@@ -87,21 +91,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\anastasia.gaidarli\\source\\repos\\Domain\\Domain.csproj": {
+    "D:\\Internship_Test\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anastasia.gaidarli\\source\\repos\\Domain\\Domain.csproj",
+        "projectUniqueName": "D:\\Internship_Test\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "C:\\Users\\anastasia.gaidarli\\source\\repos\\Domain\\Domain.csproj",
-        "packagesPath": "C:\\Users\\anastasia.gaidarli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anastasia.gaidarli\\source\\repos\\Domain\\obj\\",
+        "projectPath": "D:\\Internship_Test\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "D:\\Internship_Test\\Domain\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\anastasia.gaidarli\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -132,6 +140,28 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -148,7 +178,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
