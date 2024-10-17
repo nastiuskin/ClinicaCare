@@ -3,14 +3,13 @@ using Domain.SeedWork;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Domain.MedicalServices
+namespace Domain.MedicalProcedures
 {
     public class MedicalProcedure : IAgregateRoot
     {
         private readonly List<Doctor> _doctors;
 
         public int Id { get; private set; }
-
 
         [Required(ErrorMessage = "Procedure type is required.")]
         public MedicalProcedureType Type { get; private set; }
@@ -23,7 +22,7 @@ namespace Domain.MedicalServices
 
         public IReadOnlyCollection<Doctor> Doctors => _doctors.AsReadOnly();
 
-        public MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration)
+        private MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration)
         {
             Type = type;
             Price = price;
@@ -33,6 +32,11 @@ namespace Domain.MedicalServices
 
         public void AssignDoctor(Doctor doctor)
         {
+            if (doctor == null)
+            {
+                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null.");
+            }
+
             if (!_doctors.Contains(doctor))
             {
                 _doctors.Add(doctor);
@@ -50,6 +54,8 @@ namespace Domain.MedicalServices
             {
                 throw new InvalidOperationException("Doctor not found in the list.");
             }
+
+            _doctors.Remove(doctor);
         }
 
         public void UpdatePrice(decimal newPrice)
@@ -68,8 +74,19 @@ namespace Domain.MedicalServices
             {
                 throw new ArgumentException("Duration must be a positive value.", nameof(newDuration));
             }
+
             Duration = newDuration;
         }
 
+        public static MedicalProcedure Create(MedicalProcedureType type, decimal price, TimeSpan duration)
+        {
+            if (price <= 0)
+                throw new ArgumentException("Price must be greater than zero.", nameof(price));
+
+            if (duration <= TimeSpan.Zero)
+                throw new ArgumentException("Duration must be a positive value.", nameof(duration));
+
+            return new MedicalProcedure(type, price, duration);
+        }
     }
 }

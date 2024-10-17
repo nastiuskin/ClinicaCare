@@ -1,6 +1,8 @@
 ﻿using Domain.Doctors;
-using Domain.MedicalServices;
+using Domain.MedicalProcedures;
+using Domain.Patients;
 using Domain.SeedWork;
+using Domain.SeedWork.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Appointments
@@ -9,7 +11,7 @@ namespace Domain.Appointments
     {
         public int Id { get; private set; }
         private readonly Doctor _doctor;
-        private readonly Patient.Patient _patient;
+        private readonly Patient _patient;
         private readonly MedicalProcedure _medicalProcedure;
 
         [Required]
@@ -17,8 +19,7 @@ namespace Domain.Appointments
         public AppointmentStatus Status { get; private set; }
         public string DoctorFeedback { get; private set; }
 
-        //create method vor validating appointment creation calling methods isAvailableTime etc
-        public Appointment(Doctor doctor, Patient.Patient patient, MedicalProcedure medicalProcedure, TimeSlot appointmentDateTime)
+        private Appointment(Doctor doctor, Patient patient, MedicalProcedure medicalProcedure, TimeSlot appointmentDateTime)
         {
             _doctor = doctor;
             _patient = patient;
@@ -40,6 +41,15 @@ namespace Domain.Appointments
         public void UpdateStatus(AppointmentStatus newStatus)
         {
             Status = newStatus;
+        }
+
+        public static Appointment Create(Doctor doctor, Patient patient, MedicalProcedure medicalProcedure, TimeSlot appointmentDateTime)
+        {
+            if(doctor == null) throw new ArgumentNullException("Doctor cannot be null", nameof (doctor));
+            if(patient == null) throw new ArgumentNullException("Patient cannot be null", nameof(_patient));
+            if(medicalProcedure == null) throw new ArgumentNullException("Medical Procedure cannot be null", nameof (_medicalProcedure));
+            if(appointmentDateTime == null) throw new ArgumentNullException("Appointment time is required", nameof(appointmentDateTime));
+            return new Appointment(doctor, patient, medicalProcedure, appointmentDateTime);
         }
     }
 }

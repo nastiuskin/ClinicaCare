@@ -1,6 +1,7 @@
 ﻿using Domain.Appointments;
-using Domain.MedicalServices;
+using Domain.MedicalProcedures;
 using Domain.SeedWork;
+using Domain.SeedWork.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Doctors
@@ -19,16 +20,27 @@ namespace Domain.Doctors
         [Required(ErrorMessage = "Cabinet number is required.")]
         public int CabinetNumber { get; private set; }
 
-        public Doctor(string firstName, string lastName, string email, string phoneNumber,
-                      SpecializationType specialization, string biography, int cabinetNumber)
-                       : base(firstName, lastName, email, phoneNumber)
-        {
-            Specialization = specialization;
+        private Doctor(UserParams userParams,SpecializationType specialization, string biography, int cabinetNumber, TimeSlot workingHours)
+                       : base(userParams)
+        {   Specialization = specialization;
             Biography = biography;
             CabinetNumber = cabinetNumber;
+            WorkingHours = workingHours;
 
             _appointments = new List<Appointment>();
             _medicalProcedures = new List<MedicalProcedure>();
+        }
+
+        public static Doctor Create(UserParams userParams,
+                                     SpecializationType specialization, string biography, int cabinetNumber,
+                                     TimeSlot workingHours)
+        {
+            if (cabinetNumber <= 0)
+                throw new ArgumentException("Cabinet number must be greater than zero.", nameof(cabinetNumber));
+            if (workingHours == null)
+                throw new ArgumentNullException(nameof(workingHours), "Working hours are required.");
+
+            return new Doctor(userParams,specialization, biography, cabinetNumber, workingHours);
         }
 
         public void AddAppointment(Appointment appointment)

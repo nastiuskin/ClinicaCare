@@ -1,6 +1,6 @@
 ﻿using Domain.Doctors;
-using Domain.MedicalServices;
-using Domain.SeedWork;
+using Domain.MedicalProcedures;
+using Domain.SeedWork.ValueObjects;
 
 namespace Domain.DomainServices
 {
@@ -8,6 +8,22 @@ namespace Domain.DomainServices
     {
         public List<TimeSlot> GetAvailableTimeSlots(Doctor doctor, MedicalProcedure medicalProcedure)
         {
+            if (doctor == null)
+            {
+                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null.");
+            }
+
+            if (medicalProcedure == null)
+            {
+                throw new ArgumentNullException(nameof(medicalProcedure), "MedicalProcedure cannot be null.");
+            }
+
+            // Check if doctor's working hours are set
+            if (doctor.WorkingHours == null)
+            {
+                throw new InvalidOperationException("Doctor's working hours cannot be null.");
+            }
+
             var availableTimeSlots = new List<TimeSlot>();
             DateTime startTime = doctor.WorkingHours.StartTime.Date;
             DateTime endTime = doctor.WorkingHours.EndTime.Date;
@@ -17,7 +33,7 @@ namespace Domain.DomainServices
             {
                 var timeSlot = new TimeSlot(startTime, startTime.Add(medicalProcedure.Duration));
 
-                if (IsTimeAvailable(doctor,timeSlot))
+                if (IsTimeAvailable(doctor, timeSlot))
                 {
                     availableTimeSlots.Add(timeSlot);
                 }
@@ -29,6 +45,15 @@ namespace Domain.DomainServices
 
         private bool IsTimeAvailable(Doctor doctor, TimeSlot timeSlot)
         {
+            if (doctor == null)
+            {
+                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null.");
+            }
+
+            if (timeSlot == null)
+            {
+                throw new ArgumentNullException(nameof(timeSlot), "TimeSlot cannot be null.");
+            }
             // Check if the time slot is within working hours
             if (timeSlot.StartTime < doctor.WorkingHours.StartTime || timeSlot.EndTime > doctor.WorkingHours.EndTime)
             {
@@ -38,8 +63,5 @@ namespace Domain.DomainServices
             // Check for overlaps with occupied appointments
             return !doctor.GetPlannedAppointments().Any(a => a.AppointmentDateTime.OverlapsWith(timeSlot));
         }
-
-        //to add the logic for deleting appointment from schedule if it is completed or canceled
-        //so in the schedule are stored only planned appointments
     }
 }

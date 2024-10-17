@@ -1,6 +1,6 @@
 ﻿using Domain.SeedWork;
 
-namespace Domain.Patient
+namespace Domain.Patients
 {
     public interface IPatientRepo : IBaseRepo<Patient>
     {

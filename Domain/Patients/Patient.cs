@@ -1,15 +1,16 @@
 ﻿using Domain.Appointments;
 using Domain.SeedWork;
+using Domain.SeedWork.ValueObjects;
 
-namespace Domain.Patient
+namespace Domain.Patients
 {
     public class Patient : User, IAgregateRoot
     {
         private readonly List<Appointment> _appointments;
         public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
-        public Patient(string firstName, string lastName, string email, string phoneNumber, DateTime dateOfBirth)
-            : base(firstName, lastName, email, phoneNumber)
+        public Patient(UserParams userParams)
+            : base(userParams)
         {
             _appointments = new List<Appointment>();
         }

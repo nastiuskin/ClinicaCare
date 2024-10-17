@@ -1,6 +1,6 @@
 ﻿using Domain.SeedWork;
 
-namespace Domain.MedicalServices
+namespace Domain.MedicalProcedures
 {
     public interface IMedicalProcedureRepo : IBaseRepo<MedicalProcedure>
     {
