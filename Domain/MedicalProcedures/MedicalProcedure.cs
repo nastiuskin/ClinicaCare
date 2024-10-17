@@ -1,12 +1,4 @@
-<<<<<<<< HEAD:Domain/Entities/MedicalServices/MedicalService.cs
-﻿using Domain.Entities.Doctors;
-using Domain.Entities.enums;
-using System.ComponentModel.DataAnnotations;
-
-
-namespace Domain.Entities.MedicalServices
-========
-﻿using Domain.Doctors;
+using Domain.Doctors;
 using Domain.SeedWork;
 using System.ComponentModel.DataAnnotations;
 
@@ -76,10 +68,6 @@ namespace Domain.MedicalProcedures
             Price = newPrice;
         }
 
-<<<<<<<< HEAD:Domain/Entities/MedicalServices/MedicalService.cs
-        public void UpdateDuration(TimeOnly newDuration)
-        {
-========
         public void UpdateDuration(TimeSpan newDuration)
         {
             if (newDuration <= TimeSpan.Zero)

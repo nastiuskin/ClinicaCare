@@ -1,9 +1,5 @@
-<<<<<<<< HEAD:Domain/Entities/Patients/Patient.cs
-﻿namespace Domain.Entities.Patient
-========
-﻿using Domain.Appointments;
+using Domain.Appointments;
 using Domain.SeedWork;
-using Domain.SeedWork.ValueObjects;
 
 namespace Domain.Patients
 {
