@@ -1,8 +1,9 @@
 ﻿using Domain.Appointments;
 using Domain.MedicalProcedures;
 using Domain.SeedWork;
-using Domain.SeedWork.ValueObjects;
-using System.ComponentModel.DataAnnotations;
+using Domain.Validation;
+using Domain.ValueObjects;
+using FluentResults;
 
 namespace Domain.Doctors
 {
@@ -11,54 +12,66 @@ namespace Domain.Doctors
         private List<Appointment> _appointments;
         private List<MedicalProcedure> _medicalProcedures;
         public TimeSlot WorkingHours { get; private set; }
-
-        [Required(ErrorMessage = "Specialization is required.")]
         public SpecializationType Specialization { get; private set; }
 
         public string Biography { get; private set; }
-
-        [Required(ErrorMessage = "Cabinet number is required.")]
         public int CabinetNumber { get; private set; }
 
-        private Doctor(UserParams userParams,SpecializationType specialization, string biography, int cabinetNumber, TimeSlot workingHours)
+        private Doctor(UserParams userParams, DoctorParams doctorParams)
                        : base(userParams)
-        {   Specialization = specialization;
-            Biography = biography;
-            CabinetNumber = cabinetNumber;
-            WorkingHours = workingHours;
+        {
+            Specialization = doctorParams.Specialization;
+            Biography = doctorParams.Biography;
+            CabinetNumber = doctorParams.CabinetNumber;
+            WorkingHours = doctorParams.WorkingHours;
 
             _appointments = new List<Appointment>();
             _medicalProcedures = new List<MedicalProcedure>();
         }
 
-        public static Doctor Create(UserParams userParams,
-                                     SpecializationType specialization, string biography, int cabinetNumber,
-                                     TimeSlot workingHours)
+        public static Result<Doctor> Create(UserParams userParams, DoctorParams doctorParams)
         {
-            if (cabinetNumber <= 0)
-                throw new ArgumentException("Cabinet number must be greater than zero.", nameof(cabinetNumber));
-            if (workingHours == null)
-                throw new ArgumentNullException(nameof(workingHours), "Working hours are required.");
+            var userValidator = new UserCreateValidator();
+            var userValidationResult = userValidator.Validate(userParams);
 
-            return new Doctor(userParams,specialization, biography, cabinetNumber, workingHours);
+            if (!userValidationResult.IsValid)
+            {
+                var errors = userValidationResult.Errors
+                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .ToList();
+                return Result.Fail(errors);
+            }
+
+            var doctorValidator = new DoctorСreateValidator();
+            var doctorValidationResult = doctorValidator.Validate(doctorParams);
+
+            if (!doctorValidationResult.IsValid)
+            {
+                var errors = doctorValidationResult.Errors
+                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .ToList();
+                return Result.Fail(errors);
+            }
+
+            return Result.Ok(new Doctor(userParams, doctorParams));
         }
 
-        public void AddAppointment(Appointment appointment)
+        public Result AddAppointment(Appointment appointment)
         {
             if (appointment == null)
-            {
-                throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null.");
-            }
+                return Result.Fail(new FluentResults.Error("Appointment cannot be null."));
+
             _appointments.Add(appointment);
+            return Result.Ok();
         }
 
-        public void AddMedicalProcedure(MedicalProcedure medicalProcedure)
+        public Result AddMedicalProcedure(MedicalProcedure medicalProcedure)
         {
             if (medicalProcedure == null)
-            {
-                throw new ArgumentNullException(nameof(medicalProcedure), "Medical procedure cannot be null.");
-            }
+                return Result.Fail(new FluentResults.Error("Medical procedure cannot be null."));
+
             _medicalProcedures.Add(medicalProcedure);
+            return Result.Ok();
         }
 
         public IReadOnlyCollection<Appointment> GetPlannedAppointments()

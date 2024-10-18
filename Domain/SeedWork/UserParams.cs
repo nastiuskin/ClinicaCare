@@ -1,4 +1,4 @@
-﻿using Domain.SeedWork.ValueObjects;
+﻿using Domain.ValueObjects;
 
 namespace Domain.SeedWork
 {

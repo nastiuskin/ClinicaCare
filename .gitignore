@@ -8,3 +8,12 @@ ClinicaCare/obj/
 
 Domain/bin/
 Domain/obj/
+
+/API/obj/
+/API/bin/
+
+
+**/bin/
+**/obj/
+
+*.nuget.*
