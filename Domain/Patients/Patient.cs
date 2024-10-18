@@ -1,5 +1,6 @@
 using Domain.Appointments;
 using Domain.SeedWork;
+using FluentResults;
 
 namespace Domain.Patients
 {
@@ -14,13 +15,14 @@ namespace Domain.Patients
             _appointments = new List<Appointment>();
         }
 
-        public void AddAppointment(Appointment appointment)
+        public Result AddAppointment(Appointment appointment)
         {
             if (appointment == null)
             {
-                throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null.");
+                return Result.Fail(new FluentResults.Error("Appointment cannot be null"));
             }
             _appointments.Add(appointment);
+            return Result.Ok();
         }
 
     }

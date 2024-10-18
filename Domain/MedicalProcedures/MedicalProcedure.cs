@@ -1,5 +1,6 @@
 using Domain.Doctors;
 using Domain.SeedWork;
+using FluentResults;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -30,63 +31,69 @@ namespace Domain.MedicalProcedures
             _doctors = new List<Doctor>();
         }
 
-        public void AssignDoctor(Doctor doctor)
+        public Result AssignDoctor(Doctor doctor)
         {
             if (doctor == null)
             {
-                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null.");
+                return Result.Fail(new FluentResults.Error("Doctor cannot be null."));
             }
 
-            if (!_doctors.Contains(doctor))
+            if (_doctors.Contains(doctor))
             {
-                _doctors.Add(doctor);
+                return Result.Fail(new FluentResults.Error("Doctor is already in the list."));
             }
+
+            _doctors.Add(doctor);
+            return Result.Ok();
         }
 
-        public void RemoveDoctor(Doctor doctor)
+        public Result RemoveDoctor(Doctor doctor)
         {
             if (doctor == null)
             {
-                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null.");
+                return Result.Fail(new FluentResults.Error("Doctor cannot be null"));
             }
 
             if (!_doctors.Contains(doctor))
             {
-                throw new InvalidOperationException("Doctor not found in the list.");
+                return Result.Fail(new FluentResults.Error("Doctor not found in the list"));
             }
 
             _doctors.Remove(doctor);
+            return Result.Ok();
         }
 
-        public void UpdatePrice(decimal newPrice)
+        public Result UpdatePrice(decimal newPrice)
         {
             if (newPrice <= 0)
             {
-                throw new ArgumentException("Price must be greater than zero.", nameof(newPrice));
+                return Result.Fail(new FluentResults.Error("Price must be greater than zero"));
             }
 
             Price = newPrice;
+            return Result.Ok();
         }
 
-        public void UpdateDuration(TimeSpan newDuration)
+        public Result UpdateDuration(TimeSpan newDuration)
         {
             if (newDuration <= TimeSpan.Zero)
             {
-                throw new ArgumentException("Duration must be a positive value.", nameof(newDuration));
+                return Result.Fail(new FluentResults.Error("Duration must be a positive value"));
             }
 
             Duration = newDuration;
+            return Result.Ok();
         }
 
-        public static MedicalProcedure Create(MedicalProcedureType type, decimal price, TimeSpan duration)
+        public static Result<MedicalProcedure> Create(MedicalProcedureType type, decimal price, TimeSpan duration)
         {
             if (price <= 0)
-                throw new ArgumentException("Price must be greater than zero.", nameof(price));
+                return Result.Fail(new FluentResults.Error("Price must be greater than zero."));
 
             if (duration <= TimeSpan.Zero)
-                throw new ArgumentException("Duration must be a positive value.", nameof(duration));
+                return Result.Fail(new FluentResults.Error("Duration must be a positive value."));
 
-            return new MedicalProcedure(type, price, duration);
+            return Result.Ok(new MedicalProcedure(type, price, duration));
         }
     }
 }
