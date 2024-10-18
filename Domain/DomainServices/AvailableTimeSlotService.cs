@@ -10,19 +10,13 @@ namespace Domain.DomainServices
         public Result<List<TimeSlot>> GetAvailableTimeSlots(Doctor doctor, MedicalProcedure medicalProcedure)
         {
             if (doctor == null)
-            {
                 return Result.Fail(new FluentResults.Error("Doctor cannot be null."));
-            }
 
             if (medicalProcedure == null)
-            {
                 return Result.Fail(new FluentResults.Error("MedicalProcedure cannot be null."));
-            }
 
             if (doctor.WorkingHours == null)
-            {
                 return Result.Fail(new FluentResults.Error("Doctor's working hours cannot be null."));
-            }
 
             var availableTimeSlots = new List<TimeSlot>();
             DateTime startTime = doctor.WorkingHours.StartTime.Date;
@@ -46,9 +40,8 @@ namespace Domain.DomainServices
         private bool IsTimeAvailable(Doctor doctor, TimeSlot timeSlot)
         {
             if (timeSlot.StartTime < doctor.WorkingHours.StartTime || timeSlot.EndTime > doctor.WorkingHours.EndTime)
-            {
                 return false;
-            }
+
             return !doctor.GetPlannedAppointments().Any(a => a.AppointmentDateTime.OverlapsWith(timeSlot));
         }
     }

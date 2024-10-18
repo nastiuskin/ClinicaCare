@@ -59,9 +59,8 @@ namespace Domain.Doctors
         public Result AddAppointment(Appointment appointment)
         {
             if (appointment == null)
-            {
                 return Result.Fail(new FluentResults.Error("Appointment cannot be null."));
-            }
+
             _appointments.Add(appointment);
             return Result.Ok();
         }
@@ -69,9 +68,8 @@ namespace Domain.Doctors
         public Result AddMedicalProcedure(MedicalProcedure medicalProcedure)
         {
             if (medicalProcedure == null)
-            {
                 return Result.Fail(new FluentResults.Error("Medical procedure cannot be null."));
-            }
+
             _medicalProcedures.Add(medicalProcedure);
             return Result.Ok();
         }

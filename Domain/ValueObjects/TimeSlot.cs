@@ -16,9 +16,7 @@ namespace Domain.ValueObjects
         public static Result<TimeSlot> Create(DateTime startTime, DateTime endTime)
         {
             if (startTime >= endTime)
-            {
                 return Result.Fail(new FluentResults.Error("End time must be greater than start time."));
-            }
 
             return Result.Ok(new TimeSlot(startTime, endTime));
         }

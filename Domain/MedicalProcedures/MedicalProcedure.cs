@@ -34,14 +34,10 @@ namespace Domain.MedicalProcedures
         public Result AssignDoctor(Doctor doctor)
         {
             if (doctor == null)
-            {
                 return Result.Fail(new FluentResults.Error("Doctor cannot be null."));
-            }
 
             if (_doctors.Contains(doctor))
-            {
                 return Result.Fail(new FluentResults.Error("Doctor is already in the list."));
-            }
 
             _doctors.Add(doctor);
             return Result.Ok();
@@ -50,14 +46,10 @@ namespace Domain.MedicalProcedures
         public Result RemoveDoctor(Doctor doctor)
         {
             if (doctor == null)
-            {
                 return Result.Fail(new FluentResults.Error("Doctor cannot be null"));
-            }
 
             if (!_doctors.Contains(doctor))
-            {
                 return Result.Fail(new FluentResults.Error("Doctor not found in the list"));
-            }
 
             _doctors.Remove(doctor);
             return Result.Ok();
@@ -66,9 +58,7 @@ namespace Domain.MedicalProcedures
         public Result UpdatePrice(decimal newPrice)
         {
             if (newPrice <= 0)
-            {
                 return Result.Fail(new FluentResults.Error("Price must be greater than zero"));
-            }
 
             Price = newPrice;
             return Result.Ok();
@@ -77,9 +67,7 @@ namespace Domain.MedicalProcedures
         public Result UpdateDuration(TimeSpan newDuration)
         {
             if (newDuration <= TimeSpan.Zero)
-            {
                 return Result.Fail(new FluentResults.Error("Duration must be a positive value"));
-            }
 
             Duration = newDuration;
             return Result.Ok();

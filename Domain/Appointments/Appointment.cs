@@ -32,14 +32,10 @@ namespace Domain.Appointments
         public Result AddFeedback(string feedback)
         {
             if (Status != AppointmentStatus.COMPLETED)
-            {
                 return Result.Fail(new FluentResults.Error("Feedback can only be added after the appointment is completed."));
-            }
 
             if (string.IsNullOrWhiteSpace(feedback))
-            {
                 return Result.Fail(new FluentResults.Error("Feedback cannot be empty."));
-            }
 
             DoctorFeedback = feedback;
             return Result.Ok();
@@ -61,6 +57,24 @@ namespace Domain.Appointments
             if (appointmentDateTime == null) throw new ArgumentNullException("Appointment time is required", nameof(appointmentDateTime));
             return new Appointment(doctor, patient, medicalProcedure, appointmentDateTime);
         }
+
+    //AppointmentValidator needed
+    /*public static Result<Appointment> Create(Doctor doctor, Patient patient, MedicalProcedure medicalProcedure, TimeSlot appointmentDateTime)
+        {
+            var validator = new AppointmentCreateValidator();
+            var appointment = new Appointment(doctor, patient, medicalProcedure, appointmentDateTime);
+            var appointmentValidatorResult = validator.Validate(appointment);
+
+            if (!appointmentValidatorResult.IsValid)
+            {
+                var errors = appointmentValidatorResult.Errors
+                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .ToList();
+                return Result.Fail(errors);
+            }
+
+            return Result.Ok(appointment);
+        }*/
     }
 }
 

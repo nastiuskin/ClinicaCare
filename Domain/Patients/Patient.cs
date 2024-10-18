@@ -18,9 +18,8 @@ namespace Domain.Patients
         public Result AddAppointment(Appointment appointment)
         {
             if (appointment == null)
-            {
                 return Result.Fail(new FluentResults.Error("Appointment cannot be null"));
-            }
+
             _appointments.Add(appointment);
             return Result.Ok();
         }

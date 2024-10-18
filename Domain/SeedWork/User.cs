@@ -32,9 +32,8 @@ namespace Domain.SeedWork
         {
             var result = PhoneNumber.Create(phoneNumber);
             if (result.IsFailed)
-            {
                 return Result.Fail(result.Errors);
-            }
+
             PhoneNumber = result.Value;
             return Result.Ok();
         }
@@ -43,9 +42,8 @@ namespace Domain.SeedWork
         {
             var result = Email.Create(email);
             if (result.IsFailed)
-            {
                 return Result.Fail(result.Errors);
-            }
+
             Email = result.Value;
             return Result.Ok();
 
