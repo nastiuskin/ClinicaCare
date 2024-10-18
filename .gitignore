@@ -12,4 +12,8 @@ Domain/obj/
 /API/obj/
 /API/bin/
 
+
+**/bin/
+**/obj/
+
 *.nuget.*
