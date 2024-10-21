@@ -17,6 +17,7 @@ namespace Domain.Doctors
         public string Biography { get; private set; }
         public int CabinetNumber { get; private set; }
 
+        protected Doctor() { }
         private Doctor(UserParams userParams, DoctorParams doctorParams)
                        : base(userParams)
         {

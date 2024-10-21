@@ -1,3 +1,4 @@
+using Domain.Appointments;
 using Domain.Doctors;
 using Domain.SeedWork;
 using FluentResults;
@@ -10,7 +11,8 @@ namespace Domain.MedicalProcedures
     {
         private readonly List<Doctor> _doctors;
 
-        public int Id { get; private set; }
+        private readonly List<Appointment> _appointments;
+        public MedicalProcedureId MedicalProcedureId { get; private set; }
 
         [Required(ErrorMessage = "Procedure type is required.")]
         public MedicalProcedureType Type { get; private set; }
@@ -22,7 +24,9 @@ namespace Domain.MedicalProcedures
         public TimeSpan Duration { get; private set; }
 
         public IReadOnlyCollection<Doctor> Doctors => _doctors.AsReadOnly();
+        public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
+        private MedicalProcedure() { }
         private MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration)
         {
             Type = type;

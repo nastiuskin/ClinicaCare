@@ -9,6 +9,7 @@ namespace Domain.Patients
         private readonly List<Appointment> _appointments;
         public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
+        protected Patient() { }
         public Patient(UserParams userParams)
             : base(userParams)
         {

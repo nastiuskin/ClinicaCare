@@ -6,7 +6,7 @@ namespace Domain.SeedWork
 {
     public class User
     {
-        public int Id { get; private set; }
+        public UserId UserId { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
 
@@ -18,6 +18,7 @@ namespace Domain.SeedWork
         public Email Email { get; private set; }
 
         public PhoneNumber PhoneNumber { get; private set; }
+        public User() { }
 
         protected User(UserParams user)
         {
