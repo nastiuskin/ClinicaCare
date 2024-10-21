@@ -1,6 +1,7 @@
 using Domain.Appointments;
 using Domain.Doctors;
 using Domain.SeedWork;
+using Domain.Validation;
 using FluentResults;
 using System.ComponentModel.DataAnnotations;
 
@@ -75,11 +76,15 @@ namespace Domain.MedicalProcedures
 
         public static Result<MedicalProcedure> Create(MedicalProcedureParams mpParams)
         {
-            if (mpParams.Price <= 0)
-                return Result.Fail(new FluentResults.Error("Price must be greater than zero."));
-
-            if (mpParams.Duration <= TimeSpan.Zero)
-                return Result.Fail(new FluentResults.Error("Duration must be a positive value."));
+            var mpValidator = new MedicalProcedureCreateValidator();
+            var mpValidationResult = mpValidator.Validate(mpParams);
+            if (!mpValidationResult.IsValid)
+            {
+                var errors = mpValidationResult.Errors
+                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .ToList();
+                return Result.Fail(errors);
+            }
 
             return Result.Ok(new MedicalProcedure(mpParams));
         }

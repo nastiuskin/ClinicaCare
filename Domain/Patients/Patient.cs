@@ -1,5 +1,6 @@
 using Domain.Appointments;
 using Domain.SeedWork;
+using Domain.Validation;
 using FluentResults;
 
 namespace Domain.Patients
@@ -10,7 +11,7 @@ namespace Domain.Patients
         public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
         protected Patient() { }
-        public Patient(UserParams userParams)
+        private Patient(UserParams userParams)
             : base(userParams)
         {
             _appointments = new List<Appointment>();
@@ -23,6 +24,21 @@ namespace Domain.Patients
 
             _appointments.Add(appointment);
             return Result.Ok();
+        }
+
+        public Result<Patient> Create(UserParams patientParams)
+        {
+            var validator = new UserCreateValidator();
+            var validationResult = validator.Validate(patientParams);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors
+                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .ToList();
+                return Result.Fail(errors);
+
+            }
+            return Result.Ok(new Patient(patientParams));
         }
 
     }
