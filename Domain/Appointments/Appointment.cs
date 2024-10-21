@@ -12,10 +12,10 @@ namespace Domain.Appointments
     {
         public AppointmentId Id { get; private set; }
         
-        public DoctorId DoctorId { get; private set; }
+        public UserId DoctorId { get; private set; }
         public Doctor Doctor { get; private set; }
 
-        public PatientId PatientId { get; private set; }
+        public UserId PatientId { get; private set; }
         public Patient Patient { get; private set; }
 
         public MedicalProcedureId MedicalProcedureId { get; private set; }
@@ -23,6 +23,8 @@ namespace Domain.Appointments
         public TimeSlot AppointmentDateTime { get; private set; }
         public AppointmentStatus Status { get; private set; }
         public string DoctorFeedback { get; private set; }
+
+        private Appointment() { }
 
         private Appointment(AppointmentParams appointmentParams)
         {

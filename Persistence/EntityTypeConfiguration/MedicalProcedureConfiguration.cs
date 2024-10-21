@@ -8,13 +8,15 @@ namespace Persistence.EntityTypeConfiguration
     {
         public void Configure(EntityTypeBuilder<MedicalProcedure> builder)
         {
-            builder.ToTable("Medical Procedures");
+            builder.ToTable("MedicalProcedures");
 
-            builder.HasKey(mp => mp.MedicalProcedureId);
+            builder.HasKey(mp => mp.Id);
 
-            builder.Property(mp => mp.MedicalProcedureId)
-                .HasConversion(medicalProcedureId => medicalProcedureId.Value,
-                value => new MedicalProcedureId(value));
+            builder.Property(mp => mp.Id)
+                .HasConversion(
+                     medicalProcedureId => medicalProcedureId.Value, 
+                     value => new MedicalProcedureId(value))          
+                 .IsRequired();
 
             builder.HasMany(mp => mp.Doctors)
                 .WithMany(d => d.MedicalProcedures);

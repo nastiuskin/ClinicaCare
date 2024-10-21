@@ -3,7 +3,10 @@ using Domain.Doctors;
 using Domain.MedicalProcedures;
 using Domain.Patients;
 using Domain.SeedWork;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Configuration;
+using Persistence.EntityTypeConfiguration;
 
 
 namespace Persistence
@@ -13,14 +16,17 @@ namespace Persistence
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
 
+        public DbSet<User> Users { get; set; }
         public DbSet<MedicalProcedure> MedicalProcedures { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<User> Users { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new MedicalProcedureConfiguration());
+            modelBuilder.ApplyConfiguration(new DoctorConfiguration());
+            modelBuilder.ApplyConfiguration(new AppointmentConfiguration());
         }
 
 

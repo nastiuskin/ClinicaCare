@@ -10,10 +10,11 @@ namespace Domain.MedicalProcedures
 {
     public class MedicalProcedure : IAgregateRoot
     {
+        public MedicalProcedureId Id { get; private set; }
+
         private readonly List<Doctor> _doctors;
 
         private readonly List<Appointment> _appointments;
-        public MedicalProcedureId Id { get; private set; }
         public MedicalProcedureType Type { get; private set; }
 
         public decimal Price { get; private set; }
@@ -28,7 +29,7 @@ namespace Domain.MedicalProcedures
         {
             Type = mpParams.Type;
             Price = mpParams.Price;
-            Duration = mpParams.Duration;
+            Duration = mpParams.Duration;   
             _doctors = new List<Doctor>();
         }
 

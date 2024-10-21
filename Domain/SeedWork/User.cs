@@ -18,7 +18,7 @@ namespace Domain.SeedWork
         public Email Email { get; private set; }
 
         public PhoneNumber PhoneNumber { get; private set; }
-        public User() { }
+        protected User() { }
 
         protected User(UserParams user)
         {
@@ -50,10 +50,10 @@ namespace Domain.SeedWork
 
         }
 
-        private static Result<User> Create(UserParams userParams)
+        /*private static Result<User> Create(UserParams userParams)
         {
-           var validator = new UserCreateValidator();
-           var validationResult = validator.Validate(userParams);
+            var validator = new UserCreateValidator();
+            var validationResult = validator.Validate(userParams);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors
@@ -63,7 +63,7 @@ namespace Domain.SeedWork
 
             }
             return Result.Ok(new User(userParams));
-        }
+        }*/
     }
 }
 
