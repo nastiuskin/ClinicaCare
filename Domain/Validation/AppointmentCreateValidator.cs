@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Domain.Validation
 {
-    public class AppointmentCreateValidator : AbstractValidator<Appointment>
+    public class AppointmentCreateValidator : AbstractValidator<AppointmentParams>
     {
         public AppointmentCreateValidator() 
         {
@@ -18,9 +18,6 @@ namespace Domain.Validation
 
                RuleFor(appointment => appointment.AppointmentDateTime)
                     .NotNull().WithMessage("Appointment time is required.");
-
-               RuleFor(appointment => appointment.Status)
-                    .IsInEnum().WithMessage("Invalid appointment status.");
             }
     }
 }

@@ -12,26 +12,22 @@ namespace Domain.MedicalProcedures
         private readonly List<Doctor> _doctors;
 
         private readonly List<Appointment> _appointments;
-        public MedicalProcedureId MedicalProcedureId { get; private set; }
-
-        [Required(ErrorMessage = "Procedure type is required.")]
+        public MedicalProcedureId Id { get; private set; }
         public MedicalProcedureType Type { get; private set; }
 
         public decimal Price { get; private set; }
 
-
-        [Required(ErrorMessage = "Duration is required.")]
         public TimeSpan Duration { get; private set; }
 
         public IReadOnlyCollection<Doctor> Doctors => _doctors.AsReadOnly();
         public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
         private MedicalProcedure() { }
-        private MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration)
+        private MedicalProcedure(MedicalProcedureParams mpParams)
         {
-            Type = type;
-            Price = price;
-            Duration = duration;
+            Type = mpParams.Type;
+            Price = mpParams.Price;
+            Duration = mpParams.Duration;
             _doctors = new List<Doctor>();
         }
 
@@ -77,15 +73,15 @@ namespace Domain.MedicalProcedures
             return Result.Ok();
         }
 
-        public static Result<MedicalProcedure> Create(MedicalProcedureType type, decimal price, TimeSpan duration)
+        public static Result<MedicalProcedure> Create(MedicalProcedureParams mpParams)
         {
-            if (price <= 0)
+            if (mpParams.Price <= 0)
                 return Result.Fail(new FluentResults.Error("Price must be greater than zero."));
 
-            if (duration <= TimeSpan.Zero)
+            if (mpParams.Duration <= TimeSpan.Zero)
                 return Result.Fail(new FluentResults.Error("Duration must be a positive value."));
 
-            return Result.Ok(new MedicalProcedure(type, price, duration));
+            return Result.Ok(new MedicalProcedure(mpParams));
         }
     }
 }
