@@ -1,5 +1,5 @@
-﻿using Domain.Doctors;
-using Domain.SeedWork;
+﻿using Domain.SeedWork;
+using Domain.Users.Doctors;
 using FluentValidation;
 
 namespace Domain.Validation

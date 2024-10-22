@@ -1,12 +1,13 @@
-﻿using Domain.Validation;
+﻿using Domain.SeedWork;
+using Domain.Validation;
 using Domain.ValueObjects;
 using FluentResults;
 using System.ComponentModel.DataAnnotations;
-namespace Domain.SeedWork
+namespace Domain.Users
 {
-    public class User
+    public abstract class User : IAgregateRoot
     {
-        public int Id { get; private set; }
+        public UserId Id { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
 
@@ -18,6 +19,7 @@ namespace Domain.SeedWork
         public Email Email { get; private set; }
 
         public PhoneNumber PhoneNumber { get; private set; }
+        protected User() { }
 
         protected User(UserParams user)
         {
@@ -49,10 +51,10 @@ namespace Domain.SeedWork
 
         }
 
-        private static Result<User> Create(UserParams userParams)
+        /*private static Result<User> Create(UserParams userParams)
         {
-           var validator = new UserCreateValidator();
-           var validationResult = validator.Validate(userParams);
+            var validator = new UserCreateValidator();
+            var validationResult = validator.Validate(userParams);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors
@@ -62,7 +64,7 @@ namespace Domain.SeedWork
 
             }
             return Result.Ok(new User(userParams));
-        }
+        }*/
     }
 }
 

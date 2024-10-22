@@ -1,5 +1,7 @@
-using Domain.Doctors;
+using Domain.Appointments;
 using Domain.SeedWork;
+using Domain.Users.Doctors;
+using Domain.Validation;
 using FluentResults;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,26 +10,26 @@ namespace Domain.MedicalProcedures
 {
     public class MedicalProcedure : IAgregateRoot
     {
+        public MedicalProcedureId Id { get; private set; }
+
         private readonly List<Doctor> _doctors;
 
-        public int Id { get; private set; }
-
-        [Required(ErrorMessage = "Procedure type is required.")]
+        private readonly List<Appointment> _appointments;
         public MedicalProcedureType Type { get; private set; }
 
         public decimal Price { get; private set; }
 
-
-        [Required(ErrorMessage = "Duration is required.")]
         public TimeSpan Duration { get; private set; }
 
         public IReadOnlyCollection<Doctor> Doctors => _doctors.AsReadOnly();
+        public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
-        private MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration)
+        private MedicalProcedure() { }
+        private MedicalProcedure(MedicalProcedureParams mpParams)
         {
-            Type = type;
-            Price = price;
-            Duration = duration;
+            Type = mpParams.Type;
+            Price = mpParams.Price;
+            Duration = mpParams.Duration;   
             _doctors = new List<Doctor>();
         }
 
@@ -73,15 +75,19 @@ namespace Domain.MedicalProcedures
             return Result.Ok();
         }
 
-        public static Result<MedicalProcedure> Create(MedicalProcedureType type, decimal price, TimeSpan duration)
+        public static Result<MedicalProcedure> Create(MedicalProcedureParams mpParams)
         {
-            if (price <= 0)
-                return Result.Fail(new FluentResults.Error("Price must be greater than zero."));
+            var mpValidator = new MedicalProcedureCreateValidator();
+            var mpValidationResult = mpValidator.Validate(mpParams);
+            if (!mpValidationResult.IsValid)
+            {
+                var errors = mpValidationResult.Errors
+                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .ToList();
+                return Result.Fail(errors);
+            }
 
-            if (duration <= TimeSpan.Zero)
-                return Result.Fail(new FluentResults.Error("Duration must be a positive value."));
-
-            return Result.Ok(new MedicalProcedure(type, price, duration));
+            return Result.Ok(new MedicalProcedure(mpParams));
         }
     }
 }

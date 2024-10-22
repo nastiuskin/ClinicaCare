@@ -1,4 +1,4 @@
-﻿namespace Domain.Doctors
+﻿namespace Domain.Users.Doctors
 {
     public enum SpecializationType
     {
