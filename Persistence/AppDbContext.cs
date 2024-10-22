@@ -1,12 +1,10 @@
 ﻿using Domain.Appointments;
-using Domain.Doctors;
 using Domain.MedicalProcedures;
-using Domain.Patients;
-using Domain.SeedWork;
-using Domain.ValueObjects;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Configuration;
-using Persistence.EntityTypeConfiguration;
+using Persistence.Database.Appointments;
+using Persistence.Database.MedicalProcedures;
+using Persistence.Database.Users;
 
 
 namespace Persistence

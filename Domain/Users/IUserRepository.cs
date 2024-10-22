@@ -1,13 +1,13 @@
 ﻿using Domain.Intefraces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Users.Doctors;
+using Domain.Users.Patients;
 
 namespace Domain.Users
 {
     public interface IUserRepository : IBaseRepository<User>
     {
+        public Task<User?> GetByIdAsync(UserId id);
+        public Task<IEnumerable<Doctor>> GetAllDoctorsAsync();
+        public Task<IEnumerable<Patient>> GetAllPatientsAsync();
     }
 }
