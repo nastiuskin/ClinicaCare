@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.MedicalProcedures
+namespace Domain.Users
 {
-    public record MedicalProcedureId(Guid Value) : ITypedId;
+    public interface IUserRepository : IBaseRepository<User>
+    {
+    }
 }

@@ -1,10 +1,11 @@
-﻿using Domain.Validation;
+﻿using Domain.SeedWork;
+using Domain.Validation;
 using Domain.ValueObjects;
 using FluentResults;
 using System.ComponentModel.DataAnnotations;
-namespace Domain.SeedWork
+namespace Domain.Users
 {
-    public class User
+    public abstract class User : IAgregateRoot
     {
         public UserId Id { get; private set; }
         public string FirstName { get; private set; }

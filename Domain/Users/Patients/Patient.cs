@@ -1,11 +1,10 @@
 using Domain.Appointments;
-using Domain.SeedWork;
 using Domain.Validation;
 using FluentResults;
 
-namespace Domain.Patients
+namespace Domain.Users.Patients
 {
-    public class Patient : User, IAgregateRoot
+    public class Patient : User
     {
         private readonly List<Appointment> _appointments;
         public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
@@ -20,7 +19,7 @@ namespace Domain.Patients
         public Result AddAppointment(Appointment appointment)
         {
             if (appointment == null)
-                return Result.Fail(new FluentResults.Error("Appointment cannot be null"));
+                return Result.Fail(new Error("Appointment cannot be null"));
 
             _appointments.Add(appointment);
             return Result.Ok();
@@ -33,7 +32,7 @@ namespace Domain.Patients
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors
-                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .Select(error => new Error(error.ErrorMessage))
                     .ToList();
                 return Result.Fail(errors);
 

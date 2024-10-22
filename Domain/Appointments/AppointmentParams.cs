@@ -1,6 +1,6 @@
-﻿using Domain.Doctors;
-using Domain.MedicalProcedures;
-using Domain.Patients;
+﻿using Domain.MedicalProcedures;
+using Domain.Users.Doctors;
+using Domain.Users.Patients;
 using Domain.ValueObjects;
 
 namespace Domain.Appointments

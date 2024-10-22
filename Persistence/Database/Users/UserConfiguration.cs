@@ -1,11 +1,12 @@
 ﻿using Domain.Appointments;
-using Domain.Doctors;
-using Domain.Patients;
 using Domain.SeedWork;
+using Domain.Users;
+using Domain.Users.Doctors;
+using Domain.Users.Patients;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.Configuration
+namespace Persistence.Database.Users
 {
     public class UserConfiguration : IEntityTypeConfiguration<User>
     {
@@ -46,7 +47,7 @@ namespace Persistence.Configuration
                     .HasColumnName("Email")
                     .IsRequired();
             });
-            
+
         }
     }
 }

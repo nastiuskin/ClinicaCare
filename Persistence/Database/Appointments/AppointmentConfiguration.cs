@@ -1,12 +1,10 @@
 ﻿using Domain.Appointments;
-using Domain.Doctors;
 using Domain.MedicalProcedures;
-using Domain.Patients;
-using Domain.SeedWork;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.Configuration
+namespace Persistence.Database.Appointments
 {
     public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
     {

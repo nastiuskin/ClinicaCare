@@ -1,7 +1,8 @@
-﻿using Domain.Doctors;
-using Domain.MedicalProcedures;
-using Domain.Patients;
+﻿using Domain.MedicalProcedures;
 using Domain.SeedWork;
+using Domain.Users;
+using Domain.Users.Doctors;
+using Domain.Users.Patients;
 using Domain.Validation;
 using Domain.ValueObjects;
 using FluentResults;

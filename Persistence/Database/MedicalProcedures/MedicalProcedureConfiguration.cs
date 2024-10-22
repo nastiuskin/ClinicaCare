@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.EntityTypeConfiguration
+namespace Persistence.Database.MedicalProcedures
 {
     public class MedicalProcedureConfiguration : IEntityTypeConfiguration<MedicalProcedure>
     {
@@ -14,8 +14,8 @@ namespace Persistence.EntityTypeConfiguration
 
             builder.Property(mp => mp.Id)
                 .HasConversion(
-                     medicalProcedureId => medicalProcedureId.Value, 
-                     value => new MedicalProcedureId(value))          
+                     medicalProcedureId => medicalProcedureId.Value,
+                     value => new MedicalProcedureId(value))
                  .IsRequired();
 
             builder.HasMany(mp => mp.Doctors)

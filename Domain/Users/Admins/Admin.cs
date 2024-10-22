@@ -1,8 +1,7 @@
-﻿using Domain.SeedWork;
-using Domain.Validation;
+﻿using Domain.Validation;
 using FluentResults;
 
-namespace Domain.Admins
+namespace Domain.Users.Admins
 {
     public class Admin : User
     {
@@ -16,7 +15,7 @@ namespace Domain.Admins
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors
-                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .Select(error => new Error(error.ErrorMessage))
                     .ToList();
                 return Result.Fail(errors);
 

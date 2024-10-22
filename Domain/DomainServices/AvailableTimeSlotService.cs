@@ -1,5 +1,5 @@
-﻿using Domain.Doctors;
-using Domain.MedicalProcedures;
+﻿using Domain.MedicalProcedures;
+using Domain.Users.Doctors;
 using Domain.ValueObjects;
 using FluentResults;
 

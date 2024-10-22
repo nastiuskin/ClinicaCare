@@ -1,13 +1,12 @@
 ﻿using Domain.Appointments;
 using Domain.MedicalProcedures;
-using Domain.SeedWork;
 using Domain.Validation;
 using Domain.ValueObjects;
 using FluentResults;
 
-namespace Domain.Doctors
+namespace Domain.Users.Doctors
 {
-    public class Doctor : User, IAgregateRoot
+    public class Doctor : User
     {
         private List<Appointment> _appointments;
         private List<MedicalProcedure> _medicalProcedures;
@@ -38,7 +37,7 @@ namespace Domain.Doctors
             if (!userValidationResult.IsValid)
             {
                 var errors = userValidationResult.Errors
-                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .Select(error => new Error(error.ErrorMessage))
                     .ToList();
                 return Result.Fail(errors);
             }
@@ -49,7 +48,7 @@ namespace Domain.Doctors
             if (!doctorValidationResult.IsValid)
             {
                 var errors = doctorValidationResult.Errors
-                    .Select(error => new FluentResults.Error(error.ErrorMessage))
+                    .Select(error => new Error(error.ErrorMessage))
                     .ToList();
                 return Result.Fail(errors);
             }
@@ -60,7 +59,7 @@ namespace Domain.Doctors
         public Result AddAppointment(Appointment appointment)
         {
             if (appointment == null)
-                return Result.Fail(new FluentResults.Error("Appointment cannot be null."));
+                return Result.Fail(new Error("Appointment cannot be null."));
 
             _appointments.Add(appointment);
             return Result.Ok();
@@ -69,7 +68,7 @@ namespace Domain.Doctors
         public Result AddMedicalProcedure(MedicalProcedure medicalProcedure)
         {
             if (medicalProcedure == null)
-                return Result.Fail(new FluentResults.Error("Medical procedure cannot be null."));
+                return Result.Fail(new Error("Medical procedure cannot be null."));
 
             _medicalProcedures.Add(medicalProcedure);
             return Result.Ok();

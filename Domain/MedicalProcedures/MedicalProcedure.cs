@@ -1,6 +1,6 @@
 using Domain.Appointments;
-using Domain.Doctors;
 using Domain.SeedWork;
+using Domain.Users.Doctors;
 using Domain.Validation;
 using FluentResults;
 using System.ComponentModel.DataAnnotations;
