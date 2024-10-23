@@ -43,6 +43,14 @@ namespace Persistence.Database.MedicalProcedures
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<MedicalProcedure>> GetAllAsync(int pageNumber, int pageSize)
+        {
+            return await _context.MedicalProcedures
+                .Skip((pageNumber - 1)* pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<MedicalProcedure>> GetAllByDoctorIdAsync(UserId doctorId)
         {
             return await _context.MedicalProcedures
@@ -51,11 +59,9 @@ namespace Persistence.Database.MedicalProcedures
                 .ToListAsync();
         }
 
-       
-
-       
-
-
-
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _context.MedicalProcedures.CountAsync();
+        }
     }
 }

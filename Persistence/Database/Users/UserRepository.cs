@@ -41,14 +41,34 @@ namespace Persistence.Database.Users
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<IEnumerable<Doctor>> GetAllDoctorsAsync()
+        public async Task<IEnumerable<Doctor>> GetAllDoctorsAsync(int pageNumber, int pageSize)
         {
-            return await _context.Users.OfType<Doctor>().ToListAsync();
+            return await _context.Users
+                .OfType<Doctor>()
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<Patient>> GetAllPatientsAsync()
+        public async Task<IEnumerable<Patient>> GetAllPatientsAsync(int pageNumber, int pageSize)
         {
-            return await _context.Users.OfType<Patient>().ToListAsync();
+            return await _context.Users.OfType<Patient>()
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetAllAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Users
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _context.Users.CountAsync();
         }
     }
 }

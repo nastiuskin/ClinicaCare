@@ -57,7 +57,6 @@ namespace Domain.Appointments
             return Result.Ok();
         }
 
-
         public static Result<Appointment> Create(AppointmentParams appointmentParams)
         {
             var validator = new AppointmentCreateValidator();

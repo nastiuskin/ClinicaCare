@@ -17,22 +17,32 @@ namespace Persistence.Database.Appointments
             _context.Appointments.Add(entity);
             await _context.SaveChangesAsync();
         }
-         
+
         public async Task<Appointment?> GetByIdAsync(AppointmentId id)
         {
             return await _context.Appointments
                 .SingleOrDefaultAsync(a => a.Id == id);
         }
 
+        //maybe to return the id???
         public async Task DeleteAsync(Appointment entity)
         {
-           _context.Appointments.Remove(entity);
+            _context.Appointments.Remove(entity);
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Appointment>> GetAllAsync()
         {
-           return await _context.Appointments.ToListAsync();
+            return await _context.Appointments
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Appointment>> GetAllAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Appointments
+                 .Skip((pageNumber - 1) * pageSize)
+                 .Take(pageSize)
+                 .ToListAsync();
         }
 
         public async Task UpdateAsync(Appointment entity)
@@ -41,25 +51,36 @@ namespace Persistence.Database.Appointments
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Appointment>> GetAllByDoctorIdAsync(UserId doctorId)
+        public async Task<IEnumerable<Appointment>> GetAllByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
         {
             return await _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Appointment>> GetAllByPatientIdAsync(UserId patientId)
+        public async Task<IEnumerable<Appointment>> GetAllByPatientIdAsync(UserId patientId, int pageNumber, int pageSize)
         {
             return await _context.Appointments
                 .Where(a => a.PatientId == patientId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Appointment>> GetAllByMedicalProcedureIdAsync(MedicalProcedureId id)
+        public async Task<IEnumerable<Appointment>> GetAllByMedicalProcedureIdAsync(MedicalProcedureId id, int pageNumber, int pageSize)
         {
             return await _context.Appointments
                 .Where(a => a.MedicalProcedureId == id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _context.Appointments.CountAsync();
         }
     }
 }

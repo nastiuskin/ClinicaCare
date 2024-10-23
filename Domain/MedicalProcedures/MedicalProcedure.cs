@@ -3,8 +3,6 @@ using Domain.SeedWork;
 using Domain.Users.Doctors;
 using Domain.Validation;
 using FluentResults;
-using System.ComponentModel.DataAnnotations;
-
 
 namespace Domain.MedicalProcedures
 {
@@ -56,7 +54,7 @@ namespace Domain.MedicalProcedures
             _doctors.Remove(doctor);
             return Result.Ok();
         }
-
+    
         public Result UpdatePrice(decimal newPrice)
         {
             if (newPrice <= 0)

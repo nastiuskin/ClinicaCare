@@ -4,9 +4,11 @@ namespace Domain.Intefraces
 {
     public interface IBaseRepository<T> where T : IAgregateRoot
     {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task AddAsync(T entity);
-        Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
+        public Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize);
+        public Task<IEnumerable<T>> GetAllAsync();
+        public Task AddAsync(T entity);
+        public Task UpdateAsync(T entity);
+        public Task DeleteAsync(T entity);
+        public Task<int> GetTotalCountAsync();
     }
 }

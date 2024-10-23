@@ -2,8 +2,9 @@
 {
     public enum MedicalProcedureType
     {
-        CONSULTATION,
-        DIAGNOSTICS,
-        SURGERY
+        CONSULTATION = 0,
+        DIAGNOSTICS = 1,
+        SURGERY = 2,
+        THERAPY = 3
     }
 }

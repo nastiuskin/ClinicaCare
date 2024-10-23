@@ -1,7 +1,9 @@
 ﻿namespace Domain.SeedWork
 {
-    internal interface IBusinessRule
+    public interface IBusinessRule
     {
+        bool IsBroken();
+        string Message { get; }
 
     }
 }
