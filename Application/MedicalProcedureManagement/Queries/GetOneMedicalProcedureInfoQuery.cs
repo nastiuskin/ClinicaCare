@@ -1,5 +1,6 @@
 ﻿using Application.Configuration.Queries;
-using Application.MedicalProcedureManagement.Queries.QueryObjects;
+using Application.MedicalProcedureManagement.DTO;
+using Application.SeedOfWork;
 using AutoMapper;
 using Domain.MedicalProcedures;
 using FluentResults;
@@ -23,7 +24,7 @@ namespace Application.MedicalProcedureManagement.Queries
         public async Task<Result<MedicalProcedureInfoDto>> Handle(GetOneMedicalProcedureInfoQuery query, CancellationToken cancellation)
         {
             var medicalProcedure = await _medicalProcedureRepository.GetByIdAsync(new MedicalProcedureId(query.Id));
-            if (medicalProcedure == null) return Result.Fail("Medical Procedure not found");
+            if (medicalProcedure == null) return Result.Fail(RequestError.NotFound(query.Id));
 
             var medicalProcedureDto = _mapper.Map<MedicalProcedureInfoDto>(medicalProcedure);
 

@@ -25,6 +25,11 @@ namespace Persistence.Database.MedicalProcedures
                 .SingleOrDefaultAsync(mp => mp.Id == id);
         }
 
+        public async Task<MedicalProcedure?> GetByNameAsync(string name)
+        {
+            return await _context.MedicalProcedures.SingleOrDefaultAsync(mp => mp.Name == name);
+        }
+
         public async Task UpdateAsync(MedicalProcedure entity)
         {
             _context.MedicalProcedures.Update(entity);
@@ -51,6 +56,13 @@ namespace Persistence.Database.MedicalProcedures
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<MedicalProcedure>> GetAllByTypeAsync(MedicalProcedureType type)
+        {
+            return await _context.MedicalProcedures
+                .Where(mp => mp.Type == type)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<MedicalProcedure>> GetAllByDoctorIdAsync(UserId doctorId)
         {
             return await _context.MedicalProcedures
@@ -63,5 +75,5 @@ namespace Persistence.Database.MedicalProcedures
         {
             return await _context.MedicalProcedures.CountAsync();
         }
-    }
+}
 }
