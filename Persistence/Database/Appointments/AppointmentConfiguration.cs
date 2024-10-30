@@ -20,7 +20,8 @@ namespace Persistence.Database.Appointments
 
             builder.Property(a => a.DoctorId)
            .HasConversion(doctorId => doctorId.Value,
-                          value => new UserId(value));
+                          value => new UserId(value))
+           .IsRequired();
 
             builder.HasOne(a => a.Doctor)
              .WithMany(d => d.Appointments)
@@ -28,7 +29,8 @@ namespace Persistence.Database.Appointments
 
             builder.Property(a => a.PatientId)
             .HasConversion(patientId => patientId.Value,
-                           value => new UserId(value));
+                           value => new UserId(value))
+            .IsRequired();
 
             builder.HasOne(a => a.Patient)
                 .WithMany(p => p.Appointments)
@@ -36,22 +38,26 @@ namespace Persistence.Database.Appointments
 
             builder.Property(a => a.MedicalProcedureId)
             .HasConversion(medicalProcedureId => medicalProcedureId.Value,
-                           value => new MedicalProcedureId(value));
+                           value => new MedicalProcedureId(value))
+            .IsRequired();
 
             builder.HasOne(a => a.MedicalProcedure)
                 .WithMany(mp => mp.Appointments)
                 .HasForeignKey(a => a.MedicalProcedureId);
 
-            builder.OwnsOne(a => a.AppointmentDateTime, ts =>
-            {
-                ts.Property(ts => ts.StartTime)
-                .HasColumnName("StartTime")
-                .IsRequired();
+            //builder.OwnsOne(a => a.AppointmentDateTime, ts =>
+            //{
+            //    ts.Property(ts => ts.StartTime)
+            //    .HasColumnName("StartTime")
+            //    .IsRequired();
 
-                ts.Property(ts => ts.EndTime)
-                .HasColumnName("EndTime")
+            //    ts.Property(ts => ts.EndTime)
+            //    .HasColumnName("EndTime")
+            //    .IsRequired();
+            //});
+
+            builder.Property(a => a.AppointmentDateTime)
                 .IsRequired();
-            });
 
             builder.Property(a => a.Status)
                 .IsRequired()

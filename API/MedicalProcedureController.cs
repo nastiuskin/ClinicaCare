@@ -18,13 +18,13 @@ namespace API.MedicalProcedures
 
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateMedicalProcedure([FromBody] MedicalProcedureFormDto procedureDto)
         {
             var result = await _mediator.Send(new CreateMedicalProcedureCommand(procedureDto));
             if (result.IsSuccess)
-                return CreatedAtAction(nameof(CreateMedicalProcedure), result.Value);
+                return Ok();
             return BadRequest(result.Errors);
         }
 
@@ -32,7 +32,7 @@ namespace API.MedicalProcedures
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetInfoById(Guid id)
         {
             var result = await _mediator.Send(new GetOneMedicalProcedureInfoQuery(id));
 
@@ -41,18 +41,17 @@ namespace API.MedicalProcedures
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllMedicalProceduresInfo()
         {
             var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery());
             if (result.IsSuccess) return Ok(result.Value);
-            return NotFound();
+            return BadRequest();
         }
 
         [HttpGet]
-        [Route("by-type/{type}")] //i do not like it
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Route("by-type/{type}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetMedicalProceduresByType(MedicalProcedureType type)
@@ -61,7 +60,7 @@ namespace API.MedicalProcedures
             if (result.IsSuccess) return Ok(result.Value);
 
             if (result.Errors.Any()) return BadRequest(result.Errors);
-            return NotFound();
+            return BadRequest();
         }
 
         [HttpPut]
@@ -69,7 +68,7 @@ namespace API.MedicalProcedures
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateMedicalProcedure(Guid id, [FromBody] MedicalProcedureFormDto updateMedicalProcedureDto)
+        public async Task<IActionResult> UpdateMedicalProcedure(Guid id, [FromBody] MedicalProcedureUpdateDto updateMedicalProcedureDto)
         {
             var result = await _mediator.Send(new UpdateMedicalProcedureCommand(id, updateMedicalProcedureDto));
 
@@ -93,6 +92,16 @@ namespace API.MedicalProcedures
             return NotFound();
         }
 
+        [HttpPost]
+        [Route("{medicalId}/assign-doctor/{doctorId}")]
+        public async Task<IActionResult> AssignDoctorToMedicalProcedure(Guid medicalId, Guid doctorId)
+        {
+            var result = await _mediator.Send(new AddDoctorToMedicalProcedureCommand(medicalId, doctorId));
+            if (result.IsSuccess) return Ok();
+
+            if (result.Errors.Any()) return BadRequest(result.Errors);
+            return BadRequest();
+        }
 
     }
 }

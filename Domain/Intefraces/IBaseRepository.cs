@@ -2,7 +2,7 @@
 
 namespace Domain.Intefraces
 {
-    public interface IBaseRepository<T> where T : IAgregateRoot
+    public interface IBaseRepository<T> where T : IAggregateRoot
     {
         public Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize);
         public Task<IEnumerable<T>> GetAllAsync();

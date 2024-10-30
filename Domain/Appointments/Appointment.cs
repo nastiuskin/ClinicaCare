@@ -1,18 +1,17 @@
-﻿using Domain.MedicalProcedures;
+﻿using Domain.Appointments.Rules;
+using Domain.MedicalProcedures;
 using Domain.SeedWork;
 using Domain.Users;
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
-using Domain.Validation;
-using Domain.ValueObjects;
 using FluentResults;
 
 namespace Domain.Appointments
 {
-    public class Appointment : IAgregateRoot
+    public class Appointment : IAggregateRoot
     {
         public AppointmentId Id { get; private set; }
-        
+
         public UserId DoctorId { get; private set; }
         public Doctor Doctor { get; private set; }
 
@@ -21,31 +20,29 @@ namespace Domain.Appointments
 
         public MedicalProcedureId MedicalProcedureId { get; private set; }
         public MedicalProcedure MedicalProcedure { get; private set; }
-        public TimeSlot AppointmentDateTime { get; private set; }
+        public DateTime AppointmentDateTime { get; private set; }
         public AppointmentStatus Status { get; private set; }
         public string DoctorFeedback { get; private set; }
 
         private Appointment() { }
 
-        private Appointment(AppointmentParams appointmentParams)
+        private Appointment(UserId doctorId, UserId patientId,
+            MedicalProcedureId medicalProcedureId, DateTime appointmentDateTime)
         {
-            Doctor = appointmentParams.Doctor;
-            Patient = appointmentParams.Patient;
-            MedicalProcedure = appointmentParams.MedicalProcedure;
+            Id = new AppointmentId(Guid.NewGuid());
+            DoctorId = doctorId;
+            PatientId = patientId;
+            MedicalProcedureId = medicalProcedureId;
 
-            AppointmentDateTime = appointmentParams.AppointmentDateTime;
+            AppointmentDateTime = appointmentDateTime;
             Status = AppointmentStatus.SCHEDULED;
             DoctorFeedback = string.Empty;
         }
 
-        //To create Bussiness Rule for this
         public Result AddFeedback(string feedback)
         {
-            if (Status != AppointmentStatus.COMPLETED)
-                return Result.Fail(new FluentResults.Error("Feedback can only be added after the appointment is completed."));
-
-            if (string.IsNullOrWhiteSpace(feedback))
-                return Result.Fail(new FluentResults.Error("Feedback cannot be empty."));
+            var ruleResult = CheckRule(new FeedbackCanBeAddedOnlyIfStatusIsCompletedRule(this));
+            if (ruleResult.IsFailed) return ruleResult;
 
             DoctorFeedback = feedback;
             return Result.Ok();
@@ -57,20 +54,19 @@ namespace Domain.Appointments
             return Result.Ok();
         }
 
-        public static Result<Appointment> Create(AppointmentParams appointmentParams)
+        public static Result<Appointment> Create(UserId doctorId, UserId patientId,
+            MedicalProcedureId medicalProcedureId, DateTime appointmentDateTime)
         {
-            var validator = new AppointmentCreateValidator();
-            var appointmentValidatorResult = validator.Validate(appointmentParams);
+            return Result.Ok(new Appointment(doctorId, patientId, medicalProcedureId, appointmentDateTime));
+        }
 
-            if (!appointmentValidatorResult.IsValid)
+        public Result CheckRule(IBusinessRule rule)
+        {
+            if (rule.IsBroken())
             {
-                var errors = appointmentValidatorResult.Errors
-                    .Select(error => new FluentResults.Error(error.ErrorMessage))
-                    .ToList();
-                return Result.Fail(errors);
+                return Result.Fail(rule.Message);
             }
-
-            return Result.Ok(new Appointment(appointmentParams));
+            return Result.Ok();
         }
     }
 }

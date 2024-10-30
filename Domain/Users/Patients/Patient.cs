@@ -1,5 +1,4 @@
 using Domain.Appointments;
-using Domain.Validation;
 using FluentResults;
 
 namespace Domain.Users.Patients
@@ -25,18 +24,8 @@ namespace Domain.Users.Patients
             return Result.Ok();
         }
 
-        public Result<Patient> Create(UserParams patientParams)
-        {
-            var validator = new UserCreateValidator();
-            var validationResult = validator.Validate(patientParams);
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors
-                    .Select(error => new Error(error.ErrorMessage))
-                    .ToList();
-                return Result.Fail(errors);
-
-            }
+        public static Result<Patient> Create(UserParams patientParams)
+        { 
             return Result.Ok(new Patient(patientParams));
         }
 

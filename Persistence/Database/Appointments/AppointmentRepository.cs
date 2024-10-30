@@ -21,10 +21,9 @@ namespace Persistence.Database.Appointments
         public async Task<Appointment?> GetByIdAsync(AppointmentId id)
         {
             return await _context.Appointments
-                .SingleOrDefaultAsync(a => a.Id == id);
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        //maybe to return the id???
         public async Task DeleteAsync(Appointment entity)
         {
             _context.Appointments.Remove(entity);

@@ -12,7 +12,22 @@ namespace Application.MedicalProcedureManagement
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value));
 
             CreateMap<MedicalProcedureFormDto, MedicalProcedure>()
+                .ForMember(dest => dest.Doctors, opt => opt.Ignore())
+                //.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                //.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
+                //.ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
                 .ConstructUsing(src => MedicalProcedure.Create(src.Type, src.Price, TimeSpan.Parse(src.Duration + ":00"), src.Name).Value);
+
+            CreateMap<MedicalProcedureUpdateDto, MedicalProcedure>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type));
+
+            CreateMap<MedicalProcedure, MedicalProcedureInfoWithDoctorsDto>()
+               .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
+               .ForMember(dest => dest.Doctors, opt => opt.MapFrom(src => src.Doctors));
+
         }
     }
 }

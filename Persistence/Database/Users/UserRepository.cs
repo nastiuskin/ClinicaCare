@@ -24,6 +24,11 @@ namespace Persistence.Database.Users
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email.Value.Equals(email));
+        }
+
         public async Task DeleteAsync(User entity)
         {
             _context.Users.Remove(entity);
@@ -47,6 +52,20 @@ namespace Persistence.Database.Users
                 .OfType<Doctor>()
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Doctor>> GetAllDoctorsAsync()
+        {
+            return await _context.Users
+                .OfType<Doctor>()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Patient>> GetAllPatientsAsync()
+        {
+            return await _context.Users
+                .OfType<Patient>()
                 .ToListAsync();
         }
 

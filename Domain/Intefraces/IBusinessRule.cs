@@ -4,6 +4,5 @@
     {
         bool IsBroken();
         string Message { get; }
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using Domain.Appointments;
-using Domain.SeedWork;
-using Domain.Users;
+﻿using Domain.Users;
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
 using Microsoft.EntityFrameworkCore;

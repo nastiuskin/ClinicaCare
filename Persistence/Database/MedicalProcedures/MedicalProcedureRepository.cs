@@ -22,12 +22,27 @@ namespace Persistence.Database.MedicalProcedures
         public async Task<MedicalProcedure?> GetByIdAsync(MedicalProcedureId id)
         {
             return await _context.MedicalProcedures
-                .SingleOrDefaultAsync(mp => mp.Id == id);
+                .FirstOrDefaultAsync(mp => mp.Id == id);
+        }
+
+        public async Task<MedicalProcedure?> GetByIdWithDoctorsAsync(MedicalProcedureId id)
+        {
+            return await _context.MedicalProcedures
+                .Include(mp => mp.Doctors)
+                .FirstOrDefaultAsync(mp => mp.Id == id);
+        }
+
+        public async Task<MedicalProcedure?> GetByIdWithDoctorsAndAppointmentsAsync(MedicalProcedureId id)
+        {
+            return await _context.MedicalProcedures
+                    .Include(mp => mp.Doctors)
+                    .Include(mp => mp.Appointments)
+                    .FirstOrDefaultAsync(mp => mp.Id == id);
         }
 
         public async Task<MedicalProcedure?> GetByNameAsync(string name)
         {
-            return await _context.MedicalProcedures.SingleOrDefaultAsync(mp => mp.Name == name);
+            return await _context.MedicalProcedures.FirstOrDefaultAsync(mp => mp.Name == name);
         }
 
         public async Task UpdateAsync(MedicalProcedure entity)

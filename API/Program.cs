@@ -17,11 +17,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateMedicalProcedureCommand).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateMedicalProcedureCommandHandler).Assembly));
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
 
-builder.Services.AddValidatorsFromAssembly(typeof(MedicalProcedureCreateValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(MedicalProcedureCreateDtoValidator).Assembly);
 
 
 builder.Services.AddScoped<IMedicalProcedureRepository, MedicalProcedureRepository>();

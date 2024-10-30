@@ -1,4 +1,5 @@
 ﻿namespace Domain.Intefraces
 {
-    public interface ITypedId { }
+    public interface ITypedId 
+    { }
 }

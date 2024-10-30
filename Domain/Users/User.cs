@@ -1,20 +1,15 @@
 ﻿using Domain.SeedWork;
-using Domain.Validation;
 using Domain.ValueObjects;
 using FluentResults;
-using System.ComponentModel.DataAnnotations;
 namespace Domain.Users
 {
-    public abstract class User : IAgregateRoot
+    public abstract class User : IAggregateRoot
     {
         public UserId Id { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
 
-
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime DateOfBirth { get; private set; }
-
+        public DateOnly DateOfBirth { get; private set; }
 
         public Email Email { get; private set; }
 
@@ -23,10 +18,11 @@ namespace Domain.Users
 
         protected User(UserParams user)
         {
+            Id = new UserId(Guid.NewGuid());
             FirstName = user.FirstName;
             LastName = user.LastName;
-            Email = user.Email;
-            PhoneNumber = user.PhoneNumber;
+            Email = Email.Create(user.Email).Value;
+            PhoneNumber = PhoneNumber.Create(user.PhoneNumber).Value;
             DateOfBirth = user.DateOfBirth;
         }
 
@@ -51,23 +47,42 @@ namespace Domain.Users
 
         }
 
-        /*private static Result<User> Create(UserParams userParams)
-        {
-            var validator = new UserCreateValidator();
-            var validationResult = validator.Validate(userParams);
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors
-                    .Select(error => new FluentResults.Error(error.ErrorMessage))
-                    .ToList();
-                return Result.Fail(errors);
+        //public static Result ValidateUserParams(UserParams userParams)
+        //{
+        //    var errors = new List<Error>();
+        //    if (string.IsNullOrWhiteSpace(userParams.FirstName)) errors.Add(new Error("First name cannot be empty."));
 
-            }
-            return Result.Ok(new User(userParams));
-        }*/
+        //    if (string.IsNullOrWhiteSpace(userParams.LastName)) errors.Add(new Error("Last name cannot be empty."));
+
+        //    // Validate email
+        //    var emailValidationResult = Email.Create(userParams.Email);
+        //    if (emailValidationResult.IsFailed) errors.AddRange((IEnumerable<Error>)emailValidationResult.Errors);
+
+        //    //Validate PhoneNumber
+        //    var phoneNumberValidationResult = PhoneNumber.Create(userParams.PhoneNumber);
+        //    if (phoneNumberValidationResult.IsFailed) errors.AddRange((IEnumerable<Error>)phoneNumberValidationResult.Errors);
+
+        //    return errors.Count > 0 ? Result.Fail(errors) : Result.Ok();
+        //}
+
+
+        //private static Result<User> Create(UserParams userParams)
+        //{
+        //    var validator = new UserCreateValidator();
+        //    var validationResult = validator.Validate(userParams);
+        //    if (!validationResult.IsValid)
+        //    {
+        //        var errors = validationResult.Errors
+        //            .Select(error => new FluentResults.Error(error.ErrorMessage))
+        //            .ToList();
+        //        return Result.Fail(errors);
+
+        //    }
+        //    return Result.Ok(new User(userParams));
+        //}
+
     }
+
 }
-
-
 
 

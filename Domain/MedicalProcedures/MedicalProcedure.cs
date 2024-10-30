@@ -11,32 +11,28 @@ namespace Domain.MedicalProcedures
 
         public string Name { get; private set; }
 
-        private readonly List<Doctor?> _doctors;
+        private readonly List<Doctor> _doctors;
 
-        private readonly List<Appointment?> _appointments;
+        private readonly List<Appointment> _appointments;
         public MedicalProcedureType Type { get; private set; }
 
         public decimal Price { get; private set; }
 
         public TimeSpan Duration { get; private set; }
 
-        public IReadOnlyCollection<Doctor?> Doctors => _doctors.AsReadOnly();
-        public IReadOnlyCollection<Appointment?> Appointments => _appointments.AsReadOnly();
+        public IReadOnlyCollection<Doctor> Doctors => _doctors.AsReadOnly();
+        public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
-        private MedicalProcedure()
-        {
-            _doctors = new List<Doctor?>();
-            _appointments = new List<Appointment?>();
-        }
+        private MedicalProcedure() { }
         private MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration, string name)
         {
-            Id = new MedicalProcedureId(Guid.NewGuid()); //??
+            Id = new MedicalProcedureId(Guid.NewGuid());
             Name = name;
             Type = type;
             Price = price;
             Duration = duration;
-            _doctors = new List<Doctor?>();
-            _appointments = new List<Appointment?>();
+            _doctors = new List<Doctor>();
+            _appointments = new List<Appointment>();
         }
 
         public Result AssignDoctor(Doctor doctor)
@@ -80,7 +76,8 @@ namespace Domain.MedicalProcedures
             return Result.Ok();
         }
 
-        public static Result<MedicalProcedure> Create(MedicalProcedureType type, decimal price, TimeSpan duration, string name)
+        public static Result<MedicalProcedure> Create(MedicalProcedureType type, decimal price,
+            TimeSpan duration, string name)
         {
             return Result.Ok(new MedicalProcedure(type, price, duration, name));
         }

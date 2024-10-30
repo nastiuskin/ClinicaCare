@@ -7,5 +7,6 @@ namespace Application.MedicalProcedureManagement.DTO
         public MedicalProcedureType Type { get; set; }
         public string Duration { get; set; }
         public decimal Price { get; set; }
+        public List<Guid> Doctors { get; set; }
     }
 }

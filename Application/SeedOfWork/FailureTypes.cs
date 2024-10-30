@@ -4,6 +4,6 @@
     {
         BUSSINESS_RULE,
         NOT_FOUND,
-        DUBLICATE
+        DUBLICATED
     }
 }
