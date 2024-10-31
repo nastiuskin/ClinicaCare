@@ -4,7 +4,6 @@ using Application.SeedOfWork;
 using AutoMapper;
 using Domain.MedicalProcedures;
 using Domain.Users;
-using Domain.Users.Doctors;
 using FluentResults;
 using FluentValidation;
 
@@ -50,30 +49,20 @@ namespace Application.MedicalProcedureManagement.Commands.Update
 
             _mapper.Map(command.MedicalProcedureUpdateDto, medicalProcedure);
 
-            var doctorsToAdd = command.MedicalProcedureUpdateDto.DoctorsToAdd;
-            if (doctorsToAdd != null && doctorsToAdd.Count > 0)
+            if (command.MedicalProcedureUpdateDto.DoctorsToAdd?.Any() == true)
             {
-                foreach (var doctorId in doctorsToAdd)
-                {
-                    var doctor = await _userRepository.GetByIdAsync(new UserId(doctorId));
-                    if (doctor == null || doctor is not Doctor) continue;
+                var doctorsToAdd = await _userRepository.GetListOfDoctorsByIdsAsync(
+                    command.MedicalProcedureUpdateDto.DoctorsToAdd.Select(id => new UserId(id)).ToList());
 
-                    var assignDoctorResult = medicalProcedure.AssignDoctor((Doctor)doctor);
-                    if (assignDoctorResult.IsFailed) continue;
-                }
+                doctorsToAdd.ToList().ForEach(doctor => medicalProcedure.AssignDoctor(doctor));
             }
 
-            var doctorsToRemove = command.MedicalProcedureUpdateDto.DoctorsToRemove;
-            if (doctorsToRemove != null && doctorsToRemove.Count > 0)
+            if (command.MedicalProcedureUpdateDto.DoctorsToRemove?.Any() == true)
             {
-                foreach (var doctorId in doctorsToRemove)
-                {
-                    var doctor = await _userRepository.GetByIdAsync(new UserId(doctorId));
-                    if (doctor == null || doctor is not Doctor) continue;
+                var doctorsToRemove = await _userRepository.GetListOfDoctorsByIdsAsync(
+                    command.MedicalProcedureUpdateDto.DoctorsToRemove.Select(id => new UserId(id)).ToList());
 
-                    var assignDoctorResult = medicalProcedure.RemoveDoctor((Doctor)doctor);
-                    if (assignDoctorResult.IsFailed) continue;
-                }
+                doctorsToRemove.ToList().ForEach(doctor => medicalProcedure.RemoveDoctor(doctor));
             }
             await _medicalProcedureRepository.UpdateAsync(medicalProcedure);
 

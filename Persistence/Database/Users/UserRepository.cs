@@ -2,6 +2,7 @@
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Persistence.Database.Users
 {
@@ -88,6 +89,14 @@ namespace Persistence.Database.Users
         public async Task<int> GetTotalCountAsync()
         {
             return await _context.Users.CountAsync();
+        }
+
+        public async Task<IEnumerable<Doctor>> GetListOfDoctorsByIdsAsync(List<UserId> doctors)
+        {
+            return await _context.Users
+            .OfType<Doctor>()
+            .Where(d => doctors.Contains(d.Id))
+            .ToListAsync();
         }
     }
 }

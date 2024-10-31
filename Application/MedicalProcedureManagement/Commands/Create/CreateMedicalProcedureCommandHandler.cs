@@ -4,7 +4,6 @@ using Application.SeedOfWork;
 using AutoMapper;
 using Domain.MedicalProcedures;
 using Domain.Users;
-using Domain.Users.Doctors;
 using FluentResults;
 using FluentValidation;
 
@@ -42,27 +41,18 @@ namespace Application.MedicalProcedureManagement.Commands.Create
                 return Result.Fail(errors);
             }
 
-            var existingMedicalProcedure = await _medicalProcedureRepository
-                .GetByNameAsync(command.MedicalProcedureCreateDto.Name);
-
-            if (existingMedicalProcedure != null)
-                return Result.Fail(ResponseError.Dublicated(nameof(existingMedicalProcedure)).Message);
+            if (await _medicalProcedureRepository.GetByNameAsync(command.MedicalProcedureCreateDto.Name) != null)
+                return Result.Fail(ResponseError.Dublicated(nameof(command.MedicalProcedureCreateDto.Name)).Message);
 
             var medicalProcedure = _mapper.Map<MedicalProcedure>(command.MedicalProcedureCreateDto);
 
-            var doctors = command.MedicalProcedureCreateDto.Doctors;
-            if (doctors != null && doctors.Count > 0)
+            if (command.MedicalProcedureCreateDto.Doctors?.Any() == true)
             {
-                foreach (var doctorId in doctors)
-                {
-                    var doctor = await _userRepository.GetByIdAsync(new UserId(doctorId));
-                    if (doctor == null || doctor is not Doctor) continue;
+                var doctorIds = command.MedicalProcedureCreateDto.Doctors.Select(id => new UserId(id)).ToList();
+                var doctors = await _userRepository.GetListOfDoctorsByIdsAsync(doctorIds);
 
-                    var assignDoctorResult = medicalProcedure.AssignDoctor((Doctor)doctor);
-                    if (assignDoctorResult.IsFailed) continue;
-                }
+                doctors.ToList().ForEach(doctor => medicalProcedure.AssignDoctor(doctor));
             }
-
             await _medicalProcedureRepository.AddAsync(medicalProcedure);
             return Result.Ok();
         }

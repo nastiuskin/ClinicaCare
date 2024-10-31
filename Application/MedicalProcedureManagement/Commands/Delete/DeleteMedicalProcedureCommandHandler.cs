@@ -26,7 +26,7 @@ namespace Application.MedicalProcedureManagement.Commands.Delete
                 return Result.Fail(ResponseError.NotFound(nameof(medicalProcedure), command.id).Message);
 
             await _medicalProcedureRepository.DeleteAsync(medicalProcedure);
-            return Result.Ok(); ;
+            return Result.Ok(); 
         }
     }
 

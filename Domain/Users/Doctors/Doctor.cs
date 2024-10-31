@@ -7,8 +7,9 @@ namespace Domain.Users.Doctors
 {
     public class Doctor : User
     {
-        private readonly List<Appointment> _appointments = new List<Appointment>();
-        private readonly List<MedicalProcedure> _medicalProcedures = new List<MedicalProcedure>();
+        private readonly List<Appointment> _appointments;
+        private readonly List<MedicalProcedure> _medicalProcedures;
+        //public List<MedicalProcedure> MedicalProcedures {  get; private set; }
 
         public TimeSlot WorkingHours { get; private set; }
         public SpecializationType Specialization { get; private set; }
