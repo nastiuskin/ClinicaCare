@@ -35,9 +35,9 @@ namespace API
         [Route("/doctors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllDoctors()
+        public async Task<IActionResult> GetAllDoctors([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
-            var result = await _mediator.Send(new GetAllDoctorsInfoQuery());
+            var result = await _mediator.Send(new GetAllDoctorsInfoQuery(pageNumber, pageSize));
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);
@@ -59,9 +59,9 @@ namespace API
         [Route("/patients")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllPatients()
+        public async Task<IActionResult> GetAllPatients([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
-            var result = await _mediator.Send(new GetAllPatientsInfoQuery());
+            var result = await _mediator.Send(new GetAllPatientsInfoQuery(pageNumber, pageSize));
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);

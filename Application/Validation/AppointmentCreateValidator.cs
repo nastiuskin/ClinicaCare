@@ -17,8 +17,11 @@ namespace Domain.Validation
             RuleFor(appointment => appointment.MedicalProcedureId)
                  .NotNull().WithMessage("Medical Procedure cannot be null.");
 
-            RuleFor(appointment => appointment.AppointmentDateTime)
+            RuleFor(appointment => appointment.Date)
                  .NotNull().WithMessage("Appointment date is required.");
+
+            RuleFor(appointment => appointment.Duration)
+                .NotNull().WithMessage("Appointment duration is required");
         }
     }
 }
