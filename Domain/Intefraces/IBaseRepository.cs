@@ -2,11 +2,12 @@
 
 namespace Domain.Intefraces
 {
-    public interface IBaseRepository<T> where T : IAgregateRoot
+    public interface IBaseRepository<T> where T : IAggregateRoot
     {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task AddAsync(T entity);
-        Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
+        public IQueryable<T> GetAllAsync(int pageNumber, int pageSize);
+        public Task AddAsync(T entity);
+        public Task UpdateAsync(T entity);
+        public Task DeleteAsync(T entity);
+        public Task<int> GetTotalCountAsync();
     }
 }

@@ -1,5 +1,4 @@
-﻿using Domain.SeedWork;
-using Domain.Users.Doctors;
+﻿using Domain.Users.Doctors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

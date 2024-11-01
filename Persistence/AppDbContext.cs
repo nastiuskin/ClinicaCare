@@ -1,12 +1,7 @@
 ﻿using Domain.Appointments;
-using Domain.Doctors;
 using Domain.MedicalProcedures;
-using Domain.Patients;
-using Domain.SeedWork;
-using Domain.ValueObjects;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Configuration;
-using Persistence.EntityTypeConfiguration;
 
 
 namespace Persistence
@@ -23,13 +18,9 @@ namespace Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
-            modelBuilder.ApplyConfiguration(new MedicalProcedureConfiguration());
-            modelBuilder.ApplyConfiguration(new DoctorConfiguration());
-            modelBuilder.ApplyConfiguration(new AppointmentConfiguration());
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
-
-
     }
 
 }

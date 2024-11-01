@@ -42,6 +42,9 @@ namespace Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("AppointmentDateTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("DoctorFeedback")
                         .IsRequired()
                         .HasColumnType("text");
@@ -77,6 +80,10 @@ namespace Persistence.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("interval");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
@@ -85,16 +92,19 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("MedicalProcedures", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.SeedWork.User", b =>
+            modelBuilder.Entity("Domain.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -118,9 +128,9 @@ namespace Persistence.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Domain.Doctors.Doctor", b =>
+            modelBuilder.Entity("Domain.Users.Doctors.Doctor", b =>
                 {
-                    b.HasBaseType("Domain.SeedWork.User");
+                    b.HasBaseType("Domain.Users.User");
 
                     b.Property<string>("Biography")
                         .IsRequired()
@@ -135,16 +145,16 @@ namespace Persistence.Migrations
                     b.HasDiscriminator().HasValue("Doctor");
                 });
 
-            modelBuilder.Entity("Domain.Patients.Patient", b =>
+            modelBuilder.Entity("Domain.Users.Patients.Patient", b =>
                 {
-                    b.HasBaseType("Domain.SeedWork.User");
+                    b.HasBaseType("Domain.Users.User");
 
                     b.HasDiscriminator().HasValue("Patient");
                 });
 
             modelBuilder.Entity("DoctorMedicalProcedure", b =>
                 {
-                    b.HasOne("Domain.Doctors.Doctor", null)
+                    b.HasOne("Domain.Users.Doctors.Doctor", null)
                         .WithMany()
                         .HasForeignKey("DoctorsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -159,7 +169,7 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Appointments.Appointment", b =>
                 {
-                    b.HasOne("Domain.Doctors.Doctor", "Doctor")
+                    b.HasOne("Domain.Users.Doctors.Doctor", "Doctor")
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -171,34 +181,10 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Patients.Patient", "Patient")
+                    b.HasOne("Domain.Users.Patients.Patient", "Patient")
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("Domain.ValueObjects.TimeSlot", "AppointmentDateTime", b1 =>
-                        {
-                            b1.Property<Guid>("AppointmentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<DateTime>("EndTime")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("EndTime");
-
-                            b1.Property<DateTime>("StartTime")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("StartTime");
-
-                            b1.HasKey("AppointmentId");
-
-                            b1.ToTable("Appointments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AppointmentId");
-                        });
-
-                    b.Navigation("AppointmentDateTime")
                         .IsRequired();
 
                     b.Navigation("Doctor");
@@ -208,7 +194,7 @@ namespace Persistence.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("Domain.SeedWork.User", b =>
+            modelBuilder.Entity("Domain.Users.User", b =>
                 {
                     b.OwnsOne("Domain.ValueObjects.Email", "Email", b1 =>
                         {
@@ -253,19 +239,19 @@ namespace Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Doctors.Doctor", b =>
+            modelBuilder.Entity("Domain.Users.Doctors.Doctor", b =>
                 {
                     b.OwnsOne("Domain.ValueObjects.TimeSlot", "WorkingHours", b1 =>
                         {
                             b1.Property<Guid>("DoctorId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<DateTime>("EndTime")
-                                .HasColumnType("timestamp with time zone")
+                            b1.Property<TimeSpan>("EndTime")
+                                .HasColumnType("interval")
                                 .HasColumnName("WorkingEndTime");
 
-                            b1.Property<DateTime>("StartTime")
-                                .HasColumnType("timestamp with time zone")
+                            b1.Property<TimeSpan>("StartTime")
+                                .HasColumnType("interval")
                                 .HasColumnName("WorkingStartTime");
 
                             b1.HasKey("DoctorId");
@@ -285,12 +271,12 @@ namespace Persistence.Migrations
                     b.Navigation("Appointments");
                 });
 
-            modelBuilder.Entity("Domain.Doctors.Doctor", b =>
+            modelBuilder.Entity("Domain.Users.Doctors.Doctor", b =>
                 {
                     b.Navigation("Appointments");
                 });
 
-            modelBuilder.Entity("Domain.Patients.Patient", b =>
+            modelBuilder.Entity("Domain.Users.Patients.Patient", b =>
                 {
                     b.Navigation("Appointments");
                 });

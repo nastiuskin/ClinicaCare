@@ -16,7 +16,7 @@ namespace Domain.ValueObjects
             if (string.IsNullOrWhiteSpace(phoneNumber))
                 return Result.Fail<PhoneNumber>("Phone number is required.");
 
-            if (!Regex.IsMatch(phoneNumber, @"^\+?[1-9]\d{1,14}$"))
+            if (!Regex.IsMatch(phoneNumber, @"^\+373\d{8}$"))
                 return Result.Fail<PhoneNumber>("Invalid phone number format.");
 
             return Result.Ok(new PhoneNumber(phoneNumber));

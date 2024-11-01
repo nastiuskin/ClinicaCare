@@ -1,6 +1,4 @@
-﻿using Domain.ValueObjects;
-
-namespace Domain.Users.Doctors
+﻿namespace Domain.Users.Doctors
 {
-    public record DoctorParams(SpecializationType Specialization, string Biography, int CabinetNumber, TimeSlot WorkingHours);
+    public record DoctorParams(SpecializationType Specialization, string Biography, int CabinetNumber, TimeSpan WorkingHoursStart, TimeSpan WorkingHoursEnd);
 }

@@ -1,16 +1,15 @@
 using Domain.Appointments;
 using Domain.SeedWork;
 using Domain.Users.Doctors;
-using Domain.Validation;
 using FluentResults;
-using System.ComponentModel.DataAnnotations;
-
 
 namespace Domain.MedicalProcedures
 {
-    public class MedicalProcedure : IAgregateRoot
+    public class MedicalProcedure : IAggregateRoot
     {
         public MedicalProcedureId Id { get; private set; }
+
+        public string Name { get; private set; }
 
         private readonly List<Doctor> _doctors;
 
@@ -25,12 +24,15 @@ namespace Domain.MedicalProcedures
         public IReadOnlyCollection<Appointment> Appointments => _appointments.AsReadOnly();
 
         private MedicalProcedure() { }
-        private MedicalProcedure(MedicalProcedureParams mpParams)
+        private MedicalProcedure(MedicalProcedureType type, decimal price, TimeSpan duration, string name)
         {
-            Type = mpParams.Type;
-            Price = mpParams.Price;
-            Duration = mpParams.Duration;   
+            Id = new MedicalProcedureId(Guid.NewGuid());
+            Name = name;
+            Type = type;
+            Price = price;
+            Duration = duration;
             _doctors = new List<Doctor>();
+            _appointments = new List<Appointment>();
         }
 
         public Result AssignDoctor(Doctor doctor)
@@ -70,24 +72,14 @@ namespace Domain.MedicalProcedures
         {
             if (newDuration <= TimeSpan.Zero)
                 return Result.Fail(new FluentResults.Error("Duration must be a positive value"));
-
             Duration = newDuration;
             return Result.Ok();
         }
 
-        public static Result<MedicalProcedure> Create(MedicalProcedureParams mpParams)
+        public static Result<MedicalProcedure> Create(MedicalProcedureType type, decimal price,
+            TimeSpan duration, string name)
         {
-            var mpValidator = new MedicalProcedureCreateValidator();
-            var mpValidationResult = mpValidator.Validate(mpParams);
-            if (!mpValidationResult.IsValid)
-            {
-                var errors = mpValidationResult.Errors
-                    .Select(error => new FluentResults.Error(error.ErrorMessage))
-                    .ToList();
-                return Result.Fail(errors);
-            }
-
-            return Result.Ok(new MedicalProcedure(mpParams));
+            return Result.Ok(new MedicalProcedure(type, price, duration, name));
         }
     }
 }

@@ -4,6 +4,7 @@
     {
         CONSULTATION,
         DIAGNOSTICS,
-        SURGERY
+        SURGERY,
+        THERAPY
     }
 }
