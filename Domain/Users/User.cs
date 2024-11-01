@@ -23,7 +23,6 @@ namespace Domain.Users
 
         protected User(UserParams user)
         {
-            //coment
             FirstName = user.FirstName;
             LastName = user.LastName;
             Email = user.Email;
