@@ -9,8 +9,8 @@ namespace Domain.MedicalProcedures
         public Task<MedicalProcedure?> GetByIdWithDoctorsAsync(MedicalProcedureId id);
         public Task<MedicalProcedure?> GetByIdWithDoctorsAndAppointmentsAsync(MedicalProcedureId id);
         public Task<MedicalProcedure?> GetByNameAsync(string name);
-        public Task<IEnumerable<MedicalProcedure>> GetAllByDoctorIdAsync(UserId doctorId);
-        public Task<IEnumerable<MedicalProcedure>> GetAllByTypeAsync(MedicalProcedureType type);
+        public IQueryable<MedicalProcedure> GetAllByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize);
+        public IQueryable<MedicalProcedure> GetAllByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize);
 
     }
 }

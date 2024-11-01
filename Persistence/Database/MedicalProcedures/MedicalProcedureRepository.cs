@@ -57,33 +57,26 @@ namespace Persistence.Database.MedicalProcedures
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<MedicalProcedure>> GetAllAsync()
+        public IQueryable<MedicalProcedure> GetAllAsync(int pageNumber, int pageSize)
         {
-            return await _context.MedicalProcedures
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<MedicalProcedure>> GetAllAsync(int pageNumber, int pageSize)
-        {
-            return await _context.MedicalProcedures
+            return _context.MedicalProcedures
                 .Skip((pageNumber - 1)* pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
 
-        public async Task<IEnumerable<MedicalProcedure>> GetAllByTypeAsync(MedicalProcedureType type)
+        public IQueryable<MedicalProcedure> GetAllByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize)
         {
-            return await _context.MedicalProcedures
+            return _context.MedicalProcedures
                 .Where(mp => mp.Type == type)
-                .ToListAsync();
+                .Skip((pageNumber - 1)* pageSize)
+                .Take(pageSize);
         }
 
-        public async Task<IEnumerable<MedicalProcedure>> GetAllByDoctorIdAsync(UserId doctorId)
+        public IQueryable<MedicalProcedure> GetAllByDoctorIdAsync(UserId doctorId)
         {
-            return await _context.MedicalProcedures
+            return _context.MedicalProcedures
                 .Where(mp => mp.Doctors
-                .Any(d => d.Id == doctorId))
-                .ToListAsync();
+                .Any(d => d.Id == doctorId));
         }
 
         public async Task<int> GetTotalCountAsync()

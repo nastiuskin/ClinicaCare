@@ -2,7 +2,6 @@
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Persistence.Database.Users
 {
@@ -42,48 +41,26 @@ namespace Persistence.Database.Users
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public IQueryable<Doctor> GetAllDoctorsAsync(int pageNumber, int pageSize)
         {
-            return await _context.Users.ToListAsync();
-        }
-
-        public async Task<IEnumerable<Doctor>> GetAllDoctorsAsync(int pageNumber, int pageSize)
-        {
-            return await _context.Users
+            return _context.Users
                 .OfType<Doctor>()
                 .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
 
-        public async Task<IEnumerable<Doctor>> GetAllDoctorsAsync()
+        public IQueryable<Patient> GetAllPatientsAsync(int pageNumber, int pageSize)
         {
-            return await _context.Users
-                .OfType<Doctor>()
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Patient>> GetAllPatientsAsync()
-        {
-            return await _context.Users
-                .OfType<Patient>()
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Patient>> GetAllPatientsAsync(int pageNumber, int pageSize)
-        {
-            return await _context.Users.OfType<Patient>()
+            return _context.Users.OfType<Patient>()
                 .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync(int pageNumber, int pageSize)
+        public IQueryable<User> GetAllAsync(int pageNumber, int pageSize)
         {
-            return await _context.Users
+            return _context.Users
                 .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Take(pageSize);
         }
 
         public async Task<int> GetTotalCountAsync()

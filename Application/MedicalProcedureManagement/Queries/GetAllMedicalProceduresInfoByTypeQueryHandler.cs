@@ -3,10 +3,11 @@ using Application.MedicalProcedureManagement.DTO;
 using AutoMapper;
 using Domain.MedicalProcedures;
 using FluentResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.MedicalProcedureManagement.Queries
 {
-    public record GetAllMedicalProceduresInfoByTypeQuery(MedicalProcedureType Type)
+    public record GetAllMedicalProceduresInfoByTypeQuery(MedicalProcedureType Type, int PageNumber, int PageSize)
         : IQuery<Result<ICollection<MedicalProcedureInfoDto>>>;
 
     public class GetAllMedicalProceduresInfoByTypeQueryHandler
@@ -25,7 +26,7 @@ namespace Application.MedicalProcedureManagement.Queries
         public async Task<Result<ICollection<MedicalProcedureInfoDto>>> Handle(GetAllMedicalProceduresInfoByTypeQuery request, 
             CancellationToken cancellationToken)
         {
-            var medicalProcedures = await _medicalProcedureRepository.GetAllByTypeAsync(request.Type);
+            var medicalProcedures = await _medicalProcedureRepository.GetAllByTypeAsync(request.Type, request.PageNumber, request.PageSize).ToListAsync();
 
             var medicalProcedureInfoDtos = _mapper.Map<ICollection<MedicalProcedureInfoDto>>(medicalProcedures);
 
