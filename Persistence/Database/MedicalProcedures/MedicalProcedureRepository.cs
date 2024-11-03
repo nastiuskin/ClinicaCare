@@ -72,7 +72,7 @@ namespace Persistence.Database.MedicalProcedures
                 .Take(pageSize);
         }
 
-        public IQueryable<MedicalProcedure> GetAllByDoctorIdAsync(UserId doctorId)
+        public IQueryable<MedicalProcedure> GetAllByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
         {
             return _context.MedicalProcedures
                 .Where(mp => mp.Doctors

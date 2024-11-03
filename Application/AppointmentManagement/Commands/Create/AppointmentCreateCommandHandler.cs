@@ -44,11 +44,11 @@ namespace Application.AppointmentManagement.Commands.Create
                 return Result.Fail(errors);
             }
 
-            var medicalProcedure = await _medicalProcedureRepository.GetByIdAsync(request.AppointmentCreateDto.MedicalProcedureId);
+            var medicalProcedure = await _medicalProcedureRepository.GetByIdAsync(new MedicalProcedureId(request.AppointmentCreateDto.MedicalProcedureId));
             if (medicalProcedure == null)
                 return Result.Fail(new FluentResults.Error("Medical procedure not found."));
 
-            var doctor = await _userRepository.GetByIdAsync(request.AppointmentCreateDto.DoctorId);
+            var doctor = await _userRepository.GetByIdAsync(new UserId(request.AppointmentCreateDto.DoctorId));
             if (doctor == null)
                 return Result.Fail(new FluentResults.Error("Doctor not found."));
 

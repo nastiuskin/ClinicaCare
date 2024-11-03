@@ -1,7 +1,5 @@
 ﻿using Application.AppointmentManagement.Commands.Create;
 using Application.AppointmentManagement.DTO;
-using Application.MedicalProcedureManagement.Commands.Create;
-using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +23,16 @@ namespace API
             if (result.IsSuccess)
                 return Ok();
             return BadRequest(result.Errors);
+        }
+
+        [HttpGet]
+        [Route("timeSlots")]
+        public async Task<IActionResult> GenerateAvailableTimeSlots([FromQuery] Guid doctorId, [FromQuery] Guid medicalProcedureId, [FromQuery] string date)
+        {
+            var result = await _mediator.Send(new GegerateAvailableTimeSlotsQuery(doctorId, medicalProcedureId, date));
+            if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest();
         }
     }
 }

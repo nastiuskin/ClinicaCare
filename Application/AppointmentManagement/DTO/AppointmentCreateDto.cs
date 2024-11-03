@@ -6,10 +6,11 @@ namespace Application.AppointmentManagement.DTO
 {
     public class AppointmentCreateDto
     {
-        public UserId DoctorId { get; private set; }
-        public UserId PatientId { get; private set; }
-        public MedicalProcedureId MedicalProcedureId { get; private set; }
-        public DateOnly Date { get; private set; }
-        public TimeSlot Duration { get; private set; }
+        public Guid DoctorId { get; set; }
+        public Guid PatientId { get; set; }
+        public Guid MedicalProcedureId { get; set; }
+        public string Date { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
     }
 }

@@ -75,5 +75,13 @@ namespace Persistence.Database.Users
             .Where(d => doctors.Contains(d.Id))
             .ToListAsync();
         }
+
+        public IQueryable<Doctor> GetByIdWithAppointmentsAsync(UserId doctorId)
+        {
+            return _context.Users
+                .OfType<Doctor>()
+                .Where(d => d.Id == doctorId)
+                .Include(d => d.Appointments);
+        }
     }
 }
