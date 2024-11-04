@@ -7,6 +7,6 @@ namespace Application.UserAccountManagement.Doctors.DTO
         public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public SpecializationType SpecializationType { get; set; }
+        public string SpecializationType { get; set; }
     }
 }

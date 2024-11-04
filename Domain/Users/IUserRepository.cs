@@ -11,5 +11,6 @@ namespace Domain.Users
         public Task<IEnumerable<Doctor>> GetListOfDoctorsByIdsAsync(List<UserId> doctors);
         public IQueryable<Doctor> GetAllDoctorsAsync(int pageNumber, int pageSize); //later can be filtered by medical procedure type 
         public IQueryable<Patient> GetAllPatientsAsync(int pageNumber, int pageSize);  //can be filtered by date of birth
+        public IQueryable<Doctor> GetByIdWithAppointmentsOnSpecificDayAsync(UserId doctorId, DateOnly date);
     }
 }

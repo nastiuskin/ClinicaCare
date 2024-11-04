@@ -33,8 +33,11 @@ namespace Persistence.Database.Appointments
         public IQueryable<Appointment> GetAllAsync(int pageNumber, int pageSize)
         {
             return _context.Appointments
-                 .Skip((pageNumber - 1) * pageSize)
-                 .Take(pageSize);
+                .Include(a => a.Patient)
+                .Include(a => a.Doctor)
+                .Include(a => a.MedicalProcedure)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize);
         }
 
         public async Task UpdateAsync(Appointment entity)

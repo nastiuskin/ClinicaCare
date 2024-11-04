@@ -43,24 +43,24 @@ namespace API.MedicalProcedures
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllMedicalProceduresInfo()
+        public async Task<IActionResult> GetAllMedicalProceduresInfo([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
-            var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery());
+            var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery(pageNumber, pageSize));
             if (result.IsSuccess) return Ok(result.Value);
-            return BadRequest();
+            return BadRequest(result.Errors);
         }
 
         [HttpGet]
         [Route("by-type/{type}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetMedicalProceduresByType(MedicalProcedureType type)
+        public async Task<IActionResult> GetMedicalProceduresByType(MedicalProcedureType type, [FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
-            var result = await _mediator.Send(new GetAllMedicalProceduresInfoByTypeQuery(type));
+            var result = await _mediator.Send(new GetAllMedicalProceduresInfoByTypeQuery(type, pageNumber, pageSize));
             if (result.IsSuccess) return Ok(result.Value);
 
             if (result.Errors.Any()) return BadRequest(result.Errors);
-            return BadRequest();
+            return BadRequest(result.Errors);
         }
 
         [HttpPut]
@@ -91,17 +91,5 @@ namespace API.MedicalProcedures
             if (result.Errors.Any()) return BadRequest(result.Errors);
             return NotFound();
         }
-
-        [HttpPost]
-        [Route("{medicalId}/assign-doctor/{doctorId}")]
-        public async Task<IActionResult> AssignDoctorToMedicalProcedure(Guid medicalId, Guid doctorId)
-        {
-            var result = await _mediator.Send(new AddDoctorToMedicalProcedureCommand(medicalId, doctorId));
-            if (result.IsSuccess) return Ok();
-
-            if (result.Errors.Any()) return BadRequest(result.Errors);
-            return BadRequest();
-        }
-
     }
 }

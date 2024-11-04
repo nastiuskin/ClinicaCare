@@ -8,7 +8,7 @@ namespace Domain.DomainServices
 {
     public class AvailableTimeSlotService
     {
-        public Result<List<TimeSlot>> GetAvailableTimeSlotsForDay(Doctor doctor, MedicalProcedure medicalProcedure, DateOnly selectedDate)
+        public static Result<List<TimeSlot>> GetAvailableTimeSlotsForDay(Doctor doctor, MedicalProcedure medicalProcedure, DateOnly selectedDate)
         {
             if (doctor == null)
                 return Result.Fail(new FluentResults.Error("Doctor cannot be null."));
@@ -18,13 +18,12 @@ namespace Domain.DomainServices
 
             var availableTimeSlots = new List<TimeSlot>();
 
-            TimeSpan startTime = doctor.WorkingHours.StartTime; // e.g., 09:00
+            TimeSpan startTime = doctor.WorkingHours.StartTime; 
             TimeSpan endTime = doctor.WorkingHours.EndTime;
 
             // Retrieve existing appointments for this doctor on the selected day
-            var existingAppointments = doctor.GetPlannedAppointments()
-                                         .Where(a => a.Date.Equals(selectedDate))
-                                         .ToList();
+            var existingAppointments = doctor.GetPlannedAppointments();
+                    
 
             while (startTime.Add(medicalProcedure.Duration) <= endTime)
             {
@@ -43,7 +42,7 @@ namespace Domain.DomainServices
             return Result.Ok(availableTimeSlots);
         }
 
-        private bool IsTimeAvailable(List<Appointment> existingAppointments, TimeSlot timeSlot)
+        private static bool IsTimeAvailable(IReadOnlyCollection<Appointment> existingAppointments, TimeSlot timeSlot)
         {
             TimeSpan slotStartTime = timeSlot.StartTime;
             TimeSpan slotEndTime = timeSlot.EndTime;

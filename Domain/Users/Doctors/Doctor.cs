@@ -9,8 +9,6 @@ namespace Domain.Users.Doctors
     {
         private readonly List<Appointment> _appointments;
         private readonly List<MedicalProcedure> _medicalProcedures;
-        //public List<MedicalProcedure> MedicalProcedures {  get; private set; }
-
         public TimeSlot WorkingHours { get; private set; }
         public SpecializationType Specialization { get; private set; }
 

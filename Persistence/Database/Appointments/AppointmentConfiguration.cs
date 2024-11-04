@@ -45,19 +45,21 @@ namespace Persistence.Database.Appointments
                 .WithMany(mp => mp.Appointments)
                 .HasForeignKey(a => a.MedicalProcedureId);
 
-            //builder.OwnsOne(a => a.AppointmentDateTime, ts =>
-            //{
-            //    ts.Property(ts => ts.StartTime)
-            //    .HasColumnName("StartTime")
-            //    .IsRequired();
-
-            //    ts.Property(ts => ts.EndTime)
-            //    .HasColumnName("EndTime")
-            //    .IsRequired();
-            //});
-
-            builder.Property(a => a.AppointmentDateTime)
+            builder.OwnsOne(a => a.Duration, ts =>
+            {
+                ts.Property(ts => ts.StartTime)
+                .HasColumnName("StartTime")
                 .IsRequired();
+
+                ts.Property(ts => ts.EndTime)
+                .HasColumnName("EndTime")
+                .IsRequired();
+            });
+
+            builder.Property(a => a.Date)
+                .IsRequired();
+
+
 
             builder.Property(a => a.Status)
                 .IsRequired()

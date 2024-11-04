@@ -9,13 +9,11 @@ namespace Application.MedicalProcedureManagement
         public MedicalProcedureMapper()
         {
             CreateMap<MedicalProcedure, MedicalProcedureInfoDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
 
             CreateMap<MedicalProcedureFormDto, MedicalProcedure>()
                 .ForMember(dest => dest.Doctors, opt => opt.Ignore())
-                //.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                //.ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
-                //.ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
                 .ConstructUsing(src => MedicalProcedure.Create(src.Type, src.Price, TimeSpan.Parse(src.Duration + ":00"), src.Name).Value);
 
             CreateMap<MedicalProcedureUpdateDto, MedicalProcedure>()
@@ -26,6 +24,7 @@ namespace Application.MedicalProcedureManagement
 
             CreateMap<MedicalProcedure, MedicalProcedureInfoWithDoctorsDto>()
                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
+               .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
                .ForMember(dest => dest.Doctors, opt => opt.MapFrom(src => src.Doctors));
 
         }

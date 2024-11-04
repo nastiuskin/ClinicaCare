@@ -4,6 +4,7 @@ using Domain.SeedWork;
 using Domain.Users;
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
+using Domain.ValueObjects;
 using FluentResults;
 
 namespace Domain.Appointments
@@ -20,27 +21,30 @@ namespace Domain.Appointments
 
         public MedicalProcedureId MedicalProcedureId { get; private set; }
         public MedicalProcedure MedicalProcedure { get; private set; }
-        public DateTime AppointmentDateTime { get; private set; }
+        public DateOnly Date { get; private set; }
+        public TimeSlot Duration { get; private set; }
         public AppointmentStatus Status { get; private set; }
         public string DoctorFeedback { get; private set; }
 
         private Appointment() { }
 
         private Appointment(UserId doctorId, UserId patientId,
-            MedicalProcedureId medicalProcedureId, DateTime appointmentDateTime)
+            MedicalProcedureId medicalProcedureId, DateOnly date, TimeSlot duration)
         {
             Id = new AppointmentId(Guid.NewGuid());
             DoctorId = doctorId;
             PatientId = patientId;
             MedicalProcedureId = medicalProcedureId;
+            Duration = duration;
 
-            AppointmentDateTime = appointmentDateTime;
+            Date = date;
             Status = AppointmentStatus.SCHEDULED;
             DoctorFeedback = string.Empty;
         }
 
         public Result AddFeedback(string feedback)
         {
+            if (String.IsNullOrWhiteSpace(feedback)) return Result.Fail("Feedback cannot be empty");
             var ruleResult = CheckRule(new FeedbackCanBeAddedOnlyIfStatusIsCompletedRule(this));
             if (ruleResult.IsFailed) return ruleResult;
 
@@ -48,16 +52,22 @@ namespace Domain.Appointments
             return Result.Ok();
         }
 
-        public Result UpdateStatus(AppointmentStatus newStatus)
+        public Result Complete()
         {
-            Status = newStatus;
+            Status = AppointmentStatus.COMPLETED;
+            return Result.Ok();
+        }
+
+        public Result Cancel()
+        {
+            Status = AppointmentStatus.CANCELED;
             return Result.Ok();
         }
 
         public static Result<Appointment> Create(UserId doctorId, UserId patientId,
-            MedicalProcedureId medicalProcedureId, DateTime appointmentDateTime)
+            MedicalProcedureId medicalProcedureId, DateOnly date, TimeSlot duration)
         {
-            return Result.Ok(new Appointment(doctorId, patientId, medicalProcedureId, appointmentDateTime));
+            return Result.Ok(new Appointment(doctorId, patientId, medicalProcedureId, date, duration));
         }
 
         public Result CheckRule(IBusinessRule rule)
