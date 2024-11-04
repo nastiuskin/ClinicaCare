@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Domain.Validation
 {
-    public class AppointmentCreateValidator : AbstractValidator<AppointmentCreateDto>
+    public class AppointmentCreateValidator : AbstractValidator<AppointmentFormDto>
     {
         public AppointmentCreateValidator()
         {

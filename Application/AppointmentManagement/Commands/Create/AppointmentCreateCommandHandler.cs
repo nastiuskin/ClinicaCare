@@ -9,7 +9,7 @@ using FluentValidation;
 
 namespace Application.AppointmentManagement.Commands.Create
 {
-    public record AppointmentCreateCommand(AppointmentCreateDto AppointmentCreateDto)
+    public record AppointmentCreateCommand(AppointmentFormDto AppointmentCreateDto)
         : ICommand<Result>;
 
     public class AppointmentCreateCommandHandler
@@ -19,10 +19,10 @@ namespace Application.AppointmentManagement.Commands.Create
         private readonly IMedicalProcedureRepository _medicalProcedureRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        private readonly IValidator<AppointmentCreateDto> _validator;
+        private readonly IValidator<AppointmentFormDto> _validator;
 
         public AppointmentCreateCommandHandler(IAppointmentRepository appointmentRepository,
-            IMapper mapper, IValidator<AppointmentCreateDto> validator, IUserRepository userRepository,
+            IMapper mapper, IValidator<AppointmentFormDto> validator, IUserRepository userRepository,
             IMedicalProcedureRepository medicalProcedureRepository)
         {
             _appointmentRepository = appointmentRepository;

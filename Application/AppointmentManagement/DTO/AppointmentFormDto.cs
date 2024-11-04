@@ -1,10 +1,6 @@
-﻿using Domain.MedicalProcedures;
-using Domain.Users;
-using Domain.ValueObjects;
-
-namespace Application.AppointmentManagement.DTO
+﻿namespace Application.AppointmentManagement.DTO
 {
-    public class AppointmentCreateDto
+    public class AppointmentFormDto
     {
         public Guid DoctorId { get; set; }
         public Guid PatientId { get; set; }

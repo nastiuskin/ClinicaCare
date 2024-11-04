@@ -1,4 +1,5 @@
-﻿using Application.UserAccountManagement.Doctors.Commands.Create;
+﻿using Application.AppointmentManagement.Queries;
+using Application.UserAccountManagement.Doctors.Commands.Create;
 using Application.UserAccountManagement.Doctors.DTO;
 using Application.UserAccountManagement.Doctors.Queries;
 using Application.UserAccountManagement.Patients.Commands.Create;
@@ -20,7 +21,7 @@ namespace API
         }
 
         [HttpPost]
-        [Route("/doctors")]
+        [Route("doctors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateDoctor([FromBody] DoctorFormDto doctorDto)
@@ -32,7 +33,7 @@ namespace API
         }
 
         [HttpGet]
-        [Route("/doctors")]
+        [Route("doctors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllDoctors([FromQuery] int pageNumber, [FromQuery] int pageSize)
@@ -44,7 +45,7 @@ namespace API
         }
 
         [HttpPost]
-        [Route("/patients")]
+        [Route("patients")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreatePatient([FromBody] UserFormDto patientDto)
@@ -56,12 +57,32 @@ namespace API
         }
 
         [HttpGet]
-        [Route("/patients")]
+        [Route("patients")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllPatients([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var result = await _mediator.Send(new GetAllPatientsInfoQuery(pageNumber, pageSize));
+            if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
+
+        [HttpGet]
+        [Route("patients/{id}/appointments")]
+        public async Task<IActionResult> GetAllAppointmentsByPatientId(Guid id, [FromQuery] int pageNumber, [FromQuery] int pageSize)
+        {
+            var result = await _mediator.Send(new GetAllAppointmentsByPatientIdQuery(id, pageNumber, pageSize));
+            if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
+
+        [HttpGet]
+        [Route("doctors/{id}/appointments")]
+        public async Task<IActionResult> GetAllAppointmentsByDoctorId(Guid id, [FromQuery] int pageNumber, [FromQuery] int pageSize)
+        {
+            var result = await _mediator.Send(new GetAllAppointmentsByDoctorIdQuery(id, pageNumber, pageSize));
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);

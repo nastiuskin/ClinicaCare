@@ -47,7 +47,7 @@ namespace API.MedicalProcedures
         {
             var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery(pageNumber, pageSize));
             if (result.IsSuccess) return Ok(result.Value);
-            return BadRequest();
+            return BadRequest(result.Errors);
         }
 
         [HttpGet]
@@ -60,7 +60,7 @@ namespace API.MedicalProcedures
             if (result.IsSuccess) return Ok(result.Value);
 
             if (result.Errors.Any()) return BadRequest(result.Errors);
-            return BadRequest();
+            return BadRequest(result.Errors);
         }
 
         [HttpPut]

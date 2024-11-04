@@ -16,7 +16,7 @@ namespace Application.UserAccountManagement.Doctors
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => DateOnly.ParseExact(src.DateOfBirth, "dd.MM.yyyy")))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
-                .ForMember(dest => dest.Specialization, opt => opt.MapFrom(src => src.Specialization))
+                .ForMember(dest => dest.Specialization, opt => opt.MapFrom(src => src.Specialization.ToString()))
                 .ForMember(dest => dest.Biography, opt => opt.MapFrom(src => src.Biography))
                 .ForMember(dest => dest.CabinetNumber, opt => opt.MapFrom(src => src.CabinetNumber))
                 .ForMember(dest => dest.WorkingHours, opt => opt.MapFrom(

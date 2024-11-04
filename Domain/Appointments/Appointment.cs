@@ -44,6 +44,7 @@ namespace Domain.Appointments
 
         public Result AddFeedback(string feedback)
         {
+            if (String.IsNullOrWhiteSpace(feedback)) return Result.Fail("Feedback cannot be empty");
             var ruleResult = CheckRule(new FeedbackCanBeAddedOnlyIfStatusIsCompletedRule(this));
             if (ruleResult.IsFailed) return ruleResult;
 
@@ -51,9 +52,15 @@ namespace Domain.Appointments
             return Result.Ok();
         }
 
-        public Result UpdateStatus(AppointmentStatus newStatus)
+        public Result Complete()
         {
-            Status = newStatus;
+            Status = AppointmentStatus.COMPLETED;
+            return Result.Ok();
+        }
+
+        public Result Cancel()
+        {
+            Status = AppointmentStatus.CANCELED;
             return Result.Ok();
         }
 
