@@ -1,19 +1,19 @@
-﻿using Application.Configuration.Queries;
+﻿using Application.AppointmentManagement.DTO;
+using Application.Configuration.Queries;
 using Application.SeedOfWork;
 using Domain.DomainServices;
 using Domain.MedicalProcedures;
 using Domain.Users;
-using Domain.ValueObjects;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.AppointmentManagement.Commands.Create
 {
     public record GenerateAvailableTimeSlotsQuery(Guid DoctorId, Guid MedicalProcedureId, string Date)
-        : IQuery<Result<List<TimeSlot>>>;
+        : IQuery<Result<List<TimeSlotDto>>>;
 
     public class GenerateAvailableTimeSlotsQueryHandler
-        : IQueryHandler<GenerateAvailableTimeSlotsQuery, Result<List<TimeSlot>>>
+        : IQueryHandler<GenerateAvailableTimeSlotsQuery, Result<List<TimeSlotDto>>>
     {
         private readonly IMedicalProcedureRepository _medicalProcedureRepository;
         private readonly IUserRepository _userRepository;
@@ -24,7 +24,7 @@ namespace Application.AppointmentManagement.Commands.Create
             _userRepository = userRepository;
         }
 
-        public async Task<Result<List<TimeSlot>>> Handle(GenerateAvailableTimeSlotsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<List<TimeSlotDto>>> Handle(GenerateAvailableTimeSlotsQuery request, CancellationToken cancellationToken)
         {
             var medicalProcedure = await _medicalProcedureRepository.GetByIdAsync(new MedicalProcedureId(request.MedicalProcedureId));
             if (medicalProcedure == null) return Result.Fail(ResponseError.NotFound(nameof(medicalProcedure), request.MedicalProcedureId));
@@ -34,7 +34,14 @@ namespace Application.AppointmentManagement.Commands.Create
             if (doctor == null) return Result.Fail(ResponseError.NotFound(nameof(doctor), request.DoctorId));
 
             var availableTimeSlots = AvailableTimeSlotService.GetAvailableTimeSlotsForDay(doctor, medicalProcedure, DateOnly.Parse(request.Date)).Value;
-            return Result.Ok(availableTimeSlots);
+
+            var timeSlotDtos = availableTimeSlots.Select(slot => new TimeSlotDto
+            {
+                StartTime = slot.StartTime.ToString(@"hh\:mm"),
+                EndTime = slot.EndTime.ToString(@"hh\:mm")
+            }).ToList();
+
+            return Result.Ok(timeSlotDtos);
         }
     }
 }
