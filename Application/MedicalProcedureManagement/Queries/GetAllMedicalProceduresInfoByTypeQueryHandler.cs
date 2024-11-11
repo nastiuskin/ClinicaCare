@@ -16,7 +16,8 @@ namespace Application.MedicalProcedureManagement.Queries
         private readonly IMedicalProcedureRepository _medicalProcedureRepository;
         private readonly IMapper _mapper;
 
-        public GetAllMedicalProceduresInfoByTypeQueryHandler(IMedicalProcedureRepository medicalProcedureRepository, 
+        public GetAllMedicalProceduresInfoByTypeQueryHandler(
+            IMedicalProcedureRepository medicalProcedureRepository, 
             IMapper mapper)
         {
             _medicalProcedureRepository = medicalProcedureRepository;

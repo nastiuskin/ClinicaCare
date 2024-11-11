@@ -24,7 +24,10 @@ namespace Application.AppointmentManagement.Commands.Complete
             var appointment = await _appointmentRepository.GetByIdAsync(new AppointmentId(command.Id));
             if (appointment == null) return Result.Fail(ResponseError.NotFound(nameof(appointment), command.Id));
 
-            appointment.Complete();
+            var result = appointment.Complete();
+            if (!result.IsSuccess) 
+                return Result.Fail(result.Errors);
+
             await _appointmentRepository.UpdateAsync(appointment);
             return Result.Ok();
         }

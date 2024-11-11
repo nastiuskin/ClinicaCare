@@ -5,6 +5,7 @@ using Application.MedicalProcedureManagement.DTO;
 using Application.MedicalProcedureManagement.Queries;
 using Domain.MedicalProcedures;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.MedicalProcedures
@@ -16,7 +17,7 @@ namespace API.MedicalProcedures
         private readonly IMediator _mediator;
         public MedicalProcedureController(IMediator mediator) => _mediator = mediator;
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -63,6 +64,7 @@ namespace API.MedicalProcedures
             return BadRequest(result.Errors);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -78,6 +80,7 @@ namespace API.MedicalProcedures
             return NotFound();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -26,7 +26,7 @@ namespace Persistence.Database.Users
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email.Value.Equals(email));
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
         }
 
         public async Task DeleteAsync(User entity)

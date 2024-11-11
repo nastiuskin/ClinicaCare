@@ -1,4 +1,5 @@
 ﻿using Domain.Users;
+using Domain.Users.Admins;
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
 using Microsoft.EntityFrameworkCore;
@@ -19,33 +20,19 @@ namespace Persistence.Database.Users
                                value => new UserId(value));
 
             builder.HasDiscriminator<string>("UserType")
-                .HasValue<User>("Admin")
+                .HasValue<Admin>("Admin")
                 .HasValue<Doctor>("Doctor")
                 .HasValue<Patient>("Patient");
 
             builder.Property(u => u.FirstName)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(u => u.LastName)
-                .IsRequired();
+                .IsRequired(false);
 
-            builder.Property(u => u.DateOfBirth)
-                .IsRequired();
+            builder.Property(u => u.DateOfBirth);
 
-            builder.OwnsOne(u => u.PhoneNumber, phoneBuilder =>
-            {
-                phoneBuilder.Property(p => p.Value)
-                    .HasColumnName("PhoneNumber")
-                    .IsRequired();
-            });
-
-            builder.OwnsOne(u => u.Email, emailBuilder =>
-            {
-                emailBuilder.Property(p => p.Value)
-                    .HasColumnName("Email")
-                    .IsRequired();
-            });
-
+            builder.Property(u => u.RefreshTokenExpiryTime);
         }
     }
 }

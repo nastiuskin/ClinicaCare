@@ -1,12 +1,14 @@
 ﻿using Domain.Appointments;
 using Domain.MedicalProcedures;
 using Domain.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace Persistence
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<UserId>, UserId>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }

@@ -20,8 +20,11 @@ namespace Application.MedicalProcedureManagement.Commands.Create
         private readonly IMapper _mapper;
         private readonly IValidator<MedicalProcedureFormDto> _validator;
 
-        public CreateMedicalProcedureCommandHandler(IMedicalProcedureRepository medicalProcedureRepository,
-            IMapper mapper, IValidator<MedicalProcedureFormDto> validator, IUserRepository userRepository)
+        public CreateMedicalProcedureCommandHandler(
+            IMedicalProcedureRepository medicalProcedureRepository,
+            IMapper mapper, 
+            IValidator<MedicalProcedureFormDto> validator, 
+            IUserRepository userRepository)
         {
             _mapper = mapper;
             _medicalProcedureRepository = medicalProcedureRepository;

@@ -1,85 +1,53 @@
 ﻿using Domain.SeedWork;
-using Domain.ValueObjects;
 using FluentResults;
+using Microsoft.AspNetCore.Identity;
 namespace Domain.Users
 {
-    public abstract class User : IAggregateRoot
+    public abstract class User : IdentityUser<UserId>, IAggregateRoot
     {
-        public UserId Id { get; private set; }
-        public string FirstName { get; private set; }
-        public string LastName { get; private set; }
-
-        public DateOnly DateOfBirth { get; private set; }
-
-        public Email Email { get; private set; }
-
-        public PhoneNumber PhoneNumber { get; private set; }
+        public string? FirstName { get; private set; }
+        public string? LastName { get; private set; }
+        public DateOnly? DateOfBirth { get; private set; }
+        public string? RefreshToken { get; private set; }
+        public DateTime? RefreshTokenExpiryTime { get; private set; }
         protected User() { }
-
-        protected User(UserParams user)
+        protected User(UserParams user) 
         {
             Id = new UserId(Guid.NewGuid());
             FirstName = user.FirstName;
+            Email = user.Email;
+            PhoneNumber = user.PhoneNumber;
             LastName = user.LastName;
-            Email = Email.Create(user.Email).Value;
-            PhoneNumber = PhoneNumber.Create(user.PhoneNumber).Value;
             DateOfBirth = user.DateOfBirth;
+            UserName = user.Email;
         }
 
         protected Result ChangePhoneNumber(string phoneNumber)
         {
-            var result = PhoneNumber.Create(phoneNumber);
-            if (result.IsFailed)
-                return Result.Fail(result.Errors);
-
-            PhoneNumber = result.Value;
+            PhoneNumber = phoneNumber;
             return Result.Ok();
         }
 
         protected Result ChangeEmail(string email)
         {
-            var result = Email.Create(email);
-            if (result.IsFailed)
-                return Result.Fail(result.Errors);
-
-            Email = result.Value;
+            Email = email;
             return Result.Ok();
 
         }
 
-        //public static Result ValidateUserParams(UserParams userParams)
-        //{
-        //    var errors = new List<Error>();
-        //    if (string.IsNullOrWhiteSpace(userParams.FirstName)) errors.Add(new Error("First name cannot be empty."));
+        public Result SetRefreshToken(string refreshToken, DateTime refreshTokenExpiryTime) 
+        {
+            RefreshToken = refreshToken;
+            RefreshTokenExpiryTime = refreshTokenExpiryTime;
+            return Result.Ok();
+        }
 
-        //    if (string.IsNullOrWhiteSpace(userParams.LastName)) errors.Add(new Error("Last name cannot be empty."));
-
-        //    // Validate email
-        //    var emailValidationResult = Email.Create(userParams.Email);
-        //    if (emailValidationResult.IsFailed) errors.AddRange((IEnumerable<Error>)emailValidationResult.Errors);
-
-        //    //Validate PhoneNumber
-        //    var phoneNumberValidationResult = PhoneNumber.Create(userParams.PhoneNumber);
-        //    if (phoneNumberValidationResult.IsFailed) errors.AddRange((IEnumerable<Error>)phoneNumberValidationResult.Errors);
-
-        //    return errors.Count > 0 ? Result.Fail(errors) : Result.Ok();
-        //}
-
-
-        //private static Result<User> Create(UserParams userParams)
-        //{
-        //    var validator = new UserCreateValidator();
-        //    var validationResult = validator.Validate(userParams);
-        //    if (!validationResult.IsValid)
-        //    {
-        //        var errors = validationResult.Errors
-        //            .Select(error => new FluentResults.Error(error.ErrorMessage))
-        //            .ToList();
-        //        return Result.Fail(errors);
-
-        //    }
-        //    return Result.Ok(new User(userParams));
-        //}
+        public Result DeleteRefreshToken()
+        {
+            RefreshToken = null;
+            RefreshTokenExpiryTime = null;
+            return Result.Ok();
+        }
 
     }
 

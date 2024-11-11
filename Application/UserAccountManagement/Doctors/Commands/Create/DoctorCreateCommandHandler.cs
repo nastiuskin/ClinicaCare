@@ -5,6 +5,7 @@ using Domain.Users;
 using Domain.Users.Doctors;
 using FluentResults;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.UserAccountManagement.Doctors.Commands.Create
 {
@@ -12,22 +13,22 @@ namespace Application.UserAccountManagement.Doctors.Commands.Create
         : ICommand<Result>;
 
 
-    public class DoctorCreateCommandHandler 
+    public class DoctorCreateCommandHandler
         : ICommandHandler<DoctorCreateCommand, Result>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly IValidator<DoctorFormDto> _validator;
 
-        public DoctorCreateCommandHandler(IUserRepository userRepository, 
+        public DoctorCreateCommandHandler(UserManager<User> userManager,
             IMapper mapper, IValidator<DoctorFormDto> validator)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
             _mapper = mapper;
             _validator = validator;
         }
 
-        public async Task<Result> Handle(DoctorCreateCommand command, 
+        public async Task<Result> Handle(DoctorCreateCommand command,
             CancellationToken cancellationToken)
         {
             var doctorValidationResult = await _validator.ValidateAsync(command.DoctorFormDto);
@@ -40,14 +41,28 @@ namespace Application.UserAccountManagement.Doctors.Commands.Create
                 return Result.Fail(errors);
             }
 
-            var existingDoctor = await _userRepository.GetByEmailAsync(command.DoctorFormDto.Email);
-            if (existingDoctor != null) return Result.Fail("Email in use");
+            var existingDoctor = await _userManager.FindByEmailAsync(command.DoctorFormDto.Email);
+            if (existingDoctor != null) 
+                return Result.Fail("Email in use");
 
             var doctor = _mapper.Map<Doctor>(command.DoctorFormDto);
-       
-            await _userRepository.AddAsync(doctor);
+
+            var result = await _userManager.CreateAsync(doctor, command.DoctorFormDto.Password);
+            if (!result.Succeeded)
+            {
+                var identityErrors = result.Errors
+                    .Select(error => new FluentResults.Error(error.Description))
+                    .ToList();
+                return Result.Fail(identityErrors);
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(doctor, "Doctor");
+            if (!roleResult.Succeeded)
+            {
+                var errors = roleResult.Errors.Select(error => new FluentResults.Error(error.Description)).ToList();
+                return Result.Fail(errors);
+            }
             return Result.Ok();
         }
     }
-
 }

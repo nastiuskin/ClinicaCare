@@ -2,7 +2,9 @@
 using Application.AppointmentManagement.Commands.Complete;
 using Application.AppointmentManagement.Commands.Create;
 using Application.AppointmentManagement.DTO;
+using Application.AppointmentManagement.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API
@@ -18,6 +20,7 @@ namespace API
             _mediator = mediator;
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpPost]
         public async Task<IActionResult> CreateAppointment([FromBody] AppointmentFormDto appointmentCreateDto)
         {
@@ -27,6 +30,7 @@ namespace API
             return BadRequest(result.Errors);
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpGet]
         [Route("timeSlots")]
         public async Task<IActionResult> GetAvailableTimeSlots([FromQuery] Guid doctorId, [FromQuery] Guid medicalProcedureId, [FromQuery] string date)
@@ -37,6 +41,7 @@ namespace API
             return BadRequest(result.Errors);
         }
 
+        [Authorize(Roles = "Doctor")]
         [HttpPost]
         [Route("{id}/complete")]
         public async Task<IActionResult> CompleteAppointment(Guid id)
@@ -47,6 +52,7 @@ namespace API
             return BadRequest(result.Errors);
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpPost]
         [Route("{id}/cancel")]
         public async Task<IActionResult> CancelAppointment(Guid id)
@@ -57,6 +63,7 @@ namespace API
             return BadRequest(result.Errors);
         }
 
+        [Authorize(Roles = "Doctor")]
         [HttpPost]
         [Route("{id}/feedback")]
         public async Task<IActionResult> AddFeedbackToAppointment([FromRoute] Guid id, [FromBody] string Feedback)
@@ -67,5 +74,14 @@ namespace API
             return BadRequest(result.Errors);
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAllAppointmentsByCurrentUserId([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        {
+            var result = await _mediator.Send(new GetAllAppointmentsByCurrentUserIdQuery(pageNumber, pageSize));
+            if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
     }
 }

@@ -25,7 +25,10 @@ namespace Application.AppointmentManagement.Commands.Cancel
             var appointment = await _appointmentRepository.GetByIdAsync(new AppointmentId(command.Id));
             if (appointment == null) return Result.Fail(ResponseError.NotFound(nameof(appointment), command.Id));
 
-            appointment.Cancel();
+            var result = appointment.Cancel();
+            if (!result.IsSuccess)
+                return Result.Fail(result.Errors);
+
             await _appointmentRepository.UpdateAsync(appointment);
             return Result.Ok();
         }
