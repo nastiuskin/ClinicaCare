@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API
+namespace API.Controllers
 {
     [ApiController]
     [Route("api/appointments")]
@@ -32,7 +32,7 @@ namespace API
 
         [Authorize(Roles = "Patient")]
         [HttpGet]
-        [Route("timeSlots")]
+        [Route("available-time-slots")]
         public async Task<IActionResult> GetAvailableTimeSlots([FromQuery] Guid doctorId, [FromQuery] Guid medicalProcedureId, [FromQuery] string date)
         {
             var result = await _mediator.Send(new GenerateAvailableTimeSlotsQuery(doctorId, medicalProcedureId, date));

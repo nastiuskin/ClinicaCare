@@ -2,16 +2,13 @@
 using Application.Auth.Logout;
 using Application.Auth.RefreshToken;
 using Application.Auth.Register;
-using Application.UserAccountManagement.Doctors.Commands.Create;
-using Application.UserAccountManagement.Doctors.DTO;
 using Application.UserAccountManagement.Doctors.Queries;
-using Application.UserAccountManagement.Patients.Queries;
 using Application.UserAccountManagement.UserDtos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API
+namespace API.Controllers
 {
     [ApiController]
     [Route("api/account")]
@@ -24,7 +21,7 @@ namespace API
         }
 
         [HttpPost]
-        [Route("patients/register")]
+        [Route("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
@@ -33,19 +30,6 @@ namespace API
             var result = await _mediator.Send(new PatientRegisterCommand(patientDto));
             if (result.IsSuccess)
                 return Ok("You have successfully registered");
-            return BadRequest(result.Errors);
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        [Route("doctors/create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateDoctor([FromBody] DoctorFormDto doctorDto)
-        {
-            var result = await _mediator.Send(new DoctorCreateCommand(doctorDto));
-            if (result.IsSuccess)
-                return Ok();
             return BadRequest(result.Errors);
         }
 
@@ -93,17 +77,5 @@ namespace API
             return BadRequest(result.Errors);
         }
 
-        [Authorize(Roles = "Doctor,Admin")]
-        [HttpGet]
-        [Route("patients")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllPatients([FromQuery] int pageNumber, [FromQuery] int pageSize)
-        {
-            var result = await _mediator.Send(new GetAllPatientsInfoQuery(pageNumber, pageSize));
-            if (result.IsSuccess)
-                return Ok(result.Value);
-            return BadRequest(result.Errors);
-        }
     }
 }
