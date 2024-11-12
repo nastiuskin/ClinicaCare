@@ -1,4 +1,4 @@
-﻿using Application.UserAccountManagement.Patients.UserDtos;
+﻿using Application.UserAccountManagement.UserDtos;
 using Domain.ValueObjects;
 using FluentValidation;
 
@@ -27,6 +27,9 @@ namespace Domain.Validation
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("Phone number is required.")
                 .Must(phoneNumber => PhoneNumber.Create(phoneNumber).IsSuccess).WithMessage("Invalid pnoheNumber format.");
+
+            RuleFor(x => x.ConfirmPassword)
+                .Equal(x => x.Password).WithMessage("Passwords do not match.");
         }
     }
 }

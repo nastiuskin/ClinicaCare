@@ -30,7 +30,7 @@ namespace Persistence.Database.Appointments
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<Appointment> GetAllAsync(int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetPaginatedAsync(int pageNumber, int pageSize)
         {
             return _context.Appointments
                 .Include(a => a.Patient)
@@ -46,7 +46,7 @@ namespace Persistence.Database.Appointments
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<Appointment> GetAllByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetPaginatedAppointmentsByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
         {
             return _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
@@ -54,7 +54,7 @@ namespace Persistence.Database.Appointments
                 .Take(pageSize); 
         }
 
-        public IQueryable<Appointment> GetAllByPatientIdAsync(UserId patientId, int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetPaginatedAppointmentsByPatientIdAsync(UserId patientId, int pageNumber, int pageSize)
         {
             return _context.Appointments
                 .Where(a => a.PatientId == patientId)
@@ -62,7 +62,7 @@ namespace Persistence.Database.Appointments
                 .Take(pageSize); 
         }
 
-        public IQueryable<Appointment> GetAllByMedicalProcedureIdAsync(MedicalProcedureId id, int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetPaginatedAppointmentsByMedicalProcedureIdAsync(MedicalProcedureId id, int pageNumber, int pageSize)
         {
             return _context.Appointments
                 .Where(a => a.MedicalProcedureId == id)

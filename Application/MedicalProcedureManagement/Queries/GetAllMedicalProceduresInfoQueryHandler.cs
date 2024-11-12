@@ -17,7 +17,8 @@ namespace Application.MedicalProcedureManagement.Queries
         private readonly IMedicalProcedureRepository _medicalProcedureRepository;
         private readonly IMapper _mapper;
 
-        public GetAllMedicalProceduresInfoQueryHandler(IMedicalProcedureRepository medicalProcedureRepository,
+        public GetAllMedicalProceduresInfoQueryHandler(
+            IMedicalProcedureRepository medicalProcedureRepository,
             IMapper mapper)
         {
             _medicalProcedureRepository = medicalProcedureRepository;
@@ -27,7 +28,7 @@ namespace Application.MedicalProcedureManagement.Queries
         public async Task<Result<ICollection<MedicalProcedureInfoDto>>> Handle(GetAllMedicalProceduresInfoQuery query,
             CancellationToken cancellationToken)
         {
-            var medicalProcedures = await _medicalProcedureRepository.GetAllAsync(query.PageNumber, query.PageSize).ToListAsync();
+            var medicalProcedures = await _medicalProcedureRepository.GetPaginatedAsync(query.PageNumber, query.PageSize).ToListAsync();
 
             var medicalProcedureInfoDtos = _mapper.Map<ICollection<MedicalProcedureInfoDto>>(medicalProcedures);
 

@@ -1,4 +1,4 @@
-﻿using Application.UserAccountManagement.Patients.UserDtos;
+﻿using Application.UserAccountManagement.UserDtos;
 using Domain.Users.Doctors;
 
 namespace Application.UserAccountManagement.Doctors.DTO

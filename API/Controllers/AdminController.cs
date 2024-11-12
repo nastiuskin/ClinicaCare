@@ -2,22 +2,53 @@
 using Application.MedicalProcedureManagement.Commands.Delete;
 using Application.MedicalProcedureManagement.Commands.Update;
 using Application.MedicalProcedureManagement.DTO;
-using Application.MedicalProcedureManagement.Queries;
-using Domain.MedicalProcedures;
+using Application.UserAccountManagement.Doctors.Commands.Create;
+using Application.UserAccountManagement.Doctors.DTO;
+using Application.UserAccountManagement.Patients.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.MedicalProcedures
+namespace API.Controllers
 {
     [ApiController]
-    [Route("api/procedures")]
-    public class MedicalProcedureController : ControllerBase
+    [Route("api/admin")]
+    [Authorize(Roles = "Admin")]
+    public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public MedicalProcedureController(IMediator mediator) => _mediator = mediator;
-
+        public AdminController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         [HttpPost]
+        [Route("doctors")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateDoctor([FromBody] DoctorFormDto doctorDto)
+        {
+            var result = await _mediator.Send(new DoctorCreateCommand(doctorDto));
+            if (result.IsSuccess)
+                return Ok();
+            return BadRequest(result.Errors);
+        }
+
+
+        [HttpGet]
+        [Route("patients")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPaginatedPatients([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        {
+            var result = await _mediator.Send(new GetAllPatientsInfoQuery(pageNumber, pageSize));
+            if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
+
+        [HttpPost]
+        [Route("procedures")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateMedicalProcedure([FromBody] MedicalProcedureFormDto procedureDto)
@@ -28,43 +59,8 @@ namespace API.MedicalProcedures
             return BadRequest(result.Errors);
         }
 
-        [HttpGet]
-        [Route("{id}")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetInfoById(Guid id)
-        {
-            var result = await _mediator.Send(new GetOneMedicalProcedureInfoQuery(id));
-
-            if (result.IsSuccess) return Ok(result.Value);
-            return NotFound();
-        }
-
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllMedicalProceduresInfo([FromQuery] int pageNumber, [FromQuery] int pageSize)
-        {
-            var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery(pageNumber, pageSize));
-            if (result.IsSuccess) return Ok(result.Value);
-            return BadRequest(result.Errors);
-        }
-
-        [HttpGet]
-        [Route("by-type/{type}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetMedicalProceduresByType(MedicalProcedureType type, [FromQuery] int pageNumber, [FromQuery] int pageSize)
-        {
-            var result = await _mediator.Send(new GetAllMedicalProceduresInfoByTypeQuery(type, pageNumber, pageSize));
-            if (result.IsSuccess) return Ok(result.Value);
-
-            if (result.Errors.Any()) return BadRequest(result.Errors);
-            return BadRequest(result.Errors);
-        }
-
         [HttpPut]
-        [Route("{id}")]
+        [Route("procedures/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -79,7 +75,7 @@ namespace API.MedicalProcedures
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("procedures/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

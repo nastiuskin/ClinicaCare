@@ -6,7 +6,7 @@ using FluentResults;
 
 namespace Domain.DomainServices
 {
-    public class AvailableTimeSlotService
+    public class AvailableTimeSlotService  
     {
         public static Result<List<TimeSlot>> GetAvailableTimeSlotsForDay(Doctor doctor, MedicalProcedure medicalProcedure, DateOnly selectedDate)
         {
