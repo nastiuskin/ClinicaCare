@@ -41,7 +41,7 @@ namespace Persistence.Database.Users
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<Doctor> GetAllDoctorsAsync(int pageNumber, int pageSize)
+        public IQueryable<Doctor> GetPaginatedDoctorsAsync(int pageNumber, int pageSize)
         {
             return _context.Users
                 .OfType<Doctor>()
@@ -49,14 +49,14 @@ namespace Persistence.Database.Users
                 .Take(pageSize);
         }
 
-        public IQueryable<Patient> GetAllPatientsAsync(int pageNumber, int pageSize)
+        public IQueryable<Patient> GetPaginatedPatientsAsync(int pageNumber, int pageSize)
         {
             return _context.Users.OfType<Patient>()
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize);
         }
 
-        public IQueryable<User> GetAllAsync(int pageNumber, int pageSize)
+        public IQueryable<User> GetPaginatedAsync(int pageNumber, int pageSize)
         {
             return _context.Users
                 .Skip((pageNumber - 1) * pageSize)

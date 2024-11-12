@@ -24,7 +24,7 @@ namespace Application.UserAccountManagement.Patients.Queries
         }
         public async Task<Result<ICollection<UserViewDto>>> Handle(GetAllPatientsInfoQuery request, CancellationToken cancellationToken)
         {
-            var patients = await _userRepository.GetAllPatientsAsync(request.PageNumber, request.PageSize).ToListAsync();
+            var patients = await _userRepository.GetPaginatedPatientsAsync(request.PageNumber, request.PageSize).ToListAsync();
 
             var patientsInfoDtos = _mapper.Map<ICollection<UserViewDto>>(patients);
 

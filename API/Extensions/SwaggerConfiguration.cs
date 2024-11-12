@@ -7,7 +7,6 @@ namespace API.Extensions
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
             services.AddEndpointsApiExplorer();
-            services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "ClinicaCare", Version = "v1" });
@@ -41,6 +40,12 @@ namespace API.Extensions
             });
             
             return services;
+        }
+
+        public static void UseSwaggerMiddleware(this WebApplication app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
     }
 }

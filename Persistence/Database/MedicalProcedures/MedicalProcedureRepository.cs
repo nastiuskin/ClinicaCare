@@ -57,14 +57,14 @@ namespace Persistence.Database.MedicalProcedures
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<MedicalProcedure> GetAllAsync(int pageNumber, int pageSize)
+        public IQueryable<MedicalProcedure> GetPaginatedAsync(int pageNumber, int pageSize)
         {
             return _context.MedicalProcedures
                 .Skip((pageNumber - 1)* pageSize)
                 .Take(pageSize);
         }
 
-        public IQueryable<MedicalProcedure> GetAllByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize)
+        public IQueryable<MedicalProcedure> GetPaginatedProceduresByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize)
         {
             return _context.MedicalProcedures
                 .Where(mp => mp.Type == type)
@@ -72,7 +72,7 @@ namespace Persistence.Database.MedicalProcedures
                 .Take(pageSize);
         }
 
-        public IQueryable<MedicalProcedure> GetAllByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
+        public IQueryable<MedicalProcedure> GetPaginatedProceduresByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
         {
             return _context.MedicalProcedures
                 .Where(mp => mp.Doctors

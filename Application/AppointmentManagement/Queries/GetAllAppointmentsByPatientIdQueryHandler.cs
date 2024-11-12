@@ -25,7 +25,7 @@ namespace Application.AppointmentManagement.Queries
         public async Task<Result<ICollection<AppointmentInfoDto>>> Handle(GetAllAppointmentsByPatientIdQuery query,
             CancellationToken cancellationToken)
         {
-            var appointments = await _appointmentRepository.GetAllAsync(query.PageNumber, query.PageSize)
+            var appointments = await _appointmentRepository.GetPaginatedAsync(query.PageNumber, query.PageSize)
                  .Where(a => a.PatientId == new UserId(query.PatientId)).ToListAsync();
 
             var appointmentDtos = _mapper.Map<ICollection<AppointmentInfoDto>>(appointments);
