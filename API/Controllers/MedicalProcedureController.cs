@@ -27,7 +27,7 @@ namespace API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllMedicalProceduresInfo([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedMedicalProceduresInfo([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery(pageNumber, pageSize));
             if (result.IsSuccess) return Ok(result.Value);
@@ -38,7 +38,7 @@ namespace API.Controllers
         [Route("by-type/{type}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetMedicalProceduresByType(MedicalProcedureType type, [FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedMedicalProceduresByType(MedicalProcedureType type, [FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var result = await _mediator.Send(new GetAllMedicalProceduresInfoByTypeQuery(type, pageNumber, pageSize));
             if (result.IsSuccess) return Ok(result.Value);

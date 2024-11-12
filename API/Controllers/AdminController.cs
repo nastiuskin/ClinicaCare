@@ -39,7 +39,7 @@ namespace API.Controllers
         [Route("patients")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllPatients([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedPatients([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var result = await _mediator.Send(new GetAllPatientsInfoQuery(pageNumber, pageSize));
             if (result.IsSuccess)

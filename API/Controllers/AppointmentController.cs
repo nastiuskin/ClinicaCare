@@ -76,7 +76,7 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetAllAppointmentsByCurrentUserId([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedAppointmentsByCurrentUserId([FromQuery] int pageNumber, [FromQuery] int pageSize)
         {
             var result = await _mediator.Send(new GetAllAppointmentsByCurrentUserIdQuery(pageNumber, pageSize));
             if (result.IsSuccess)
