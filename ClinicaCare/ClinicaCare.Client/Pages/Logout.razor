@@ -1,0 +1,50 @@
+﻿@page "/logout"
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Services
+@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+@rendermode InteractiveWebAssembly
+
+<h1 class="text-center mb-4">Logout</h1>
+
+<div class="center-form">
+    <MudPaper Class="pa-4 mx-auto mud-width-full mud-width-md shadow-lg" Style="max-width: 400px;">
+        <MudItem xs="12">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" @onclick="UserLogout">Logout</MudButton>
+        </MudItem>
+
+        @if (errors != null && errors.Length > 0)
+        {
+            <MudAlert Severity="Severity.Error" Style="margin-top: 20px;">
+                @foreach (var error in errors)
+                {
+                    <div>@error</div>
+                }
+            </MudAlert>
+        }
+    </MudPaper>
+</div>
+
+
+
+@code {
+    bool success;
+    string[] errors = { };
+    private async Task UserLogout()
+    {
+        var result = await AuthService.LogoutAsync(); 
+
+        if (result.Success)
+        {
+
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            errors = result.Errors;
+        }
+    }
+}

@@ -1,0 +1,79 @@
+﻿@page "/register"
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Services
+@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveWebAssembly
+
+<h1 style="text-align: center;">Register</h1>
+
+<div class="center-form">
+    <MudPaper Class="pa-4 mx-auto mud-width-full mud-width-md shadow-lg" Style="max-width: 400px;">
+        <EditForm Model="@userFormDto" OnValidSubmit="RegisterPatient">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="First Name" @bind-Value="userFormDto.FirstName" />
+                    <ValidationMessage For="@(() => userFormDto.FirstName)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Last Name" @bind-Value="userFormDto.LastName" />
+                    <ValidationMessage For="@(() => userFormDto.LastName)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Email" @bind-Value="userFormDto.Email" />
+                    <ValidationMessage For="@(() => userFormDto.Email)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Phone Number" @bind-Value="userFormDto.PhoneNumber" />
+                    <ValidationMessage For="@(() => userFormDto.PhoneNumber)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Date of Birth" @bind-Value="userFormDto.DateOfBirth" Placeholder="dd.mm.yyyy" />
+                    <ValidationMessage For="@(() => userFormDto.DateOfBirth)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Password" InputType="InputType.Password" @bind-Value="userFormDto.Password" />
+                    <ValidationMessage For="@(() => userFormDto.Password)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Confirm Password" InputType="InputType.Password" @bind-Value="userFormDto.ConfirmPassword" />
+                    <ValidationMessage For="@(() => userFormDto.ConfirmPassword)" />
+                </MudItem>
+
+                <!-- Submit Button -->
+                <MudItem xs="12">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Register</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudPaper>
+</div>
+
+@code {
+    private UserFormDto userFormDto = new UserFormDto();
+    private string[] errors;
+
+    private async Task RegisterPatient()
+    {
+        var result = await AuthService.RegisterAsync(userFormDto);
+
+        if (result.Success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            errors = result.Errors;
+        }
+    }
+}

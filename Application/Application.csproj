@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="UserAccountManagement\Patients\Commands\**" />
+    <EmbeddedResource Remove="UserAccountManagement\Patients\Commands\**" />
+    <None Remove="UserAccountManagement\Patients\Commands\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.2.0" />
@@ -18,11 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="UserAccountManagement\Patients\Commands\" />
-    <Folder Include="UserAccountManagement\Patients\DTO\" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

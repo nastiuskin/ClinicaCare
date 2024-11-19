@@ -48,6 +48,13 @@ namespace Application.Auth.Login
                 SameSite = SameSiteMode.Strict
             });
 
+            //_httpContextAccessor.HttpContext?.Response.Cookies.Append("accessToken", tokenResult.Value.AccessToken, new CookieOptions
+            //{
+            //    HttpOnly = true,
+            //    Secure = true,
+            //    SameSite = SameSiteMode.Strict
+            //});
+
             return Result.Ok(tokenResult.Value.AccessToken);
         }
     }

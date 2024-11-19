@@ -3,6 +3,7 @@ using API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.Services.ConfigureDbContext(builder.Configuration);
 builder.Services.ConfigureServices();
 builder.Services.InitializeRepositories();

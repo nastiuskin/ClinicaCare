@@ -1,0 +1,72 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Services
+@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+@rendermode InteractiveWebAssembly
+
+<h1 style="text-align: center; margin-bottom: 30px;">Login</h1>
+
+<div class="center-form">
+    <MudPaper Class="pa-4 mx-auto mud-width-full mud-width-md shadow-lg" Style="max-width: 400px;">
+        <EditForm Model="@userLoginDto" OnValidSubmit="UserLogin" FormName="LoginForm">
+            <DataAnnotationsValidator />
+            <MudGrid>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Email" @bind-Value="userLoginDto.Email" />
+                    <ValidationMessage For="@(() => userLoginDto.Email)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Password" InputType="InputType.Password" @bind-Value="userLoginDto.Password" />
+                    <ValidationMessage For="@(() => userLoginDto.Password)" />
+                </MudItem>
+
+                <MudCheckBox @bind-Value="userLoginDto.RememberMe" Dense="true" Color="Color.Success" Style="margin-left: 20px; margin-top: 20px">Remember me</MudCheckBox>
+
+                <MudItem xs="12">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Login</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+
+
+        @if (errors != null && errors.Length > 0)
+        {
+            <MudAlert Severity="Severity.Error" Style="margin-top: 20px;">
+                @foreach (var error in errors)
+                {
+                    <div>@error</div>
+                }
+            </MudAlert>
+        }
+    </MudPaper>
+</div>
+
+
+@code {
+    bool success;
+    string[] errors = { };
+    private UserLoginDto userLoginDto = new UserLoginDto();
+
+
+    private async Task UserLogin()
+    {
+        var result = await AuthService.LoginAsync(userLoginDto);
+
+        if (result.Success)
+        {
+            
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            errors = result.Errors;
+        }
+    }
+}
