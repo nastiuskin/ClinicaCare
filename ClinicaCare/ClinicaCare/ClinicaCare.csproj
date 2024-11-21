@@ -11,6 +11,7 @@
     <ProjectReference Include="..\..\Persistence\Persistence.csproj" />
     <ProjectReference Include="..\..\Shared\Shared.csproj" />
     <ProjectReference Include="..\ClinicaCare.Client\ClinicaCare.Client.csproj" />
+    <PackageReference Include="Blazr.RenderState.Server" Version="1.0.0" />
     <PackageReference Include="FluentResults" Version="3.16.0" />
     <PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.1.0" />
     <PackageReference Include="FluentValidation" Version="11.10.0" />

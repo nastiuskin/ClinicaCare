@@ -4,7 +4,7 @@ using ClinicaCare.Client.Services.Interfaces;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace ClinicaCare.Client.Services
+namespace ClinicaCare.Client.Services.Auth
 {
     public class AuthService : IAuthService
     {
@@ -87,13 +87,13 @@ namespace ClinicaCare.Client.Services
             {
                 return (false, new[] { $"An error occurred: {ex.Message}" });
             }
-        } 
+        }
 
         public async Task<(bool Success, string? Token, string? ErrorMessage)> RefreshTokenAsync()
         {
             try
             {
-                var response = await _httpClient.PostAsync("/refresh", null);
+                var response = await _httpClient.PostAsync("api/account/refresh", null);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -116,7 +116,8 @@ namespace ClinicaCare.Client.Services
             }
         }
 
-
     }
+
 }
+
 

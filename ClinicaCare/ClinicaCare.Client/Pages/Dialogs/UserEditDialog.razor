@@ -1,0 +1,101 @@
+﻿@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@UserData" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <!-- First Name -->
+                <MudItem xs="12">
+                    <MudTextField Label="First Name" @bind-Value="UserData.FirstName" />
+                    <ValidationMessage For="@(() => UserData.FirstName)" />
+                </MudItem>
+
+                <!-- Last Name -->
+                <MudItem xs="12">
+                    <MudTextField Label="Last Name" @bind-Value="UserData.LastName" />
+                    <ValidationMessage For="@(() => UserData.LastName)" />
+                </MudItem>
+
+                <!-- Email -->
+                <MudItem xs="12">
+                    <MudTextField Label="Email" @bind-Value="UserData.Email" />
+                    <ValidationMessage For="@(() => UserData.Email)" />
+                </MudItem>
+
+                <!-- Phone Number -->
+                <MudItem xs="12">
+                    <MudTextField Label="Phone Number" @bind-Value="UserData.PhoneNumber" />
+                    <ValidationMessage For="@(() => UserData.PhoneNumber)" />
+                </MudItem>
+
+                <!-- Date of Birth -->
+                <MudItem xs="12">
+                    <MudTextField Label="Date of Birth" @bind-Value="UserData.DateOfBirth" />
+                    <ValidationMessage For="@(() => UserData.DateOfBirth)" />
+                </MudItem>
+            </MudGrid>
+
+            <!-- Action Buttons -->
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Save</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@if (errors != null && errors.Length > 0)
+{
+    <MudAlert Severity="Severity.Error" Style="margin-top: 20px;">
+        @foreach (var error in errors)
+        {
+            <div>@error</div>
+        }
+    </MudAlert>
+}
+else if (success)
+{
+    <MudAlert Severity="Severity.Success" Style="margin-top: 20px;">
+        Profile data successfully changed
+    </MudAlert>
+}
+
+
+@code {
+    [CascadingParameter] 
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] 
+    public UserViewDto UserData { get; set; }
+    bool success;
+    string[] errors = { };
+
+    private async Task Save()
+    {
+        var result = await UserService.UpdateAsync(UserData);
+        if (result.Success)
+        {
+            success = true;
+            MudDialog.Close(DialogResult.Ok(UserData));
+        }
+        else
+        {
+            errors = result.Errors;
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
+

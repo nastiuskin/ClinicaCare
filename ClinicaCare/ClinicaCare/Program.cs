@@ -1,8 +1,10 @@
 using API.Extensions;
 using Blazored.LocalStorage;
+using Blazr.RenderState.Server;
 using ClinicaCare.Client.Services;
 using ClinicaCare.Client.Services.Interfaces;
 using ClinicaCare.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
-
+builder.AddBlazrRenderStateServerServices();
 builder.Services.AddMudServices();
 builder.Services.ConfigureDbContext(builder.Configuration);
 builder.Services.ConfigureServices();
@@ -24,11 +26,10 @@ builder.Services.InitializeControllers();
 builder.Services.ConfigureSwagger();
 
 builder.Services.AddHttpClient();
-builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddTransient<ITokenService, TokenService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddAuthorizationCore();
+
+
 var app = builder.Build();
 
 await app.SeedDataAsync();
@@ -52,6 +53,7 @@ app.UseStaticFiles();
 app.ConfigureMiddleware();
 app.UseAntiforgery();
 app.MapControllers();
+
 
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()

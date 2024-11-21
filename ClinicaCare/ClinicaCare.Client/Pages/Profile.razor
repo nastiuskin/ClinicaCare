@@ -1,0 +1,102 @@
+﻿@page "/profile"
+
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Pages.Dialogs
+@using ClinicaCare.Client.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@using MudBlazor
+
+@inject IUserService UserService
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveWebAssembly
+
+<PageTitle>Profile</PageTitle>
+
+
+<h1 style="text-align: center; margin-bottom: 30px; font-weight: 600; font-size: 50px; display: flex; align-items: center; justify-content: center;">
+    <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Large" Style="margin-right: 12px;" />
+    Profile
+</h1>
+
+<div class="profile-container">
+    <MudCard>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="First Name" @bind-Value="userViewDto.FirstName" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Last Name" @bind-Value="userViewDto.LastName" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Email" @bind-Value="userViewDto.Email" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Phone Number" @bind-Value="userViewDto.PhoneNumber" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Date of Birth" @bind-Value="userViewDto.DateOfBirth" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+            </MudGrid>
+            <MudButton Class="edit-button" Color="Color.Primary" OnClick="ShowEditDialog" Variant="Variant.Filled" Size="Size.Small" Style="margin-top: 20px" FullWidth="true">
+                <MudIcon Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Style="margin-right: 8px" />
+                Edit Profile
+            </MudButton>
+        </MudCardContent>
+        </MudCard>
+</div>
+
+
+@code {
+    private UserViewDto userViewDto = new();
+    private string errorMessage = string.Empty;
+    private bool isEditMode = false;
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var (user, error) = await UserService.GetProfile();
+        if (user != null)
+        {
+            userViewDto = user;
+        }
+        else
+        {
+            errorMessage = error;
+        }
+    }
+
+    private async Task ShowEditDialog()
+    {
+        if (userViewDto == null)
+        {
+            errorMessage = "User data is not loaded yet.";
+            return;
+        }
+
+        var userViewDtoCopy = new UserViewDto
+            {
+                FirstName = userViewDto.FirstName,
+                LastName = userViewDto.LastName,
+                Email = userViewDto.Email,
+                PhoneNumber = userViewDto.PhoneNumber,
+                DateOfBirth = userViewDto.DateOfBirth
+            };
+
+        var parameters = new DialogParameters
+    {
+        { "UserData", userViewDtoCopy }
+    };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<UserEditDialog>("Edit Profile", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (result is { Canceled: false } && result.Data is UserViewDto updatedUser)
+        {
+            userViewDto = updatedUser;
+        }
+    }
+}

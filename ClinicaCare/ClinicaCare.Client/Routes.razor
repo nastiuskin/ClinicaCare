@@ -1,5 +1,12 @@
 ﻿@using Layout
 
+@inject Blazr.RenderState.IBlazrRenderStateService RenderStateService
+
+@if (RenderStateService.IsPreRender)
+{
+     return;
+}
+
 <Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />

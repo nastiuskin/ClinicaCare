@@ -1,0 +1,33 @@
+﻿@page "/services"
+@using Application.MedicalProcedureManagement.DTO
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject HttpClient httpClient
+@rendermode InteractiveWebAssembly
+
+<h3>Medical Procedures</h3>
+
+<MudTable Items="medicalProcedures" Dense="true" Hover="true">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Duration</MudTh>
+        <MudTh>Price</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+        <MudTd>@context.Type</MudTd>
+        <MudTd>@context.Duration.ToString(@"hh\:mm")</MudTd>
+        <MudTd>@context.Price.ToString("C")</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private List<MedicalProcedureInfoDto> medicalProcedures = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // medicalProcedures = await httpClient.GetFromJsonAsync("");
+    }
+}

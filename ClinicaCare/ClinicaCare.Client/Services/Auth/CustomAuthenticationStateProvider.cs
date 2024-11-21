@@ -1,10 +1,9 @@
 ﻿using ClinicaCare.Client.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.JSInterop;
 using System.Security.Claims;
-using System.Text.Json;
 
-namespace ClinicaCare.Client.Services
+namespace ClinicaCare.Client.Services.Auth
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
@@ -14,6 +13,7 @@ namespace ClinicaCare.Client.Services
         {
             _tokenService = tokenService;
         }
+
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var token = await _tokenService.GetTokenAsync();
@@ -48,4 +48,3 @@ namespace ClinicaCare.Client.Services
         }
     }
 }
-

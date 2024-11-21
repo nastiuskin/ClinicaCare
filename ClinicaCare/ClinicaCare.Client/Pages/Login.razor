@@ -9,6 +9,8 @@
 
 @rendermode InteractiveWebAssembly
 
+<PageTitle>Login</PageTitle>
+
 <h1 style="text-align: center; margin-bottom: 30px;">Login</h1>
 
 <div class="center-form">
@@ -45,6 +47,12 @@
                 }
             </MudAlert>
         }
+
+        <div style="text-align: center; margin-top: 20px;">
+            <span>Don't have an account? 
+                <MudLink Href="/register" Style="text-decoration: underline; color: blue;">Register here</MudLink>
+            </span>
+        </div>
     </MudPaper>
 </div>
 
@@ -61,8 +69,7 @@
 
         if (result.Success)
         {
-            
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/", true);
         }
         else
         {

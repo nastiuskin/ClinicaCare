@@ -1,15 +1,15 @@
 ﻿using Blazored.LocalStorage;
 using ClinicaCare.Client.Services.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.JSInterop;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace ClinicaCare.Client.Services
+namespace ClinicaCare.Client.Services.Auth
 {
     public class TokenService : ITokenService
     {
         private readonly ILocalStorageService _localStorage;
-
         public TokenService(ILocalStorageService localStorage)
         {
             _localStorage = localStorage;

@@ -1,0 +1,36 @@
+﻿@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <DialogContent>
+        Are you sure you want to log out?
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Secondary">No</MudButton>
+        <MudButton OnClick="Confirm" Color="Color.Primary">Yes</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = null!;
+
+    private async Task Confirm()
+    {
+        var result = await AuthService.LogoutAsync();
+
+        if (result.Success)
+        {
+            NavigationManager.NavigateTo("/", true);
+            MudDialog.Close(DialogResult.Ok(true)); 
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Cancel());
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

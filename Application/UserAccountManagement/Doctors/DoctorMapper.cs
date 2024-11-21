@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Users;
 using Domain.Users.Doctors;
 using Domain.ValueObjects;
+using Shared.DTO.Users;
 
 namespace Application.UserAccountManagement.Doctors
 {
@@ -28,10 +29,19 @@ namespace Application.UserAccountManagement.Doctors
 
 
             CreateMap<Doctor, DoctorPartialInfoDto>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
-            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
-            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
-            .ForMember(dest => dest.SpecializationType, opt => opt.MapFrom(src => src.Specialization));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+                .ForMember(dest => dest.SpecializationType, opt => opt.MapFrom(src => src.Specialization));
+
+            CreateMap<Doctor, DoctorViewDto>()
+                 .ForMember(dest => dest.SpecializationType, opt => opt.MapFrom(src => src.Specialization))
+                 .ForMember(dest => dest.Biography, opt => opt.MapFrom(src => src.Biography))
+                 .ForMember(dest => dest.CabinetNumber, opt => opt.MapFrom(src => src.CabinetNumber))
+                 .ForMember(dest => dest.WorkingHoursStart, opt => opt.MapFrom(src => src.WorkingHours.StartTime.ToString()))
+                 .ForMember(dest => dest.WorkingHoursEnd, opt => opt.MapFrom(src => src.WorkingHours.EndTime.ToString()));
+
+
         }
     }
 }

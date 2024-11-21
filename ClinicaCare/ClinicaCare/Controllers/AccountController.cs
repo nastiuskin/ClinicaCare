@@ -2,6 +2,7 @@
 using Application.Auth.Logout;
 using Application.Auth.RefreshToken;
 using Application.Auth.Register;
+using Application.UserAccountManagement;
 using Application.UserAccountManagement.Doctors.Queries;
 using Application.UserAccountManagement.UserDtos;
 using MediatR;
@@ -77,5 +78,26 @@ namespace API.Controllers
             return BadRequest(result.Errors);
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route("profile")]
+        public async Task<ActionResult> GetUserProfile()
+        {
+            var result = await _mediator.Send(new GetUserProfileQuery());
+            if(result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
+
+        [Authorize]
+        [HttpPut]
+        [Route("profile/edit")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UserViewDto userFormDto)
+        {
+            var result = await _mediator.Send(new UpdateUserCommand(userFormDto));
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result.Errors);
+        }
     }
 }
