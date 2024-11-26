@@ -30,14 +30,10 @@ namespace Persistence.Database.Appointments
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<Appointment> GetPaginatedAsync(int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetAll()
         {
-            return _context.Appointments
-                .Include(a => a.Patient)
-                .Include(a => a.Doctor)
-                .Include(a => a.MedicalProcedure)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
+            return _context.Appointments;
+                
         }
 
         public async Task UpdateAsync(Appointment entity)
@@ -46,7 +42,7 @@ namespace Persistence.Database.Appointments
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<Appointment> GetPaginatedAppointmentsByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetAllAppointmentsByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
         {
             return _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
@@ -54,7 +50,7 @@ namespace Persistence.Database.Appointments
                 .Take(pageSize); 
         }
 
-        public IQueryable<Appointment> GetPaginatedAppointmentsByPatientIdAsync(UserId patientId, int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetAllAppointmentsByPatientIdAsync(UserId patientId, int pageNumber, int pageSize)
         {
             return _context.Appointments
                 .Where(a => a.PatientId == patientId)
@@ -62,7 +58,7 @@ namespace Persistence.Database.Appointments
                 .Take(pageSize); 
         }
 
-        public IQueryable<Appointment> GetPaginatedAppointmentsByMedicalProcedureIdAsync(MedicalProcedureId id, int pageNumber, int pageSize)
+        public IQueryable<Appointment> GetAllAppointmentsByMedicalProcedureIdAsync(MedicalProcedureId id, int pageNumber, int pageSize)
         {
             return _context.Appointments
                 .Where(a => a.MedicalProcedureId == id)

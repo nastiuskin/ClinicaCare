@@ -1,0 +1,80 @@
+﻿@using Application.MedicalProcedureManagement.DTO
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject IMedicalProcedureService MedicalProcedureService
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@ProcedureUpdateDto" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudGrid>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Name" @bind-Value="ProcedureUpdateDto.Name" />
+                    <ValidationMessage For="@(() => ProcedureUpdateDto.Name)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Type" @bind-Value="ProcedureUpdateDto.Type" />
+                    <ValidationMessage For="@(() => ProcedureUpdateDto.Type)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Duration" @bind-Value="ProcedureUpdateDto.Duration" />
+                    <ValidationMessage For="@(() => ProcedureUpdateDto.Duration)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Price" @bind-Value="ProcedureUpdateDto.Price" />
+                    <ValidationMessage For="@(() => ProcedureUpdateDto.Price)" />
+                </MudItem>
+
+                </MudGrid>
+            <!-- Action Buttons -->
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudButton ButtonType="ButtonType.Submit" OnClick="Save" Color="Color.Primary">Save</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public MedicalProcedureUpdateDto ProcedureUpdateDto { get; set; }
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    bool success;
+
+    private async Task Save()
+    {
+        var result = await MedicalProcedureService.UpdateMedicalProcedureAsync(Id, ProcedureUpdateDto);
+        if (result)
+        {
+            success = true;
+            MudDialog.Close(DialogResult.Ok(ProcedureUpdateDto));
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
+

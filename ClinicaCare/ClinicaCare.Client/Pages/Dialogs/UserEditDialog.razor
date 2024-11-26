@@ -53,6 +53,7 @@
     </DialogContent>
 </MudDialog>
 
+@* separate component
 @if (errors != null && errors.Length > 0)
 {
     <MudAlert Severity="Severity.Error" Style="margin-top: 20px;">
@@ -68,7 +69,7 @@ else if (success)
         Profile data successfully changed
     </MudAlert>
 }
-
+ *@
 
 @code {
     [CascadingParameter] 

@@ -1,33 +1,185 @@
 ﻿@page "/services"
+@using Application.Helpers.PaginationStuff
 @using Application.MedicalProcedureManagement.DTO
 @using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Pages.Dialogs
 @using ClinicaCare.Client.Services.Interfaces
+@using Domain.Helpers.PaginationStuff
 @using MudBlazor
-@inject HttpClient httpClient
+@inject IMedicalProcedureService MedicalProcedureService
+@inject IUserService UserService
+@inject IJSRuntime JsRuntime
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+
 @rendermode InteractiveWebAssembly
 
-<h3>Medical Procedures</h3>
+<PageTitle>Services</PageTitle>
+<h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Our Medical Procedures</h3>
 
-<MudTable Items="medicalProcedures" Dense="true" Hover="true">
-    <HeaderContent>
-        <MudTh>Name</MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh>Duration</MudTh>
-        <MudTh>Price</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>@context.Name</MudTd>
-        <MudTd>@context.Type</MudTd>
-        <MudTd>@context.Duration.ToString(@"hh\:mm")</MudTd>
-        <MudTd>@context.Price.ToString("C")</MudTd>
-    </RowTemplate>
-</MudTable>
+<MudGrid Justify="Justify.Center" Spacing="3">
+    <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateProcedure">
+            Create New Procedure
+        </MudButton>
+    </MudItem>
+
+    @if (medicalProcedures.Count > 0)
+    {
+        @foreach (var procedure in medicalProcedures)
+        {
+            <MudItem xs="12">
+                <MudCard Elevation="6" Class="pa-4 hover-card" Style="margin-bottom: 16px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <!-- Two-column layout -->
+                    <MudGrid>
+                        <MudItem xs="8">
+                            <MudCardContent>
+                                <MudText Typo="Typo.h5" Class="mud-text-capitalize">@procedure.Name</MudText>
+                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Type: @procedure.Type</MudText>
+                            </MudCardContent>
+                        </MudItem>
+
+                        <MudItem xs="4" Style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                            <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="() => ViewDetails(procedure.Id)">
+                                View Details
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info" OnClick="() => EditProcedure(procedure.Id)" Style="margin-top: 8px;">
+                                Edit
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Warning" Style="margin-top: 8px;" OnClick="() => DeleteProcedure(procedure.Id)">
+                                Delete
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudCard>
+            </MudItem>
+        }
+    }
+    else
+    {
+        <MudItem xs="12" Style="text-align: center;">
+            <MudText Typo="Typo.subtitle1" Color="Color.Secondary">No procedures available.</MudText>
+        </MudItem>
+    }
+</MudGrid>
+
+<div class="row">
+    <div class="col">
+        <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+    </div>
+</div>
 
 @code {
-    private List<MedicalProcedureInfoDto> medicalProcedures = new();
+    public List<MedicalProcedureInfoDto> medicalProcedures { get; set; } = new();
+    public MetaData MetaData { get; set; } = new MetaData();
+    private MedicalProcedureParameters _procedureParameters = new();
 
     protected override async Task OnInitializedAsync()
     {
-        // medicalProcedures = await httpClient.GetFromJsonAsync("");
+        await GetProcedures();
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        _procedureParameters.PageNumber = page;
+        await GetProcedures();
+        await ScrollToTop();
+    }
+
+    private async Task GetProcedures()
+    {
+        var pagingResponse = await MedicalProcedureService.GetAllMedicalProceduresAsync(_procedureParameters);
+        medicalProcedures = pagingResponse.Items;
+        MetaData = pagingResponse.MetaData;
+    }
+
+    private async void ViewDetails(Guid id)
+    {
+        var medicalProcedure = await MedicalProcedureService.GetMedicalProcedureAsync(id);
+
+        var parameters = new DialogParameters
+        {
+            { "medicalProcedureInfo", medicalProcedure }
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<MedicalProcedureInfoDialog>("", parameters, options);
+        var result = await dialog.Result;
+    }
+
+    private async Task DeleteProcedure(Guid procedureId)
+    {
+        var parameters = new DialogParameters
+    {
+        { "ConfirmationMessage", "Are you sure you want to delete this medical procedure?" },
+        { "OnConfirm", EventCallback.Factory.Create<bool>(this, async (confirmed) =>
+            {
+                if (confirmed)
+                {
+                    var success = await MedicalProcedureService.DeleteMedicalProcedure(procedureId);
+                    if (success)
+                    {
+                        await GetProcedures(); 
+                        Snackbar.Add("Procedure deleted successfully.", Severity.Success);
+                    }
+                    else
+                    {
+                        Snackbar.Add("Failed to delete procedure.", Severity.Error);
+                    }
+                }
+            })
+        }
+    };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<ConfirmationDialog>("Confirm Deletion", parameters, options);
+    }
+
+
+    private async void CreateProcedure()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<ProcedureCreateDialog>("Create Procedure", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetProcedures(); 
+        }
+    }
+
+    private async void EditProcedure(Guid id)
+    {
+    //     var procedure = await MedicalProcedureService.GetMedicalProcedureAsync(id);
+
+    //     var parameters = new DialogParameters
+    // {
+    //     { "ProcedureUpdateDto", new MedicalProcedureInfoWithDoctorsDto
+    //         {
+    //             Name = procedure.Name,
+    //             Type = procedure.Type,
+    //             Duration = procedure.Duration,
+    //             Price = procedure.Price
+    //         }
+    //     }
+    // };
+
+    //     var options = new DialogOptions { CloseOnEscapeKey = true };
+    //     var dialog = DialogService.Show<ServiceUpdateDialog>("Edit Procedure", parameters, options);
+
+    //     var result = await dialog.Result;
+
+    //     if (!result.Canceled)
+    //     {
+    //         await GetProcedures();
+    //     }
+    }
+
+
+    private async Task ScrollToTop()
+    {
+        await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
     }
 }

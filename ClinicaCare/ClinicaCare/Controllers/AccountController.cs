@@ -5,6 +5,7 @@ using Application.Auth.Register;
 using Application.UserAccountManagement;
 using Application.UserAccountManagement.Doctors.Queries;
 using Application.UserAccountManagement.UserDtos;
+using Domain.Helpers.PaginationStuff;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -70,9 +71,22 @@ namespace API.Controllers
         [Route("doctors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPaginatedDoctors([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedDoctors([FromQuery] UserParameters userParameters)
         {
-            var result = await _mediator.Send(new GetAllDoctorsInfoQuery(pageNumber, pageSize));
+            var result = await _mediator.Send(new GetAllDoctorsInfoQuery(userParameters));
+            if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
+
+
+        [HttpGet]
+        [Route("doctors-list")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetAllDoctors()
+        {
+            var result = await _mediator.Send(new GetListOfDoctorsQuery());
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);

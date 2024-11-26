@@ -5,7 +5,7 @@
 
 <MudDialog>
     <DialogContent>
-        Are you sure you want to log out?
+        @ConfirmationMessage
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel" Color="Color.Secondary">No</MudButton>
@@ -17,19 +17,16 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = null!;
 
+    [Parameter]
+    public string ConfirmationMessage { get; set; } = "Are you sure?";
+
+    [Parameter]
+    public EventCallback<bool> OnConfirm { get; set; }
+
     private async Task Confirm()
     {
-        var result = await AuthService.LogoutAsync();
-
-        if (result.Success)
-        {
-            NavigationManager.NavigateTo("/", true);
-            MudDialog.Close(DialogResult.Ok(true)); 
-        }
-        else
-        {
-            MudDialog.Close(DialogResult.Cancel());
-        }
+        await OnConfirm.InvokeAsync(true);
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private void Cancel() => MudDialog.Cancel();

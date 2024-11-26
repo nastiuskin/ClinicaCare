@@ -66,7 +66,7 @@ namespace ClinicaCare.Client.Services.Auth
             }
         }
 
-        public async Task<(bool Success, string[] Errors)> LogoutAsync()
+        public async Task<bool> LogoutAsync()
         {
             try
             {
@@ -75,17 +75,17 @@ namespace ClinicaCare.Client.Services.Auth
                 if (response.IsSuccessStatusCode)
                 {
                     await _tokenService.RemoveTokenAsync();
-                    return (true, Array.Empty<string>());
+                    return true;
                 }
                 else
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
-                    return (false, new[] { $"Logout failed: {errorResponse}" });
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                return (false, new[] { $"An error occurred: {ex.Message}" });
+                return false;
             }
         }
 

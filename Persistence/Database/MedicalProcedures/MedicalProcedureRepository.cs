@@ -1,4 +1,5 @@
-﻿using Domain.MedicalProcedures;
+﻿using Application.Helpers.PaginationStuff;
+using Domain.MedicalProcedures;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,14 +58,13 @@ namespace Persistence.Database.MedicalProcedures
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<MedicalProcedure> GetPaginatedAsync(int pageNumber, int pageSize)
+        public IQueryable<MedicalProcedure> GetAll()
         {
-            return _context.MedicalProcedures
-                .Skip((pageNumber - 1)* pageSize)
-                .Take(pageSize);
+            return _context.MedicalProcedures;
+               
         }
 
-        public IQueryable<MedicalProcedure> GetPaginatedProceduresByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize)
+        public IQueryable<MedicalProcedure> GetAllProceduresByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize)
         {
             return _context.MedicalProcedures
                 .Where(mp => mp.Type == type)
@@ -72,7 +72,7 @@ namespace Persistence.Database.MedicalProcedures
                 .Take(pageSize);
         }
 
-        public IQueryable<MedicalProcedure> GetPaginatedProceduresByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
+        public IQueryable<MedicalProcedure> GetAllProceduresByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
         {
             return _context.MedicalProcedures
                 .Where(mp => mp.Doctors
@@ -83,5 +83,11 @@ namespace Persistence.Database.MedicalProcedures
         {
             return await _context.MedicalProcedures.CountAsync();
         }
-}
+
+        public PagedList<MedicalProcedure> GetMedicalProceduresAsync(QueryStringParameters parameters)
+        {
+            return PagedList<MedicalProcedure>
+                .ToPagedList(GetAll(), parameters.PageNumber, parameters.PageSize);
+        }
+    }
 }

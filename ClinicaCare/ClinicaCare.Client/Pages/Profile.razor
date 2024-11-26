@@ -85,9 +85,9 @@
             };
 
         var parameters = new DialogParameters
-    {
-        { "UserData", userViewDtoCopy }
-    };
+        {
+            { "UserData", userViewDtoCopy }
+        };
 
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var dialog = DialogService.Show<UserEditDialog>("Edit Profile", parameters, options);

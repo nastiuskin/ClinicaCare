@@ -1,0 +1,151 @@
+﻿@page "/doctors"
+
+@using Application.UserAccountManagement.Doctors.DTO
+@using ClinicaCare.Client.Pages.Dialogs
+@using ClinicaCare.Client.Services.Interfaces
+@using Domain.Helpers.PaginationStuff
+@using MudBlazor
+@inject IUserService UserService
+@inject IJSRuntime JsRuntime
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+@rendermode InteractiveWebAssembly
+
+<PageTitle>Doctors</PageTitle>
+
+<h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Doctors</h3>
+
+
+<MudGrid Class="ma-4">
+    <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="ShowCreateDoctorDialog">
+           Add Doctor
+        </MudButton>
+    </MudItem>
+    @if (doctors.Count > 0)
+    {
+        @foreach (var doctor in doctors)
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard Elevation="3" Class="pa-4 hover-card" Style="margin-bottom: 24px; border-radius: 10px;">
+                    <MudCardHeader Class="d-flex align-items-center justify-content-start">
+                        <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large">
+                            @doctor.FirstName?.Substring(0, 1)
+                        </MudAvatar>
+                        <MudText Typo="Typo.h6" Class="mud-text-capitalize ml-3">@($"{doctor.FirstName} {doctor.LastName}")</MudText>
+                    </MudCardHeader>
+
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2" Style="color: #1976D2; font-weight: 500;">
+                            Specialization: @doctor.SpecializationType
+                        </MudText>
+                    </MudCardContent>
+
+                    <MudCardActions Class="d-flex justify-content-between">
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="() => ViewProfile(doctor.Id)">
+                            View Profile
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info" OnClick="() => EditDoctor(doctor.Id)">
+                            Edit
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Error" OnClick="() => DeleteDoctor(doctor.Id)">
+                            Delete
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    }
+    else
+    {
+        <MudItem xs="12" Style="text-align: center;">
+            <MudText Typo="Typo.subtitle1" Color="Color.Secondary" Style="font-weight: 400; padding: 20px;">No doctors available.</MudText>
+        </MudItem>
+    }
+</MudGrid>
+
+
+
+@code {
+    public List<DoctorPartialInfoDto> doctors { get; set; } = new();
+    public MetaData MetaData { get; set; } = new MetaData();
+    private UserParameters _userParameters = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetDoctors();
+    }
+
+
+    private async Task GetDoctors()
+    {
+        var pagingResponse = await UserService.GetPagiantedDoctorsAsync(_userParameters);
+        doctors = pagingResponse.Items;
+        MetaData = pagingResponse.MetaData;
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        _userParameters.PageNumber = page;
+        await GetDoctors();
+        await ScrollToTop();
+    }
+
+    private async Task ShowCreateDoctorDialog()
+    {
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = DialogService.Show<DoctorCreateDialog>("Create Doctor", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var newDoctor = (DoctorFormDto)result.Data;
+        }
+    }
+
+    private async Task ScrollToTop()
+    {
+        await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
+    }
+
+    private async Task ViewProfile(Guid id)
+    {
+
+    }
+
+    private async Task EditDoctor(Guid id)
+    {
+
+    }
+
+    private async Task DeleteDoctor(Guid id)
+    {
+        var parameters = new DialogParameters
+    {
+        { "ConfirmationMessage", "Are you sure you want to delete this doctor?" },
+        { "OnConfirm", EventCallback.Factory.Create<bool>(this, async (confirmed) =>
+            {
+                if (confirmed)
+                {
+                    var success = await UserService.DeleteUser(id);
+                    if (success)
+                    {
+                        await GetDoctors();
+                        Snackbar.Add("Doctor deleted successfully.", Severity.Success);
+                    }
+                    else
+                    {
+                        Snackbar.Add("Failed to delete doctor.", Severity.Error);
+                    }
+                }
+            })
+        }
+
+    };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<ConfirmationDialog>("Confirm Deletion", parameters, options);
+    }
+
+}

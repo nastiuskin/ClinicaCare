@@ -47,7 +47,7 @@ namespace Application.AppointmentManagement.Queries
             if (string.IsNullOrEmpty(roleClaim))
                 return Result.Fail("User role claim is missing or invalid.");
 
-            var appointmentsQuery = _appointmentRepository.GetPaginatedAsync(query.PageNumber, query.PageSize);
+            var appointmentsQuery = _appointmentRepository.GetAll();
             var appointments = roleClaim == "Doctor"
                 ? await appointmentsQuery.Where(a => a.DoctorId == userId).ToListAsync(cancellationToken)
                 : await appointmentsQuery.Where(a => a.PatientId == userId).ToListAsync(cancellationToken);

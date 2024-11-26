@@ -1,4 +1,6 @@
-﻿using Domain.Intefraces;
+﻿using Application.Helpers.PaginationStuff;
+using Domain.Helpers.PaginationStuff;
+using Domain.Intefraces;
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
 
@@ -9,8 +11,8 @@ namespace Domain.Users
         public Task<User?> GetByIdAsync(UserId id);
         public Task<User?> GetByEmailAsync(string email);
         public Task<IEnumerable<Doctor>> GetListOfDoctorsByIdsAsync(List<UserId> doctors);
-        public IQueryable<Doctor> GetPaginatedDoctorsAsync(int pageNumber, int pageSize); //later can be filtered by medical procedure type 
-        public IQueryable<Patient> GetPaginatedPatientsAsync(int pageNumber, int pageSize);  //can be filtered by date of birth
+        public PagedList<Doctor> GetAllDoctorsAsync(UserParameters parameters); 
+        public PagedList<Patient> GetAllPatientsAsync(UserParameters parameters);  
         public IQueryable<Doctor> GetByIdWithAppointmentsOnSpecificDayAsync(UserId doctorId, DateOnly date);
     }
 }

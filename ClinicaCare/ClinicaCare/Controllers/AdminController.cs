@@ -2,9 +2,11 @@
 using Application.MedicalProcedureManagement.Commands.Delete;
 using Application.MedicalProcedureManagement.Commands.Update;
 using Application.MedicalProcedureManagement.DTO;
+using Application.UserAccountManagement;
 using Application.UserAccountManagement.Doctors.Commands.Create;
 using Application.UserAccountManagement.Doctors.DTO;
 using Application.UserAccountManagement.Patients.Queries;
+using Domain.Helpers.PaginationStuff;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +15,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/admin")]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -39,9 +41,9 @@ namespace API.Controllers
         [Route("patients")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPaginatedPatients([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedPatients([FromQuery] UserParameters parameters)
         {
-            var result = await _mediator.Send(new GetAllPatientsInfoQuery(pageNumber, pageSize));
+            var result = await _mediator.Send(new GetAllPatientsInfoQuery(parameters));
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);
@@ -82,6 +84,20 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteMedicalProcedure(Guid id)
         {
             var result = await _mediator.Send(new DeleteMedicalProcedureCommand(id));
+            if (result.IsSuccess) return Ok();
+
+            if (result.Errors.Any()) return BadRequest(result.Errors);
+            return NotFound();
+        }
+
+        [HttpDelete]
+        [Route("users/{id}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var result = await _mediator.Send(new DeleteUserCommand(id));
             if (result.IsSuccess) return Ok();
 
             if (result.Errors.Any()) return BadRequest(result.Errors);

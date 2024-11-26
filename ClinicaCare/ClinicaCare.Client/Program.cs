@@ -30,8 +30,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.AddBlazrRenderStateWASMServices();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-
+builder.Services.AddScoped<IMedicalProcedureService, MedicalProcedureService>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 

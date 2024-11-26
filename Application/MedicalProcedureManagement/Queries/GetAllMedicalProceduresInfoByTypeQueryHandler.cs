@@ -27,7 +27,7 @@ namespace Application.MedicalProcedureManagement.Queries
         public async Task<Result<ICollection<MedicalProcedureInfoDto>>> Handle(GetAllMedicalProceduresInfoByTypeQuery request, 
             CancellationToken cancellationToken)
         {
-            var medicalProcedures = await _medicalProcedureRepository.GetPaginatedProceduresByTypeAsync(request.Type, request.PageNumber, request.PageSize).ToListAsync();
+            var medicalProcedures = await _medicalProcedureRepository.GetAllProceduresByTypeAsync(request.Type, request.PageNumber, request.PageSize).ToListAsync();
 
             var medicalProcedureInfoDtos = _mapper.Map<ICollection<MedicalProcedureInfoDto>>(medicalProcedures);
 

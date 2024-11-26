@@ -1,0 +1,68 @@
+﻿@using Application.MedicalProcedureManagement.DTO
+@using MudBlazor
+
+<MudDialog MaxWidth="MaxWidth.Medium" FullWidth="true">
+    <DialogContent>
+        <MudForm Model="@medicalProcedureInfo">
+            <MudGrid Spacing="4">
+                <!-- Medical Procedure Information -->
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h4" Class="mud-text-capitalize text-center">@medicalProcedureInfo.Name</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1" Class="mud-text-muted text-center">Type: @medicalProcedureInfo.Type</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1" Class="mud-text-muted text-center">Duration: @medicalProcedureInfo.Duration</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1" Class="mud-text-muted text-center">Price: @medicalProcedureInfo.Price.ToString("C")</MudText>
+                </MudItem>
+
+@*                 <MudDivider />
+ *@
+               @*  <!-- Doctors List -->
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mud-text-capitalize">Doctors:</MudText>
+                </MudItem>
+
+                @foreach (var doctor in medicalProcedureInfo.Doctors)
+                {
+                    <MudItem xs="12" md="6" lg="4" Style="margin-top: 12px;">
+                        <MudCard Class="pa-3">
+                            <MudCardContent>
+                                <MudText Typo="Typo.body2"><strong>@doctor.FirstName @doctor.LastName</strong></MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-muted">Specialization: @doctor.SpecializationType</MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+
+                <MudDivider /> *@
+
+                <!-- Action Buttons -->
+                <MudGrid>
+                    <MudItem xs="12" Class="d-flex justify-content-center">
+                        <MudButton OnClick="Close" Color="Color.Secondary" Variant="Variant.Text" Class="mud-button-fullwidth">
+                            Close
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public MedicalProcedureInfoWithDoctorsDto medicalProcedureInfo { get; set; }
+
+    private void Close()
+    {
+        MudDialog.Cancel();
+    }
+}

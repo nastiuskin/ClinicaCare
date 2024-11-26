@@ -32,7 +32,7 @@ namespace Application.UserAccountManagement.Doctors
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
-                .ForMember(dest => dest.SpecializationType, opt => opt.MapFrom(src => src.Specialization));
+                .ForMember(dest => dest.SpecializationType, opt => opt.MapFrom(src => src.Specialization.ToString()));
 
             CreateMap<Doctor, DoctorViewDto>()
                  .ForMember(dest => dest.SpecializationType, opt => opt.MapFrom(src => src.Specialization))

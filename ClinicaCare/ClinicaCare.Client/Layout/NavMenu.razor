@@ -1,9 +1,14 @@
 ﻿@using ClinicaCare.Client.Pages
 @using ClinicaCare.Client.Pages.Dialogs
+@using ClinicaCare.Client.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
 
 
 ﻿<div class="top-row ps-3 navbar navbar-dark">
@@ -46,15 +51,47 @@
                      </div>
                 </NotAuthorized>
             </AuthorizeView>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="services">
+                <span class="bi bi bi-list-nested-nav-menu" aria-hidden="true"></span> Services
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="doctors">
+                <span class="bi bi bi-list-nested-nav-menu" aria-hidden="true"></span> Doctors
+            </NavLink>
+        </div>
     </nav>
  </div>
 
 @code
 {
-    private async Task ShowLogoutConfirmation()
-    {
+        private async Task ShowLogoutConfirmation()
+        {
+            var parameters = new DialogParameters
+        {
+            {"ConfirmationMessage", "Are you sure you want to log out?"},
+            {"OnConfirm", EventCallback.Factory.Create<bool>(this, async(confirmed) =>
+                {
+                    if (confirmed)
+                    {
+                        var success = await AuthService.LogoutAsync();
+                        if (success)
+                        {
+                            Snackbar.Add("You have logged out.", Severity.Info);
+                            NavigationManager.NavigateTo("/", true);
+                        }
+                        else
+                        {
+                            Snackbar.Add("Failed to log out.", Severity.Error);
+                        }
+                    }
+                })
+        }
+       };
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<LogoutConfirmationDialog>("Logout Confirmation", options);
-        var result = await dialog.Result;
+        DialogService.Show<ConfirmationDialog>("", parameters, options);
     }
 }

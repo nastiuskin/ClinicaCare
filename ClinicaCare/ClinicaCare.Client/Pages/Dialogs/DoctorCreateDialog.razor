@@ -1,0 +1,129 @@
+﻿@using Application.UserAccountManagement.Doctors.DTO
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Services.Interfaces
+@using MudBlazor
+@inject IUserService UserService
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@DoctorData" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <!-- First Name -->
+                <MudItem xs="12">
+                    <MudTextField Label="First Name" @bind-Value="DoctorData.FirstName" Required="true" />
+                    <ValidationMessage For="@(() => DoctorData.FirstName)" />
+                </MudItem>
+
+                <!-- Last Name -->
+                <MudItem xs="12">
+                    <MudTextField Label="Last Name" @bind-Value="DoctorData.LastName" Required="true" /><ConfirmationDialog />
+                    <ValidationMessage For="@(() => DoctorData.LastName)" />
+                </MudItem>
+
+                <!-- Email -->
+                <MudItem xs="12">
+                    <MudTextField Label="Email" @bind-Value="DoctorData.Email" Required="true" />
+                    <ValidationMessage For="@(() => DoctorData.Email)" />
+                </MudItem>
+
+                <!-- Phone Number -->
+                <MudItem xs="12">
+                    <MudTextField Label="Phone Number" @bind-Value="DoctorData.PhoneNumber" Required="true" />
+                    <ValidationMessage For="@(() => DoctorData.PhoneNumber)" />
+                </MudItem>
+
+                <!-- Date of Birth -->
+                <MudItem xs="12">
+                    <MudTextField Label="Date of Birth (dd.MM.yyyy)" @bind-Value="DoctorData.DateOfBirth" Required="true" />
+                    <ValidationMessage For="@(() => DoctorData.DateOfBirth)" />
+                </MudItem>
+
+                <!-- Biography -->
+                <MudItem xs="12">
+                    <MudTextField Label="Biography" @bind-Value="DoctorData.Biography" />
+                </MudItem>
+
+                <!-- Cabinet Number -->
+                <MudItem xs="12">
+                    <MudTextField Label="Cabinet Number" @bind-Value="DoctorData.CabinetNumber" />
+                </MudItem>
+
+                <!-- Working Hours Start -->
+                <MudItem xs="12">
+                    <MudTextField Label="Working Hours Start" @bind-Value="DoctorData.WorkingHoursStart" />
+                </MudItem>
+
+                <!-- Working Hours End -->
+                <MudItem xs="12">
+                    <MudTextField Label="Working Hours End" @bind-Value="DoctorData.WorkingHoursEnd" />
+                </MudItem>
+            </MudGrid>
+
+            <!-- Password -->
+            <MudItem xs="12">
+                <MudTextField Label="Password" InputType="InputType.Password" @bind-Value="DoctorData.Password" />
+            </MudItem>
+
+            <!-- Confirm Password -->
+            <MudItem xs="12">
+                <MudTextField Label="Confirm Password" InputType="InputType.Password" @bind-Value="DoctorData.ConfirmPassword" />
+            </MudItem>
+
+            <!-- Action Buttons -->
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudButton ButtonType="ButtonType.Submit" OnClick="Save" Color="Color.Primary">Create</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@if (errors != null && errors.Length > 0)
+{
+    <MudAlert Severity="Severity.Error" Style="margin-top: 20px;">
+        @foreach (var error in errors)
+        {
+            <div>@error</div>
+        }
+    </MudAlert>
+}
+else if (success)
+{
+    <MudAlert Severity="Severity.Success" Style="margin-top: 20px;">
+        Doctor successfully created!
+    </MudAlert>
+}
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private DoctorFormDto DoctorData = new();
+    private bool success;
+    private string[] errors = { };
+
+    [Inject]
+    private ISnackbar Snackbar { get; set; }
+
+    private async Task Save()
+    {
+        var result = await UserService.CreateDoctorAsync(DoctorData);
+        if (result)
+        {
+            success = true;
+            Snackbar.Add("Doctor created successfully.", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(DoctorData));
+        }
+        }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}
+

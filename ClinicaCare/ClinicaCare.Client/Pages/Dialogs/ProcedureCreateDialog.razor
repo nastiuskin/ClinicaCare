@@ -1,0 +1,107 @@
+﻿@using Application.MedicalProcedureManagement.DTO
+@using Application.UserAccountManagement.Doctors.DTO
+@using ClinicaCare.Client.Services.Interfaces
+@using Domain.MedicalProcedures
+@using MudBlazor
+@inject IMedicalProcedureService MedicalProcedureService
+@inject IUserService UserService
+@inject ISnackbar Snackbar
+
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@procedureFormDto" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="Name" @bind-Value="procedureFormDto.Name" />
+                    <ValidationMessage For="@(() => procedureFormDto.Name)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudSelect Label="Type" @bind-Value="procedureFormDto.Type">
+                        @foreach (var type in Enum.GetValues(typeof(MedicalProcedureType)).Cast<MedicalProcedureType>())
+                        {
+                            <MudSelectItem Value="@type">@type.ToString()</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <ValidationMessage For="@(() => procedureFormDto.Type)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Duration" @bind-Value="procedureFormDto.Duration" Placeholder="hh:mm" />
+                    <ValidationMessage For="@(() => procedureFormDto.Duration)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Price" @bind-Value="procedureFormDto.Price" />
+                    <ValidationMessage For="@(() => procedureFormDto.Price)" />
+                </MudItem>
+            </MudGrid>
+@* 
+               <MudSelect T="Guid" Label="Assign Doctors" MultiSelection="true" @bind-SelectedValues="options">
+                @foreach (var doctor in doctors)
+                {
+                    <MudSelectItem T="Guid" Value="@doctor.Id">
+                        @($"{doctor.FirstName} {doctor.LastName}")
+                    </MudSelectItem>
+                }
+                </MudSelect>
+ *@
+            <!-- Action Buttons -->
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Save</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private MedicalProcedureFormDto procedureFormDto = new()
+        {
+            Doctors = new List<Guid>()
+        };
+    private List<DoctorPartialInfoDto> doctors;
+
+    private List<Guid> options { get; set; } = new List<Guid>();
+
+    private bool success;
+
+    protected override async Task OnInitializedAsync()
+    {
+        (success, doctors) = await UserService.GetAllDoctorsAsync();
+        if (!success || doctors == null)
+        {
+            Snackbar.Add("Failed to load doctors.", Severity.Error);
+        }
+    }
+
+    private async Task Save()
+    {
+        // procedureFormDto.Doctors = options;
+        var result = await MedicalProcedureService.CreateMedicalProcedureAsync(procedureFormDto);
+        if (result)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            Snackbar.Add("Medical procedure successfully created.", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(false));
+            Snackbar.Add("Failed to create procedure.", Severity.Error);
+        }
+    }
+
+    public void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

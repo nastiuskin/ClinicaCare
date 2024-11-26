@@ -1,5 +1,87 @@
 ﻿@page "/"
+@using ClinicaCare.Client.Services.Auth
+@using MudBlazor
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<!-- Page Wrapper -->
+<div class="page-wrapper">
+    <!-- Body Section -->
+    <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+        <MudPaper Class="pa-4 mb-4" Elevation="4">
+            <!-- Welcome Section -->
+            <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-2">Welcome to ClinicaCare!</MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Secondary" Class="mb-4">
+                We offer quality medical services and an easy appointment scheduling process.
+            </MudText>
+
+            <!-- Authentication Section -->
+            <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Tertiary" Class="mt-4">Not registered?</MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">
+                To schedule an appointment, you need to register or log in.
+            </MudText>
+
+            <MudGrid Spacing="2" Class="mb-4">
+                <MudItem xs="12" sm="6" Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="NavigateToRegister">
+                        Register
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="12" sm="6" Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" @onclick="NavigateToLogin">
+                        Login
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+
+            <!-- Services Section -->
+            <MudDivider Class="my-4" />
+            <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-2">Our Services</MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">
+                We provide a wide range of medical services, from general healthcare to specialized treatments.
+            </MudText>
+
+            <!-- How-to Section -->
+            <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-2">How to Make an Appointment</MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">
+                To make an appointment, you need to be registered or logged in.
+            </MudText>
+        </MudPaper>
+    </MudContainer>
+
+    <!-- Footer Section -->
+    <MudPaper Class="pa-4" Elevation="1" Square="true" Style="background-color: #f9f9f9;">
+        <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-2">Contact Us</MudText>
+        <MudGrid Spacing="2">
+            <MudItem xs="12" sm="4" Class="d-flex justify-center">
+                <MudText Typo="Typo.body1" Align="Align.Center">
+                    <strong>Address:</strong> [Clinic Address]
+                </MudText>
+            </MudItem>
+            <MudItem xs="12" sm="4" Class="d-flex justify-center">
+                <MudText Typo="Typo.body1" Align="Align.Center">
+                    <strong>Phone:</strong> [Phone Number]
+                </MudText>
+            </MudItem>
+            <MudItem xs="12" sm="4" Class="d-flex justify-center">
+                <MudText Typo="Typo.body1" Align="Align.Center">
+                    <strong>Email:</strong> [Email]
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</div>
+
+@code {
+    private void NavigateToRegister()
+    {
+        Navigation.NavigateTo("/register");
+    }
+
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

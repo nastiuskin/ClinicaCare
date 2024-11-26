@@ -23,10 +23,9 @@ namespace Application.MedicalProcedureManagement
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type));
 
             CreateMap<MedicalProcedure, MedicalProcedureInfoWithDoctorsDto>()
-               .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.Value))
                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+               .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration.ToString()))
                .ForMember(dest => dest.Doctors, opt => opt.MapFrom(src => src.Doctors));
-
         }
     }
 }

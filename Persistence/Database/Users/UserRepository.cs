@@ -1,4 +1,6 @@
-﻿using Domain.Users;
+﻿using Application.Helpers.PaginationStuff;
+using Domain.Helpers.PaginationStuff;
+using Domain.Users;
 using Domain.Users.Doctors;
 using Domain.Users.Patients;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,12 @@ namespace Persistence.Database.Users
         {
             _context = context;
         }
+
+        public IQueryable<User> GetAll()
+        {
+            return _context.Users.OfType<User>();
+        }
+
         public async Task AddAsync(User entity)
         {
             _context.Users.Add(entity);
@@ -41,26 +49,16 @@ namespace Persistence.Database.Users
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable<Doctor> GetPaginatedDoctorsAsync(int pageNumber, int pageSize)
+        public PagedList<Doctor> GetAllDoctorsAsync(UserParameters parameters)
         {
-            return _context.Users
-                .OfType<Doctor>()
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
+            return PagedList<Doctor>
+                .ToPagedList(GetAll().OfType<Doctor>(), parameters.PageNumber, parameters.PageSize);
         }
 
-        public IQueryable<Patient> GetPaginatedPatientsAsync(int pageNumber, int pageSize)
+        public PagedList<Patient> GetAllPatientsAsync(UserParameters parameters)
         {
-            return _context.Users.OfType<Patient>()
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
-        }
-
-        public IQueryable<User> GetPaginatedAsync(int pageNumber, int pageSize)
-        {
-            return _context.Users
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
+            return PagedList<Patient>
+                 .ToPagedList(GetAll().OfType<Patient>(), parameters.PageNumber, parameters.PageSize);
         }
 
         public async Task<int> GetTotalCountAsync()

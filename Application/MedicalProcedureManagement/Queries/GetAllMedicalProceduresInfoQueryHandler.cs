@@ -1,13 +1,16 @@
 ﻿using Application.Configuration.Queries;
+using Application.Helpers.PaginationStuff;
 using Application.MedicalProcedureManagement.DTO;
 using AutoMapper;
 using Domain.MedicalProcedures;
 using FluentResults;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Application.MedicalProcedureManagement.Queries
 {
-    public record GetAllMedicalProceduresInfoQuery(int PageNumber, int PageSize)
+    public record GetAllMedicalProceduresInfoQuery(MedicalProcedureParameters Parameters)
         : IQuery<Result<ICollection<MedicalProcedureInfoDto>>>;
 
 
@@ -16,21 +19,25 @@ namespace Application.MedicalProcedureManagement.Queries
     {
         private readonly IMedicalProcedureRepository _medicalProcedureRepository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public GetAllMedicalProceduresInfoQueryHandler(
             IMedicalProcedureRepository medicalProcedureRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor)
         {
             _medicalProcedureRepository = medicalProcedureRepository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Result<ICollection<MedicalProcedureInfoDto>>> Handle(GetAllMedicalProceduresInfoQuery query,
             CancellationToken cancellationToken)
         {
-            var medicalProcedures = await _medicalProcedureRepository.GetPaginatedAsync(query.PageNumber, query.PageSize).ToListAsync();
+            var medicalProcedures = _medicalProcedureRepository.GetMedicalProceduresAsync(query.Parameters);
 
             var medicalProcedureInfoDtos = _mapper.Map<ICollection<MedicalProcedureInfoDto>>(medicalProcedures);
+            _httpContextAccessor.HttpContext.Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(medicalProcedures.MetaData));
 
             return Result.Ok(medicalProcedureInfoDtos);
         }

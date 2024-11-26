@@ -1,4 +1,5 @@
 ﻿using Application.MedicalProcedureManagement.Queries;
+using Application.Helpers.PaginationStuff;
 using Domain.MedicalProcedures;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,9 +28,9 @@ namespace API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPaginatedMedicalProceduresInfo([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedMedicalProceduresInfo([FromQuery] MedicalProcedureParameters parameters)
         {
-            var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery(pageNumber, pageSize));
+            var result = await _mediator.Send(new GetAllMedicalProceduresInfoQuery(parameters));
             if (result.IsSuccess) return Ok(result.Value);
             return BadRequest(result.Errors);
         }
