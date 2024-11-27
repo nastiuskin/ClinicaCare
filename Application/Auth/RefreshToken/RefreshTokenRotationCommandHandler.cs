@@ -3,6 +3,7 @@ using Domain.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Application.Auth.RefreshToken
@@ -31,11 +32,16 @@ namespace Application.Auth.RefreshToken
             if (string.IsNullOrEmpty(refreshToken))
                 return Result.Fail("Refresh token is missing.");
 
-            var emailClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
-            if (string.IsNullOrEmpty(emailClaim))
-                return Result.Fail("User email claim is missing or invalid.");
+            var accessTokenResult = _jwtService.GetBearerToken(_httpContextAccessor);
+            if (accessTokenResult.IsFailed)
+                return Result.Fail(accessTokenResult.Errors);
 
-            var user = await _userManager.FindByEmailAsync(emailClaim);
+            var emailClaimResult = _jwtService.GetEmailFromToken(accessTokenResult.Value);
+            if (emailClaimResult.IsFailed)
+                return Result.Fail(emailClaimResult.Errors);
+
+
+            var user = await _userManager.FindByEmailAsync(emailClaimResult.Value);
             if (user == null)
                 return Result.Fail("User not found.");
 

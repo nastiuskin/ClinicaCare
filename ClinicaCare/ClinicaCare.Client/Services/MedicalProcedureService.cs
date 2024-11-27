@@ -9,15 +9,11 @@ using System.Text.Json;
 
 namespace ClinicaCare.Client.Services
 {
-    public class MedicalProcedureService : IMedicalProcedureService
+    public class MedicalProcedureService(IHttpClientFactory _httpClientFactory) : IMedicalProcedureService
     {
-        private readonly HttpClient _httpClient;
-        public MedicalProcedureService(HttpClient httpClientFactory)
-        {
-            _httpClient = httpClientFactory;
-        }
         public async Task<PagingResponse<MedicalProcedureInfoDto>> GetAllMedicalProceduresAsync(MedicalProcedureParameters parameters)
         {
+            using HttpClient httpClient = _httpClientFactory.CreateClient("ApiClient");
             var queryStringParam = new Dictionary<string, string>
             {
                 ["pageNumber"] = parameters.PageNumber.ToString(),
@@ -27,7 +23,7 @@ namespace ClinicaCare.Client.Services
                 queryStringParam["type"] = parameters.Type.ToString();
 
             var queryString = string.Join("&", queryStringParam.Select(kvp => $"{kvp.Key}={kvp.Value}"));
-            var response = await _httpClient.GetAsync($"api/procedures?{queryString}");
+            var response = await httpClient.GetAsync($"api/procedures?{queryString}");
             var content = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
@@ -53,7 +49,8 @@ namespace ClinicaCare.Client.Services
 
             try
             {
-                var response = await _httpClient.GetAsync(url);
+                using HttpClient httpClient = _httpClientFactory.CreateClient("ApiClient");
+                var response = await httpClient.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -81,7 +78,8 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
-                var response = await _httpClient.DeleteAsync($"api/admin/procedures/{id}");
+                using HttpClient httpClient = _httpClientFactory.CreateClient("ApiClient");
+                var response = await httpClient.DeleteAsync($"api/admin/procedures/{id}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -102,7 +100,8 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("api/admin/procedures", medicalProcedureFormDto);
+                using HttpClient httpClient = _httpClientFactory.CreateClient("ApiClient");
+                var response = await httpClient.PostAsJsonAsync("api/admin/procedures", medicalProcedureFormDto);
                 if (response.IsSuccessStatusCode)
                     return true;
                 else
@@ -118,7 +117,8 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
-                var response = await _httpClient.PutAsJsonAsync($"api/admin/procedures/{id}", medicalProcedureUpdateDto);
+                using HttpClient httpClient = _httpClientFactory.CreateClient("ApiClient");
+                var response = await httpClient.PutAsJsonAsync($"api/admin/procedures/{id}", medicalProcedureUpdateDto);
                 if (response.IsSuccessStatusCode)
                     return true;
                 else

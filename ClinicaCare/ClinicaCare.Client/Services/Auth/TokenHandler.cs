@@ -22,6 +22,7 @@ namespace ClinicaCare.Client.Services.Auth
 
             if (!string.IsNullOrEmpty(token))
             {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 if (_tokenService.IsTokenExpired(token))
                 {
                     try
@@ -34,7 +35,6 @@ namespace ClinicaCare.Client.Services.Auth
                     }
                 }
 
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
 
             return await base.SendAsync(request, cancellationToken);

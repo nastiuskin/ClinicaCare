@@ -169,8 +169,7 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
-                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient"
-                    );
+                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.GetAsync($"api/account/{id}/doctor-profile");
 
                 if (response.IsSuccessStatusCode)

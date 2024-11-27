@@ -3,7 +3,9 @@ using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -73,11 +75,11 @@ namespace Application.Auth
         public async Task<Result> RevokeRefreshTokenAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) 
+            if (user == null)
                 return Result.Fail("User not found");
 
             var deleteRefreshTokenResult = user.DeleteRefreshToken();
-            if (!deleteRefreshTokenResult.IsSuccess) 
+            if (!deleteRefreshTokenResult.IsSuccess)
                 return Result.Fail(deleteRefreshTokenResult.Errors);
 
             await _userManager.UpdateAsync(user);
@@ -98,10 +100,33 @@ namespace Application.Auth
 
         public Result ValidateRefreshTokenAsync(User user, string refreshToken)
         {
-            if (!refreshToken.Equals(user.RefreshToken)) 
+            if (!refreshToken.Equals(user.RefreshToken))
                 return Result.Fail("Refresh token is not valid");
 
             return Result.Ok();
+        }
+
+        public Result<string> GetBearerToken(IHttpContextAccessor httpContextAccessor)
+        {
+            var authorizationHeader = httpContextAccessor.HttpContext?.Request.Headers["Authorization"];
+
+            var accessToken = authorizationHeader.HasValue && !StringValues.IsNullOrEmpty(authorizationHeader.Value)
+                ? authorizationHeader.Value.ToString().Replace("Bearer ", "")
+                : string.Empty;
+
+            if (string.IsNullOrEmpty(accessToken))
+                return Result.Fail("Access token is missing.");
+            return Result.Ok(accessToken);
+        }
+
+        public Result<string> GetEmailFromToken(string accessToken)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(accessToken);
+            var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(emailClaim))
+                return Result.Fail("User email claim is missing or invalid.");
+            return Result.Ok(emailClaim);
         }
     }
 }

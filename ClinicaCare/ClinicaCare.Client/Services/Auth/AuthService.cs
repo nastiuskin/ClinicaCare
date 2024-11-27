@@ -7,122 +7,87 @@ using System.Text.Json;
 
 namespace ClinicaCare.Client.Services.Auth
 {
-    public class AuthService : IAuthService
+    public class AuthService(IHttpClientFactory _httpClientFactory, ITokenService _tokenService) : IAuthService
     {
-        private readonly IHttpClientFactory _httpClient;
-        private readonly ITokenService _tokenService;
-
-        public AuthService(IHttpClientFactory httpClientFactory, ITokenService tokenService)
-        {
-            _httpClient = httpClientFactory;
-            _tokenService = tokenService;
-        }
 
         public async Task<(bool Success, string[] Errors)> LoginAsync(UserLoginDto userLoginDto)
         {
-            try
+            using HttpClient client = _httpClientFactory.CreateClient("ApiClient");
+            var response = await client.PostAsJsonAsync("api/account/login", userLoginDto);
+
+            if (response.IsSuccessStatusCode)
             {
-                using HttpClient client = _httpClient.CreateClient("ApiClient");
-                var response = await client.PostAsJsonAsync("api/account/login", userLoginDto);
+                var token = await response.Content.ReadAsStringAsync();
+                await _tokenService.SetTokenAsync(token);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var token = await response.Content.ReadAsStringAsync();
-                    await _tokenService.SetTokenAsync(token);
-
-                    return (true, Array.Empty<string>());
-                }
-
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                var apiErrors = JsonSerializer.Deserialize<List<ApiErrorResponse>>(errorResponse);
-
-                var errorMessage = apiErrors?.FirstOrDefault()?.Message ?? "An unknown error occurred.";
-                return (false, new[] { errorMessage });
+                return (true, Array.Empty<string>());
             }
-            catch (Exception ex)
-            {
-                return (false, new[] { $"An error occurred: {ex.Message}" });
-            }
+
+            var errorResponse = await response.Content.ReadAsStringAsync();
+            var apiErrors = JsonSerializer.Deserialize<List<ApiErrorResponse>>(errorResponse);
+
+            var errorMessage = apiErrors?.FirstOrDefault()?.Message ?? "An unknown error occurred.";
+            return (false, new[] { errorMessage });
         }
 
 
         public async Task<(bool Success, string[] Errors)> RegisterAsync(UserFormDto userFormDto)
         {
-            try
-            {
-                using HttpClient client = _httpClient.CreateClient("ApiClient");
-                var response = await client.PostAsJsonAsync("/api/account/register", userFormDto);
+            using HttpClient client = _httpClientFactory.CreateClient("ApiClient");
+            var response = await client.PostAsJsonAsync("/api/account/register", userFormDto);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return (true, Array.Empty<string>());
-                }
-                else
-                {
-                    var errorResponse = await response.Content.ReadAsStringAsync();
-                    return (false, new[] { $"Registration failed: {errorResponse}" });
-                }
-            }
-            catch (Exception ex)
+            if (response.IsSuccessStatusCode)
             {
-                return (false, new[] { $"An error occurred: {ex.Message}" });
+                return (true, Array.Empty<string>());
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                return (false, new[] { $"Registration failed: {errorResponse}" });
             }
         }
 
         public async Task<bool> LogoutAsync()
         {
-            try
-            {
-                using HttpClient client = _httpClient.CreateClient("ApiClient");
-                var response = await client.PostAsync("/api/account/logout", null);
+            using HttpClient client = _httpClientFactory.CreateClient("ApiClient");
+            var response = await client.PostAsync("/api/account/logout", null);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    await _tokenService.RemoveTokenAsync();
-                    return true;
-                }
-                else
-                {
-                    var errorResponse = await response.Content.ReadAsStringAsync();
-                    return false;
-                }
-            }
-            catch (Exception ex)
+            if (response.IsSuccessStatusCode)
             {
+                await _tokenService.RemoveTokenAsync();
+                return true;
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
                 return false;
             }
         }
 
         public async Task<(bool Success, string? Token, string? ErrorMessage)> RefreshTokenAsync()
         {
-            try
+            using var client = _httpClientFactory.CreateClient("ApiClient");
+            var response = await client.PostAsync("api/account/refresh", null);
+
+            if (!response.IsSuccessStatusCode)
             {
-                using HttpClient client = _httpClient.CreateClient("ApiClient");
-                var response = await client.PostAsync("api/account/refresh", null);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var newToken = await response.Content.ReadFromJsonAsync<string>();
-                    if (!string.IsNullOrEmpty(newToken))
-                    {
-                        await _tokenService.SetTokenAsync(newToken);
-                        return (true, newToken, null);
-                    }
-
-                    return (false, null, "Received an invalid token response.");
-                }
-
                 var errorMessage = await response.Content.ReadAsStringAsync();
-                return (false, null, $"Token refresh failed with error: {errorMessage}");
+                return (false, null, $"Token refresh failed with status code {response.StatusCode}: {errorMessage}");
             }
-            catch (Exception ex)
+
+            var newToken = await response.Content.ReadFromJsonAsync<string>();
+            if (string.IsNullOrEmpty(newToken))
             {
-                return (false, null, $"An exception occurred while refreshing the token: {ex.Message}");
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                return (false, null, $"Token refresh failed: {errorMessage}");
             }
+
+            await _tokenService.SetTokenAsync(newToken);
+            return (true, newToken, null);
         }
 
     }
-
 }
+
 
 

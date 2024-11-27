@@ -10,15 +10,11 @@ using System.Text.Json;
 
 namespace ClinicaCare.Client.Services
 {
-    public class AppointmentService : IAppointmentService
+    public class AppointmentService(IHttpClientFactory httpClientFactory) : IAppointmentService
     {
-        private readonly HttpClient _httpClient;
-        public AppointmentService(HttpClient httpClientFactory)
-        {
-            _httpClient = httpClientFactory;
-        }
         public async Task<PagingResponse<AppointmentInfoDto>> GetAllAppontmentsAsync(AppointmentParameters parameters)
         {
+            using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
             var queryStringParam = new Dictionary<string, string>
             {
                 ["pageNumber"] = parameters.PageNumber.ToString(),

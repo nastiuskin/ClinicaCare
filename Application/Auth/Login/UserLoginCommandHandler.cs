@@ -4,6 +4,7 @@ using Domain.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Application.Auth.Login
 {
@@ -40,20 +41,25 @@ namespace Application.Auth.Login
             var tokenResult = await _jwtService.GenerateTokensAsync(user);
             if (!tokenResult.IsSuccess) 
                 return Result.Fail(tokenResult.Errors);
-
-            _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", tokenResult.Value.RefreshToken, new CookieOptions
+            if (command.UserLoginDto.RememberMe)
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            //_httpContextAccessor.HttpContext?.Response.Cookies.Append("accessToken", tokenResult.Value.AccessToken, new CookieOptions
-            //{
-            //    HttpOnly = true,
-            //    Secure = true,
-            //    SameSite = SameSiteMode.Strict
-            //});
+                _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", tokenResult.Value.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    MaxAge = TimeSpan.FromDays(30)
+                });
+            }
+            else
+            {
+                _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", tokenResult.Value.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
+            }
 
             return Result.Ok(tokenResult.Value.AccessToken);
         }
