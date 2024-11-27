@@ -11,7 +11,7 @@ namespace Domain.Users
         public Task<User?> GetByIdAsync(UserId id);
         public Task<User?> GetByEmailAsync(string email);
         public Task<IEnumerable<Doctor>> GetListOfDoctorsByIdsAsync(List<UserId> doctors);
-        public PagedList<Doctor> GetAllDoctorsAsync(UserParameters parameters); 
+        public PagedList<Doctor> GetAllDoctorsAsync(DoctorParameters doctorParameters); 
         public PagedList<Patient> GetAllPatientsAsync(UserParameters parameters);  
         public IQueryable<Doctor> GetByIdWithAppointmentsOnSpecificDayAsync(UserId doctorId, DateOnly date);
     }

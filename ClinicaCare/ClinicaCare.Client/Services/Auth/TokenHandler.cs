@@ -9,10 +9,10 @@ namespace ClinicaCare.Client.Services.Auth
         private readonly ITokenService _tokenService;
         private readonly IRefreshTokenService _refreshTokenService;
 
-        public TokenHandler(ITokenService tokenService) : base(new HttpClientHandler())
+        public TokenHandler(ITokenService tokenService, IRefreshTokenService refreshTokenService)
         {
             _tokenService = tokenService;
-            //_refreshTokenService = refreshTokenService;
+            _refreshTokenService = refreshTokenService;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -22,24 +22,24 @@ namespace ClinicaCare.Client.Services.Auth
 
             if (!string.IsNullOrEmpty(token))
             {
-                //if (_tokenService.IsTokenExpired(token))
-                //{
-                //    try
-                //    {
-                //        token = await _refreshTokenService.RefreshTokenAsync();
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        Console.WriteLine($"Token refresh failed: {ex.Message}");
-                //    }
-                //}
+                if (_tokenService.IsTokenExpired(token))
+                {
+                    try
+                    {
+                        token = await _refreshTokenService.RefreshTokenAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Token refresh failed: {ex.Message}");
+                    }
+                }
 
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
 
-                return await base.SendAsync(request, cancellationToken);
-            }
-
+            return await base.SendAsync(request, cancellationToken);
         }
+
     }
+}
 

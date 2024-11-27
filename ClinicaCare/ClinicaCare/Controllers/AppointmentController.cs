@@ -3,6 +3,7 @@ using Application.AppointmentManagement.Commands.Complete;
 using Application.AppointmentManagement.Commands.Create;
 using Application.AppointmentManagement.DTO;
 using Application.AppointmentManagement.Queries;
+using Domain.Helpers.PaginationStuff;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,9 +77,9 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetPaginatedAppointmentsByCurrentUserId([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetPaginatedAppointmentsByCurrentUserId([FromQuery] AppointmentParameters parameters)
         {
-            var result = await _mediator.Send(new GetAllAppointmentsByCurrentUserIdQuery(pageNumber, pageSize));
+            var result = await _mediator.Send(new GetAllAppointmentsByCurrentUserIdQuery(parameters));
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);

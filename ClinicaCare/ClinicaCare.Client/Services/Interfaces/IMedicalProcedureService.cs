@@ -2,6 +2,7 @@
 using Application.MedicalProcedureManagement.DTO;
 using Application.UserAccountManagement.UserDtos;
 using ClinicaCare.Client.Services.Pagination;
+using Domain.MedicalProcedures;
 
 namespace ClinicaCare.Client.Services.Interfaces
 {

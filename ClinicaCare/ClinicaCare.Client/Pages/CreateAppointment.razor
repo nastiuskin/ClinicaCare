@@ -1,0 +1,81 @@
+﻿@page "/create-appointment"
+@using Application.AppointmentManagement.DTO
+@using Application.Helpers.PaginationStuff
+@using Application.MedicalProcedureManagement.DTO
+@using Application.UserAccountManagement.Doctors.DTO
+@using ClinicaCare.Client.Services.Interfaces
+@using Domain.Helpers.PaginationStuff
+@using Domain.MedicalProcedures
+@using MudBlazor
+@using Shared.DTO.Users
+
+@inject IMedicalProcedureService MedicalProcedureService
+@inject IAppointmentService AppointmentService
+@inject IUserService UserService
+<h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Create Appointment</h3>
+
+
+<MudPaper Style="width: 1000px; margin: auto; display: block; margin-top: 100px">
+    <MudStepper ShowResetButton>
+        <MudStep Title="Select medical procedure">
+        <MudItem xs="12">
+            <MudSelect @bind-Value="appointmentFormDto.MedicalProcedureId">
+                <MudSelectItem Value="Guid.Empty" Disabled="true" Hidden="true">Select Procedure</MudSelectItem>
+                @foreach (var procedure in medicalProcedures)
+                {
+                    <MudSelectItem Value="@procedure.Id">@procedure.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        </MudStep>
+
+        <MudStep Title="Select doctor">
+        <MudItem xs="12">
+            <MudSelect  @bind-Value="appointmentFormDto.DoctorId">
+                <MudSelectItem Value="Guid.Empty" Disabled="true" Hidden="true">Select Doctor</MudSelectItem>
+                @foreach (var doctor in doctors)
+                {
+                    <MudSelectItem Value="@doctor.Id">@doctor.FirstName + " " + @doctor.LastName</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        </MudStep>
+        <MudStep Title="Select date">Select date</MudStep>
+        <MudStep Title="Select time">Select time</MudStep>
+
+
+    </MudStepper>
+</MudPaper>
+
+
+@code {
+    private AppointmentFormDto appointmentFormDto = new();
+    List<MedicalProcedureInfoDto> medicalProcedures = new();
+    List<DoctorPartialInfoDto> doctors = new();
+
+    private MedicalProcedureParameters _procedureParameters = new();
+    private DoctorParameters _doctorParameters = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetProcedures();
+    }
+
+    private async Task GetProcedures()
+    {
+        var response = await MedicalProcedureService.GetAllMedicalProceduresAsync(_procedureParameters);
+        medicalProcedures = response.Items;
+        // appointmentFormDto.MedicalProcedureId = medicalProcedures.First().Id;
+    }
+
+    private async Task GetDoctors(Guid medicalProcedureId)
+    {
+        // _doctorParameters.MedicalProcedureId = medicalProcedureId;
+        // var response = await UserService.GetAllDoctorsAsync();
+    }
+
+    public async Task OnProcedureSelected(Guid medicalProcedureId)
+    {
+        await GetDoctors(medicalProcedureId);
+    }
+}

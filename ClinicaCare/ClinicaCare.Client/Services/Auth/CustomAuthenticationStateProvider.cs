@@ -23,28 +23,17 @@ namespace ClinicaCare.Client.Services.Auth
             if (!string.IsNullOrEmpty(token))
             {
                 var claims = _tokenService.ParseClaimsFromJwt(token);
+
+                foreach (var claim in claims)
+                {
+                    Console.WriteLine($"{claim.Type}: {claim.Value}");
+                }
                 identity = new ClaimsIdentity(claims, "jwt");
             }
 
             var user = new ClaimsPrincipal(identity);
 
             return new AuthenticationState(user);
-        }
-
-        public void MarkUserAsAuthenticated(string token)
-        {
-            var identity = new ClaimsIdentity(_tokenService.ParseClaimsFromJwt(token), "jwt");
-            var user = new ClaimsPrincipal(identity);
-
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
-        }
-
-        public void MarkUserAsLoggedOut()
-        {
-            var identity = new ClaimsIdentity();
-            var user = new ClaimsPrincipal(identity);
-
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
     }
 }

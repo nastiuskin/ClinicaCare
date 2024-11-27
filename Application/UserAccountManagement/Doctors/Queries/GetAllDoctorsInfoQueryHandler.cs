@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Application.UserAccountManagement.Doctors.Queries
 {
-    public record GetAllDoctorsInfoQuery(UserParameters Parameters)
+    public record GetAllDoctorsInfoQuery(DoctorParameters Parameters)
         : IQuery<Result<ICollection<DoctorPartialInfoDto>>>;
 
     public class GetAllDoctorsInfoQueryHandler

@@ -1,4 +1,6 @@
-﻿using Domain.Appointments;
+﻿using Application.Helpers.PaginationStuff;
+using Domain.Appointments;
+using Domain.Helpers.PaginationStuff;
 using Domain.MedicalProcedures;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
@@ -70,5 +72,24 @@ namespace Persistence.Database.Appointments
         {
             return await _context.Appointments.CountAsync();
         }
+
+        public PagedList<Appointment> GetAppointmentsAsync(AppointmentParameters parameters, string roleClaim, UserId userId)
+        {
+            var query = GetAll();
+
+            if (roleClaim == "Doctor")
+            {
+                query = query.Where(a => a.DoctorId == userId);
+            }
+            else
+            {
+                query = query.Where(a => a.PatientId == userId);
+            }
+
+            return PagedList<Appointment>
+                .ToPagedList(query, parameters.PageNumber, parameters.PageSize);
+        }
     }
-}
+
+    }
+

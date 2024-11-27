@@ -47,10 +47,25 @@ namespace ClinicaCare.Client.Services.Auth
             var jsonBytes = WebEncoders.Base64UrlDecode(payload);
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
-            return keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()));
+            var claims = new List<Claim>();
+
+            foreach (var kvp in keyValuePairs)
+            {
+                if (kvp.Key == "sub" && kvp.Value is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Object)
+                {
+                    var subDict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonElement.GetRawText());
+                    if (subDict != null && subDict.TryGetValue("Value", out var subValue))
+                    {
+                        claims.Add(new Claim("sub", subValue)); 
+                    }
+                }
+                else
+                {
+                    claims.Add(new Claim(kvp.Key, kvp.Value.ToString()));
+                }
+            }
+
+            return claims;
         }
-
-
+        }
     }
-
-}

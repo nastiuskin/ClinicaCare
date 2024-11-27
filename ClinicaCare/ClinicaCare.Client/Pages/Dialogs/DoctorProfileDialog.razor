@@ -1,5 +1,81 @@
-﻿<h3>DoctorViewInfo</h3>
+﻿@using Application.MedicalProcedureManagement.DTO
+@using MudBlazor
+@using Shared.DTO.Users
+
+<MudDialog MaxWidth="MaxWidth.Medium" FullWidth="true">
+    <DialogContent>
+         @if (doctorInfo != null)
+        {
+            <MudForm Model="@doctorInfo">
+                <MudGrid Spacing="4">
+
+                <MudItem xs="12">
+                    <MudTextField Label="First Name" @bind-Value="doctorInfo.FirstName" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Last Name" @bind-Value="doctorInfo.LastName" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Email" @bind-Value="doctorInfo.Email" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Phone Number" @bind-Value="doctorInfo.PhoneNumber" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Date of Birth" @bind-Value="doctorInfo.DateOfBirth" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+                </MudItem>
+            </MudGrid>
+
+            <MudItem xs="12">
+                <MudTextField Label="Specialization" @bind-Value="doctorInfo.SpecializationType" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField Label="Biography" @bind-Value="doctorInfo.Biography" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField Label="CabinetNumber" @bind-Value="doctorInfo.CabinetNumber" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField Label="Working Hours Start" @bind-Value="doctorInfo.WorkingHoursStart" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField Label="Working Hours End" @bind-Value="doctorInfo.WorkingHoursEnd" ReadOnly="!isEditMode" FullWidth="true" Variant="Variant.Outlined" Margin="Margin.Normal" />
+            </MudItem>
+               
+        </MudForm>
+        }
+        else
+        {
+            <MudText Typo="Typo.subtitle1" Color="Color.Error">Doctor information is not available.</MudText>
+        }
+
+        <!-- Action Buttons -->
+        <MudGrid>
+            <MudItem xs="12" Class="d-flex justify-content-center">
+                <MudButton OnClick="Close" Color="Color.Secondary" Variant="Variant.Text" Class="mud-button-fullwidth">
+                    Close
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+</MudDialog>
+
 
 @code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
 
+    [Parameter]
+    public DoctorViewDto doctorInfo { get; set; } 
+
+    private bool isEditMode = false;
+
+    private void Close()
+    {
+        MudDialog.Cancel();
+    }
 }

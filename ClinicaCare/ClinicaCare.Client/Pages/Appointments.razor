@@ -1,0 +1,114 @@
+﻿@page "/appointments"
+@using Application.AppointmentManagement.DTO
+@using Application.Helpers.PaginationStuff
+@using Application.MedicalProcedureManagement.DTO
+@using Application.UserAccountManagement.UserDtos
+@using ClinicaCare.Client.Pages.Dialogs
+@using ClinicaCare.Client.Services.Interfaces
+@using Domain.Helpers.PaginationStuff
+@using Domain.MedicalProcedures
+@using MudBlazor
+@inject IAppointmentService AppointmentService
+@inject IUserService UserService
+@inject IJSRuntime JsRuntime
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+
+@rendermode InteractiveWebAssembly
+
+<PageTitle>Services</PageTitle>
+<h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Your Appointments</h3>
+
+<MudGrid Justify="Justify.FlexStart" Spacing="3">
+
+    <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateAppointment">
+            Create New Appointment
+        </MudButton>
+    </MudItem>
+
+    @if (appointments.Count > 0)
+    {
+        @foreach (var appointment in appointments)
+        {
+            <MudItem xs="12">
+                <MudCard Elevation="6" Class="pa-4 hover-card" Style="margin-bottom: 16px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <!-- Two-column layout -->
+                    <MudGrid>
+                        <MudItem xs="8">
+                            <MudCardContent>
+                                <MudText Typo="Typo.h5" Class="mud-text-capitalize">@appointment.MedicalProcedureName</MudText>
+                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Doctor: @appointment.DoctorName</MudText>
+                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Date: @appointment.Date</MudText>
+                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Start Time: @appointment.StartTime</MudText>
+                                <MudText Typo="Typo.body2" Style="color: #1976D2;">End Time: @appointment.EndTime</MudText>
+                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Status: @appointment.Status</MudText>
+                                @if(appointment.FeedBack != null)
+                                {
+                                    <MudText Typo="Typo.body2" Style="color: #1976D2;">Feedback: @appointment.FeedBack</MudText>
+                                }
+
+                            </MudCardContent>
+                        </MudItem>
+                    </MudGrid>
+                </MudCard>
+            </MudItem>
+        }
+    }
+    else
+    {
+        <MudItem xs="12" Style="text-align: center;">
+            <MudText Typo="Typo.subtitle1" Color="Color.Secondary">No appointments available.</MudText>
+        </MudItem>
+    }
+</MudGrid>
+
+<div class="row">
+    <div class="col">
+        <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+    </div>
+</div>
+
+@code {
+    public List<AppointmentInfoDto> appointments { get; set; } = new();
+    public MetaData MetaData { get; set; } = new MetaData();
+    private AppointmentParameters _appointmentParameters = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAppointments();
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        _appointmentParameters.PageNumber = page;
+        await GetAppointments();
+        await ScrollToTop();
+    }
+
+    private async Task GetAppointments()
+    {
+        var pagingResponse = await AppointmentService.GetAllAppontmentsAsync(_appointmentParameters);
+        appointments = pagingResponse.Items;
+        MetaData = pagingResponse.MetaData;
+    }
+
+    private async void CreateAppointment()
+    {
+        NavigationManager.NavigateTo("/create-appointment");
+
+    }
+    private async void EditAppointment(Guid id)
+    {
+       
+    }
+
+
+    private async Task ScrollToTop()
+    {
+        await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
+    }
+}

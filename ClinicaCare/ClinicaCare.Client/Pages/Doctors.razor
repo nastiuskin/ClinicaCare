@@ -46,9 +46,7 @@
                         <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="() => ViewProfile(doctor.Id)">
                             View Profile
                         </MudButton>
-                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info" OnClick="() => EditDoctor(doctor.Id)">
-                            Edit
-                        </MudButton>
+                     
                         <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Error" OnClick="() => DeleteDoctor(doctor.Id)">
                             Delete
                         </MudButton>
@@ -70,7 +68,7 @@
 @code {
     public List<DoctorPartialInfoDto> doctors { get; set; } = new();
     public MetaData MetaData { get; set; } = new MetaData();
-    private UserParameters _userParameters = new();
+    private DoctorParameters _doctorParameters = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,14 +78,14 @@
 
     private async Task GetDoctors()
     {
-        var pagingResponse = await UserService.GetPagiantedDoctorsAsync(_userParameters);
+        var pagingResponse = await UserService.GetPagiantedDoctorsAsync(_doctorParameters);
         doctors = pagingResponse.Items;
         MetaData = pagingResponse.MetaData;
     }
 
     private async Task SelectedPage(int page)
     {
-        _userParameters.PageNumber = page;
+        _doctorParameters.PageNumber = page;
         await GetDoctors();
         await ScrollToTop();
     }
@@ -100,7 +98,8 @@
 
         if (!result.Canceled)
         {
-            var newDoctor = (DoctorFormDto)result.Data;
+            await GetDoctors();
+
         }
     }
 
@@ -110,13 +109,17 @@
     }
 
     private async Task ViewProfile(Guid id)
-    {
+    { 
+        var (success, doctor) = await UserService.GetDoctorByIdAsync(id);
 
-    }
+        var parameters = new DialogParameters
+        {
+            { "doctorInfo", doctor }
+        };
 
-    private async Task EditDoctor(Guid id)
-    {
-
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<DoctorProfileDialog>("Doctor Profile", parameters, options);
+        var result = await dialog.Result;
     }
 
     private async Task DeleteDoctor(Guid id)

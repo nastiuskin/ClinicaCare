@@ -19,27 +19,6 @@
                     <MudText Typo="Typo.body1" Class="mud-text-muted text-center">Price: @medicalProcedureInfo.Price.ToString("C")</MudText>
                 </MudItem>
 
-@*                 <MudDivider />
- *@
-               @*  <!-- Doctors List -->
-                <MudItem xs="12">
-                    <MudText Typo="Typo.h6" Class="mud-text-capitalize">Doctors:</MudText>
-                </MudItem>
-
-                @foreach (var doctor in medicalProcedureInfo.Doctors)
-                {
-                    <MudItem xs="12" md="6" lg="4" Style="margin-top: 12px;">
-                        <MudCard Class="pa-3">
-                            <MudCardContent>
-                                <MudText Typo="Typo.body2"><strong>@doctor.FirstName @doctor.LastName</strong></MudText>
-                                <MudText Typo="Typo.body2" Class="mud-text-muted">Specialization: @doctor.SpecializationType</MudText>
-                            </MudCardContent>
-                        </MudCard>
-                    </MudItem>
-                }
-
-                <MudDivider /> *@
-
                 <!-- Action Buttons -->
                 <MudGrid>
                     <MudItem xs="12" Class="d-flex justify-content-center">
@@ -59,7 +38,7 @@
     private MudDialogInstance MudDialog { get; set; }
 
     [Parameter]
-    public MedicalProcedureInfoWithDoctorsDto medicalProcedureInfo { get; set; }
+    public MedicalProcedureInfoWithDoctorsDto medicalProcedureInfo { get; set; } = new();
 
     private void Close()
     {

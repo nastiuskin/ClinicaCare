@@ -56,7 +56,6 @@ namespace API.Controllers
             return Ok();
         }
 
-        [Authorize]
         [HttpPost]
         [Route("refresh")]
         public async Task<IActionResult> RefreshToken()
@@ -71,9 +70,9 @@ namespace API.Controllers
         [Route("doctors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPaginatedDoctors([FromQuery] UserParameters userParameters)
+        public async Task<IActionResult> GetPaginatedDoctors([FromQuery] DoctorParameters doctorParameters)
         {
-            var result = await _mediator.Send(new GetAllDoctorsInfoQuery(userParameters));
+            var result = await _mediator.Send(new GetAllDoctorsInfoQuery(doctorParameters));
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);
@@ -92,7 +91,7 @@ namespace API.Controllers
             return BadRequest(result.Errors);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         [Route("profile")]
         public async Task<ActionResult> GetUserProfile()
@@ -111,6 +110,16 @@ namespace API.Controllers
             var result = await _mediator.Send(new UpdateUserCommand(userFormDto));
             if (result.IsSuccess)
                 return Ok(result);
+            return BadRequest(result.Errors);
+        }
+
+        [HttpGet]
+        [Route("{id}/doctor-profile")]
+        public async Task<ActionResult> GetDoctorProfile(Guid id)
+        {
+            var result = await _mediator.Send(new GetDoctorProfileQuery(id));
+            if (result.IsSuccess)
+                return Ok(result.Value);
             return BadRequest(result.Errors);
         }
     }

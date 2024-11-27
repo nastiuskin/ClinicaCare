@@ -1,6 +1,7 @@
 ﻿@using Application.UserAccountManagement.Doctors.DTO
 @using Application.UserAccountManagement.UserDtos
 @using ClinicaCare.Client.Services.Interfaces
+@using Domain.Users.Doctors
 @using MudBlazor
 @inject IUserService UserService
 
@@ -11,32 +12,42 @@
             <MudGrid>
                 <!-- First Name -->
                 <MudItem xs="12">
-                    <MudTextField Label="First Name" @bind-Value="DoctorData.FirstName" Required="true" />
+                    <MudTextField Label="First Name" @bind-Value="DoctorData.FirstName"/>
                     <ValidationMessage For="@(() => DoctorData.FirstName)" />
                 </MudItem>
 
                 <!-- Last Name -->
                 <MudItem xs="12">
-                    <MudTextField Label="Last Name" @bind-Value="DoctorData.LastName" Required="true" /><ConfirmationDialog />
+                    <MudTextField Label="Last Name" @bind-Value="DoctorData.LastName"/><ConfirmationDialog />
                     <ValidationMessage For="@(() => DoctorData.LastName)" />
                 </MudItem>
 
                 <!-- Email -->
                 <MudItem xs="12">
-                    <MudTextField Label="Email" @bind-Value="DoctorData.Email" Required="true" />
+                    <MudTextField Label="Email" @bind-Value="DoctorData.Email"/>
                     <ValidationMessage For="@(() => DoctorData.Email)" />
                 </MudItem>
 
                 <!-- Phone Number -->
                 <MudItem xs="12">
-                    <MudTextField Label="Phone Number" @bind-Value="DoctorData.PhoneNumber" Required="true" />
+                    <MudTextField Label="Phone Number" @bind-Value="DoctorData.PhoneNumber"/>
                     <ValidationMessage For="@(() => DoctorData.PhoneNumber)" />
                 </MudItem>
 
                 <!-- Date of Birth -->
                 <MudItem xs="12">
-                    <MudTextField Label="Date of Birth (dd.MM.yyyy)" @bind-Value="DoctorData.DateOfBirth" Required="true" />
+                    <MudTextField Label="Date of Birth (dd.MM.yyyy)" @bind-Value="DoctorData.DateOfBirth"/>
                     <ValidationMessage For="@(() => DoctorData.DateOfBirth)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudSelect Label="Type" @bind-Value="DoctorData.Specialization">
+                        @foreach (var type in Enum.GetValues(typeof(SpecializationType)).Cast<SpecializationType>())
+                        {
+                            <MudSelectItem Value="@type">@type.ToString()</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <ValidationMessage For="@(() => DoctorData.Specialization)" />
                 </MudItem>
 
                 <!-- Biography -->
@@ -47,27 +58,32 @@
                 <!-- Cabinet Number -->
                 <MudItem xs="12">
                     <MudTextField Label="Cabinet Number" @bind-Value="DoctorData.CabinetNumber" />
+                    <ValidationMessage For="@(() => DoctorData.CabinetNumber)" />
                 </MudItem>
 
                 <!-- Working Hours Start -->
                 <MudItem xs="12">
                     <MudTextField Label="Working Hours Start" @bind-Value="DoctorData.WorkingHoursStart" />
+                    <ValidationMessage For="@(() => DoctorData.WorkingHoursStart)" />
                 </MudItem>
 
                 <!-- Working Hours End -->
                 <MudItem xs="12">
                     <MudTextField Label="Working Hours End" @bind-Value="DoctorData.WorkingHoursEnd" />
+                    <ValidationMessage For="@(() => DoctorData.WorkingHoursEnd)" />
                 </MudItem>
             </MudGrid>
 
             <!-- Password -->
             <MudItem xs="12">
                 <MudTextField Label="Password" InputType="InputType.Password" @bind-Value="DoctorData.Password" />
+                <ValidationMessage For="@(() => DoctorData.Password)" />
             </MudItem>
 
             <!-- Confirm Password -->
             <MudItem xs="12">
                 <MudTextField Label="Confirm Password" InputType="InputType.Password" @bind-Value="DoctorData.ConfirmPassword" />
+                <ValidationMessage For="@(() => DoctorData.ConfirmPassword)" />
             </MudItem>
 
             <!-- Action Buttons -->

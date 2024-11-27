@@ -44,7 +44,7 @@ namespace Application.Auth
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(15),
+                Expires = DateTime.Now.AddSeconds(30),
                 SigningCredentials = creds,
                 Issuer = _config["ApplicationSettings:JWT:Issuer"],
                 Audience = _config["ApplicationSettings:JWT:Audience"]

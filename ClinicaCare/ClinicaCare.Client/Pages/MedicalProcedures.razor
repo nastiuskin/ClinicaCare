@@ -5,6 +5,7 @@
 @using ClinicaCare.Client.Pages.Dialogs
 @using ClinicaCare.Client.Services.Interfaces
 @using Domain.Helpers.PaginationStuff
+@using Domain.MedicalProcedures
 @using MudBlazor
 @inject IMedicalProcedureService MedicalProcedureService
 @inject IUserService UserService
@@ -18,7 +19,24 @@
 <PageTitle>Services</PageTitle>
 <h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Our Medical Procedures</h3>
 
-<MudGrid Justify="Justify.Center" Spacing="3">
+<MudGrid Justify="Justify.FlexStart" Spacing="3">
+
+    <MudItem xs="4"> 
+        <MudSelect T="MedicalProcedureType?" Label="Type" ToStringFunc="@converter" Value="SelectedType" ValueChanged="@(value => SelectedType = value)">
+            <MudSelectItem T="MedicalProcedureType?" Value="@(null)">All</MudSelectItem>
+            @foreach (var type in Enum.GetValues(typeof(MedicalProcedureType)).Cast<MedicalProcedureType>())
+            {
+                <MudSelectItem T="MedicalProcedureType?" Value="@type">@type</MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+
+    <MudItem xs="12" Style="text-align: left; margin-bottom: 16px;">
+        <MudButton Variant="Variant.Filled" Color="Color.Surface" OnClick="ApplyFilter">
+            Apply Filter
+        </MudButton>
+    </MudItem>
+
     <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
         <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateProcedure">
             Create New Procedure
@@ -44,9 +62,9 @@
                             <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="() => ViewDetails(procedure.Id)">
                                 View Details
                             </MudButton>
-                            <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info" OnClick="() => EditProcedure(procedure.Id)" Style="margin-top: 8px;">
-                                Edit
-                            </MudButton>
+                             @* <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info" OnClick="() => EditProcedure(procedure.Id)" Style="margin-top: 8px;">
+                                 Edit
+                             </MudButton> *@
                             <MudButton Variant="Variant.Outlined" Color="Color.Warning" Style="margin-top: 8px;" OnClick="() => DeleteProcedure(procedure.Id)">
                                 Delete
                             </MudButton>
@@ -75,10 +93,15 @@
     public MetaData MetaData { get; set; } = new MetaData();
     private MedicalProcedureParameters _procedureParameters = new();
 
+    public MedicalProcedureType? SelectedType { get; set; } = null;
+
+   
     protected override async Task OnInitializedAsync()
     {
         await GetProcedures();
     }
+
+    Func<MedicalProcedureType?, string> converter = p => p == null ? "All" : Enum.GetName(typeof(MedicalProcedureType), p);
 
     private async Task SelectedPage(int page)
     {
@@ -89,6 +112,7 @@
 
     private async Task GetProcedures()
     {
+        _procedureParameters.Type = SelectedType;
         var pagingResponse = await MedicalProcedureService.GetAllMedicalProceduresAsync(_procedureParameters);
         medicalProcedures = pagingResponse.Items;
         MetaData = pagingResponse.MetaData;
@@ -148,6 +172,14 @@
         {
             await GetProcedures(); 
         }
+
+    }
+
+    private async Task ApplyFilter()
+    {
+        _procedureParameters.Type = SelectedType;
+        _procedureParameters.PageNumber = 1;  
+        await GetProcedures();
     }
 
     private async void EditProcedure(Guid id)

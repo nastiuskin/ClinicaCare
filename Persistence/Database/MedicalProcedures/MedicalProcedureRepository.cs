@@ -64,14 +64,6 @@ namespace Persistence.Database.MedicalProcedures
                
         }
 
-        public IQueryable<MedicalProcedure> GetAllProceduresByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize)
-        {
-            return _context.MedicalProcedures
-                .Where(mp => mp.Type == type)
-                .Skip((pageNumber - 1)* pageSize)
-                .Take(pageSize);
-        }
-
         public IQueryable<MedicalProcedure> GetAllProceduresByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize)
         {
             return _context.MedicalProcedures
@@ -84,10 +76,20 @@ namespace Persistence.Database.MedicalProcedures
             return await _context.MedicalProcedures.CountAsync();
         }
 
-        public PagedList<MedicalProcedure> GetMedicalProceduresAsync(QueryStringParameters parameters)
+        public PagedList<MedicalProcedure> GetMedicalProceduresAsync(MedicalProcedureParameters parameters)
         {
+            var query = GetAll();
+
+            if (parameters.Type.HasValue)
+                query = query.Where(m => m.Type == parameters.Type.Value);
+
             return PagedList<MedicalProcedure>
-                .ToPagedList(GetAll(), parameters.PageNumber, parameters.PageSize);
+                .ToPagedList(query, parameters.PageNumber, parameters.PageSize);
+        }
+
+        public IQueryable<MedicalProcedure?> GetAllProceduresByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize)
+        {
+           return _context.MedicalProcedures.Where(mp => mp.Type == type);
         }
     }
 }

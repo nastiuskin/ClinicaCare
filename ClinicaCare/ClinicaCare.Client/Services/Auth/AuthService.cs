@@ -1,6 +1,7 @@
 ﻿using Application.UserAccountManagement.UserDtos;
 using Blazored.LocalStorage;
 using ClinicaCare.Client.Services.Interfaces;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -8,12 +9,12 @@ namespace ClinicaCare.Client.Services.Auth
 {
     public class AuthService : IAuthService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClient;
         private readonly ITokenService _tokenService;
 
-        public AuthService(HttpClient client, ITokenService tokenService)
+        public AuthService(IHttpClientFactory httpClientFactory, ITokenService tokenService)
         {
-            _httpClient = client;
+            _httpClient = httpClientFactory;
             _tokenService = tokenService;
         }
 
@@ -21,7 +22,8 @@ namespace ClinicaCare.Client.Services.Auth
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("api/account/login", userLoginDto);
+                using HttpClient client = _httpClient.CreateClient("ApiClient");
+                var response = await client.PostAsJsonAsync("api/account/login", userLoginDto);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -48,7 +50,8 @@ namespace ClinicaCare.Client.Services.Auth
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("/api/account/register", userFormDto);
+                using HttpClient client = _httpClient.CreateClient("ApiClient");
+                var response = await client.PostAsJsonAsync("/api/account/register", userFormDto);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -70,7 +73,8 @@ namespace ClinicaCare.Client.Services.Auth
         {
             try
             {
-                var response = await _httpClient.PostAsync("/api/account/logout", null);
+                using HttpClient client = _httpClient.CreateClient("ApiClient");
+                var response = await client.PostAsync("/api/account/logout", null);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -93,7 +97,8 @@ namespace ClinicaCare.Client.Services.Auth
         {
             try
             {
-                var response = await _httpClient.PostAsync("api/account/refresh", null);
+                using HttpClient client = _httpClient.CreateClient("ApiClient");
+                var response = await client.PostAsync("api/account/refresh", null);
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -2,6 +2,7 @@
 using Application.UserAccountManagement.Doctors.DTO;
 using AutoMapper;
 using Domain.Users;
+using Domain.Users.Doctors;
 using FluentResults;
 
 namespace Application.UserAccountManagement.Doctors.Queries
@@ -25,7 +26,7 @@ namespace Application.UserAccountManagement.Doctors.Queries
         public async Task<Result<ICollection<DoctorPartialInfoDto>>> Handle(GetListOfDoctorsQuery request,
             CancellationToken cancellationToken)
         {
-            var doctors = _userRepository.GetAll().ToList();
+            var doctors = _userRepository.GetAll().OfType<Doctor>().ToList();
 
             var doctorsInfoDtos = _mapper.Map<ICollection<DoctorPartialInfoDto>>(doctors);
 

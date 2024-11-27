@@ -3,6 +3,7 @@ using Application.Auth;
 using Application.Configuration.Queries;
 using AutoMapper;
 using Domain.Appointments;
+using Domain.Helpers.PaginationStuff;
 using Domain.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +12,7 @@ using System.Security.Claims;
 
 namespace Application.AppointmentManagement.Queries
 {
-    public record GetAllAppointmentsByCurrentUserIdQuery(int PageNumber, int PageSize)
+    public record GetAllAppointmentsByCurrentUserIdQuery(AppointmentParameters Parameters)
         : IQuery<Result<ICollection<AppointmentInfoDto>>>;
 
     public class GetAllAppointmentsByCurrentUserIdQueryHandler
@@ -47,10 +48,7 @@ namespace Application.AppointmentManagement.Queries
             if (string.IsNullOrEmpty(roleClaim))
                 return Result.Fail("User role claim is missing or invalid.");
 
-            var appointmentsQuery = _appointmentRepository.GetAll();
-            var appointments = roleClaim == "Doctor"
-                ? await appointmentsQuery.Where(a => a.DoctorId == userId).ToListAsync(cancellationToken)
-                : await appointmentsQuery.Where(a => a.PatientId == userId).ToListAsync(cancellationToken);
+            var appointments = _appointmentRepository.GetAppointmentsAsync(query.Parameters, roleClaim, userId);
 
             var appointmentDtos = _mapper.Map<ICollection<AppointmentInfoDto>>(appointments);
      

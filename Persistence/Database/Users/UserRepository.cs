@@ -49,10 +49,18 @@ namespace Persistence.Database.Users
             await _context.SaveChangesAsync();
         }
 
-        public PagedList<Doctor> GetAllDoctorsAsync(UserParameters parameters)
+        public PagedList<Doctor> GetAllDoctorsAsync(DoctorParameters parameters)
         {
+            var query = GetAll().OfType<Doctor>();
+
+            if (parameters.MedicalProcedureId.HasValue)
+            {
+                query = query
+                    .Where(d => d.MedicalProcedures.Any(mp => mp.Id.Equals(parameters.MedicalProcedureId.Value)));
+            }
+
             return PagedList<Doctor>
-                .ToPagedList(GetAll().OfType<Doctor>(), parameters.PageNumber, parameters.PageSize);
+                .ToPagedList(query, parameters.PageNumber, parameters.PageSize);
         }
 
         public PagedList<Patient> GetAllPatientsAsync(UserParameters parameters)

@@ -13,7 +13,7 @@ namespace Domain.MedicalProcedures
         public IQueryable<MedicalProcedure?> GetAllProceduresByDoctorIdAsync(UserId doctorId, int pageNumber, int pageSize);
         public IQueryable<MedicalProcedure?> GetAllProceduresByTypeAsync(MedicalProcedureType type, int pageNumber, int pageSize);
 
-        public PagedList<MedicalProcedure> GetMedicalProceduresAsync(QueryStringParameters parameters);
+        public PagedList<MedicalProcedure> GetMedicalProceduresAsync(MedicalProcedureParameters parameters);
 
     }
 }

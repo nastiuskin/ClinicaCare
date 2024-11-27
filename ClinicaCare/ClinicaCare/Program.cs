@@ -1,10 +1,6 @@
 using API.Extensions;
-using Blazored.LocalStorage;
 using Blazr.RenderState.Server;
-using ClinicaCare.Client.Services;
-using ClinicaCare.Client.Services.Interfaces;
 using ClinicaCare.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,8 +20,6 @@ builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.InitializeControllers();
 
 builder.Services.ConfigureSwagger();
-
-builder.Services.AddHttpClient();
 
 builder.Services.AddAuthorizationCore();
 

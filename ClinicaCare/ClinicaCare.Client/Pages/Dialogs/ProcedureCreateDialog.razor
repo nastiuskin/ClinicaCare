@@ -1,6 +1,7 @@
 ﻿@using Application.MedicalProcedureManagement.DTO
 @using Application.UserAccountManagement.Doctors.DTO
 @using ClinicaCare.Client.Services.Interfaces
+@using Domain.Helpers.PaginationStuff
 @using Domain.MedicalProcedures
 @using MudBlazor
 @inject IMedicalProcedureService MedicalProcedureService
@@ -38,16 +39,34 @@
                     <ValidationMessage For="@(() => procedureFormDto.Price)" />
                 </MudItem>
             </MudGrid>
-@* 
-               <MudSelect T="Guid" Label="Assign Doctors" MultiSelection="true" @bind-SelectedValues="options">
+
+            <MudSelect T="Guid" Label="Assign Doctors" MultiSelection="true" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" @bind-SelectedValues="options">
                 @foreach (var doctor in doctors)
                 {
                     <MudSelectItem T="Guid" Value="@doctor.Id">
                         @($"{doctor.FirstName} {doctor.LastName}")
                     </MudSelectItem>
                 }
-                </MudSelect>
- *@
+            </MudSelect>
+
+            <!-- Display Selected Doctor Names -->
+            <MudPaper Class="mt-3 p-3">
+                <MudText Typo="Typo.h6">Selected Doctors:</MudText>
+                @if (options.Any())
+                {
+                    <MudList T="DoctorFormDto">
+                        @foreach (var doctor in doctors.Where(d => options.Contains(d.Id)))
+                        {
+                            <MudListItem>@($"{doctor.FirstName} {doctor.LastName}")</MudListItem>
+                        }
+                    </MudList>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2" Class="text-secondary">No doctors selected</MudText>
+                }
+            </MudPaper>
+
             <!-- Action Buttons -->
             <MudGrid>
                 <MudItem xs="6">
@@ -69,11 +88,13 @@
         {
             Doctors = new List<Guid>()
         };
-    private List<DoctorPartialInfoDto> doctors;
+    private List<DoctorPartialInfoDto> doctors = new();
 
-    private List<Guid> options { get; set; } = new List<Guid>();
+    private IEnumerable<Guid> options { get; set; } = new List<Guid>();
 
     private bool success;
+
+    // private Guid value { get; set; } = new Guid();
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,7 +107,7 @@
 
     private async Task Save()
     {
-        // procedureFormDto.Doctors = options;
+        procedureFormDto.Doctors = options.ToList();
         var result = await MedicalProcedureService.CreateMedicalProcedureAsync(procedureFormDto);
         if (result)
         {
@@ -98,6 +119,11 @@
             MudDialog.Close(DialogResult.Ok(false));
             Snackbar.Add("Failed to create procedure.", Severity.Error);
         }
+    }
+
+    private string GetMultiSelectionText(List<string> selectedValues)
+    {
+        return $"{selectedValues.Count} doctor {(selectedValues.Count > 1 ? "s have" : " has")} been selected";
     }
 
     public void Cancel()

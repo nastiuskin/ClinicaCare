@@ -3,6 +3,7 @@ using Application.MedicalProcedureManagement.DTO;
 using ClinicaCare.Client.Services.Interfaces;
 using ClinicaCare.Client.Services.Pagination;
 using Domain.Helpers.PaginationStuff;
+using Domain.MedicalProcedures;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -11,16 +12,20 @@ namespace ClinicaCare.Client.Services
     public class MedicalProcedureService : IMedicalProcedureService
     {
         private readonly HttpClient _httpClient;
-        public MedicalProcedureService(HttpClient httpClient)
+        public MedicalProcedureService(HttpClient httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory;
         }
         public async Task<PagingResponse<MedicalProcedureInfoDto>> GetAllMedicalProceduresAsync(MedicalProcedureParameters parameters)
         {
             var queryStringParam = new Dictionary<string, string>
             {
-                ["pageNumber"] = parameters.PageNumber.ToString()
+                ["pageNumber"] = parameters.PageNumber.ToString(),
             };
+
+            if (parameters.Type != null)
+                queryStringParam["type"] = parameters.Type.ToString();
+
             var queryString = string.Join("&", queryStringParam.Select(kvp => $"{kvp.Key}={kvp.Value}"));
             var response = await _httpClient.GetAsync($"api/procedures?{queryString}");
             var content = await response.Content.ReadAsStringAsync();

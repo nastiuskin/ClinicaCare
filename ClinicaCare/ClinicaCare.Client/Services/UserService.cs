@@ -4,24 +4,19 @@ using Application.UserAccountManagement.UserDtos;
 using ClinicaCare.Client.Services.Interfaces;
 using ClinicaCare.Client.Services.Pagination;
 using Domain.Helpers.PaginationStuff;
+using Shared.DTO.Users;
 using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace ClinicaCare.Client.Services
 {
-    public class UserService : IUserService
+    public class UserService(IHttpClientFactory httpClientFactory) : IUserService
     {
-        private readonly HttpClient _httpClient;
-
-        public UserService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
         public async Task<(UserViewDto User, string ErrorMessage)> GetProfile()
         {
             try
             {
+                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.GetAsync("api/account/profile");
 
                 if (response.IsSuccessStatusCode)
@@ -48,6 +43,7 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
+                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.PutAsJsonAsync("api/account/profile/edit", userViewDto);
 
                 if (response.IsSuccessStatusCode)
@@ -78,7 +74,7 @@ namespace ClinicaCare.Client.Services
             }
         }
 
-        public async Task<PagingResponse<DoctorPartialInfoDto>> GetPagiantedDoctorsAsync(UserParameters parameters)
+        public async Task<PagingResponse<DoctorPartialInfoDto>> GetPagiantedDoctorsAsync(DoctorParameters parameters)
         {
             var queryStringParam = new Dictionary<string, string>
             {
@@ -86,6 +82,7 @@ namespace ClinicaCare.Client.Services
             };
 
             var queryString = string.Join("&", queryStringParam.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+            using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
             var response = await _httpClient.GetAsync($"api/account/doctors?{queryString}");
             var content = await response.Content.ReadAsStringAsync();
 
@@ -109,6 +106,7 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
+                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.DeleteAsync($"api/admin/users/{id}");
 
                 if (!response.IsSuccessStatusCode)
@@ -129,7 +127,8 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/account/doctors");
+                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
+                var response = await _httpClient.GetAsync("api/account/doctors-list");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -150,6 +149,7 @@ namespace ClinicaCare.Client.Services
         {
             try
             {
+                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.PostAsJsonAsync("api/admin/doctors", doctorFormDto);
 
                 if (response.IsSuccessStatusCode)
@@ -164,7 +164,36 @@ namespace ClinicaCare.Client.Services
                 return false;
             }
         }
+
+        public async Task<(bool, DoctorViewDto)> GetDoctorByIdAsync(Guid id)
+        {
+            try
+            {
+                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient"
+                    );
+                var response = await _httpClient.GetAsync($"api/account/{id}/doctor-profile");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var doctorProfile = await response.Content.ReadFromJsonAsync<DoctorViewDto>();
+                    return (true, doctorProfile);
+                }
+                else
+                {
+                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    var apiErrors = JsonSerializer.Deserialize<List<ApiErrorResponse>>(errorResponse);
+
+                    var errorMessage = apiErrors?.FirstOrDefault()?.Message ?? "An unknown error occurred.";
+                    return (false, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, null);
+            }
+        }
+
     }
- }
+}
 
 
