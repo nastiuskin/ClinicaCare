@@ -12,5 +12,6 @@ namespace Application.Auth
         public Result<string> GetEmailFromToken(string accessToken);
         public Result ValidateRefreshTokenAsync(User user,string refreshToken);
         public Result<string> GetBearerToken(IHttpContextAccessor httpContextAccessor);
+        public Result<Guid> GetUserIdFromToken(string accessToken);
     }
 }

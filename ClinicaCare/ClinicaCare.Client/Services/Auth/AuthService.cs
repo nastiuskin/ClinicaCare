@@ -63,29 +63,6 @@ namespace ClinicaCare.Client.Services.Auth
                 return false;
             }
         }
-
-        public async Task<(bool Success, string? Token, string? ErrorMessage)> RefreshTokenAsync()
-        {
-            using var client = _httpClientFactory.CreateClient("ApiClient");
-            var response = await client.PostAsync("api/account/refresh", null);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorMessage = await response.Content.ReadAsStringAsync();
-                return (false, null, $"Token refresh failed with status code {response.StatusCode}: {errorMessage}");
-            }
-
-            var newToken = await response.Content.ReadFromJsonAsync<string>();
-            if (string.IsNullOrEmpty(newToken))
-            {
-                var errorMessage = await response.Content.ReadAsStringAsync();
-                return (false, null, $"Token refresh failed: {errorMessage}");
-            }
-
-            await _tokenService.SetTokenAsync(newToken);
-            return (true, newToken, null);
-        }
-
     }
 }
 

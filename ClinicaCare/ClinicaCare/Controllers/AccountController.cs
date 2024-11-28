@@ -56,6 +56,7 @@ namespace API.Controllers
             return Ok();
         }
 
+        //[Authorize]
         [HttpPost]
         [Route("refresh")]
         public async Task<IActionResult> RefreshToken()
@@ -91,7 +92,7 @@ namespace API.Controllers
             return BadRequest(result.Errors);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         [Route("profile")]
         public async Task<ActionResult> GetUserProfile()

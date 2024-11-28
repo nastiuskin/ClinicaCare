@@ -2,9 +2,6 @@
 using Domain.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Application.Auth.RefreshToken
 {
@@ -14,14 +11,14 @@ namespace Application.Auth.RefreshToken
     public class RefreshTokenRotationCommandHandler
         : ICommandHandler<RefreshTokenRotationCommand, Result<string>>
     {
-        private readonly UserManager<User> _userManager;
+        private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RefreshTokenRotationCommandHandler(UserManager<User> userManager, IJwtService jwtService,
+        public RefreshTokenRotationCommandHandler(IUserRepository userRepository, IJwtService jwtService,
             IHttpContextAccessor httpContextAccessor)
         {
-            _userManager=userManager;
+            _userRepository=userRepository;
             _jwtService=jwtService;
             _httpContextAccessor=httpContextAccessor;
         }
@@ -36,12 +33,12 @@ namespace Application.Auth.RefreshToken
             if (accessTokenResult.IsFailed)
                 return Result.Fail(accessTokenResult.Errors);
 
-            var emailClaimResult = _jwtService.GetEmailFromToken(accessTokenResult.Value);
-            if (emailClaimResult.IsFailed)
-                return Result.Fail(emailClaimResult.Errors);
+            var idResult = _jwtService.GetUserIdFromToken(accessTokenResult.Value);
+            if (idResult.IsFailed)
+                return Result.Fail(idResult.Errors);
 
 
-            var user = await _userManager.FindByEmailAsync(emailClaimResult.Value);
+            var user = await _userRepository.GetByIdAsync(new UserId(idResult.Value));
             if (user == null)
                 return Result.Fail("User not found.");
 
@@ -57,7 +54,8 @@ namespace Application.Auth.RefreshToken
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.Strict,
+                MaxAge = TimeSpan.FromDays(30)
             });
 
             return Result.Ok(tokenResult.Value.AccessToken);

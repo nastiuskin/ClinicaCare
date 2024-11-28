@@ -41,25 +41,20 @@ namespace Application.Auth.Login
             var tokenResult = await _jwtService.GenerateTokensAsync(user);
             if (!tokenResult.IsSuccess) 
                 return Result.Fail(tokenResult.Errors);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            };
+
             if (command.UserLoginDto.RememberMe)
             {
-                _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", tokenResult.Value.RefreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    MaxAge = TimeSpan.FromDays(30)
-                });
+                cookieOptions.MaxAge = TimeSpan.FromDays(30);  // Store for 30 days
             }
-            else
-            {
-                _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", tokenResult.Value.RefreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict
-                });
-            }
+
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", tokenResult.Value.RefreshToken, cookieOptions);
 
             return Result.Ok(tokenResult.Value.AccessToken);
         }

@@ -6,22 +6,21 @@ namespace ClinicaCare.Client.Services.Auth
 {
     public class RefreshTokenService(IHttpClientFactory httpClientFactory, ITokenService _tokenService) : IRefreshTokenService
     {
-        public async Task<string?> RefreshTokenAsync()
+        public async Task<bool> RefreshTokenAsync()
         {
-            using HttpClient client = httpClientFactory.CreateClient("TokenClient");
+            using HttpClient client = httpClientFactory.CreateClient("RefreshClient");
             var response = await client.PostAsync("api/account/refresh", null);
 
             if (response.IsSuccessStatusCode)
             {
-                var newToken = await response.Content.ReadFromJsonAsync<string>();
-                if (!string.IsNullOrEmpty(newToken))
+                var newAccessToken = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(newAccessToken))
                 {
-                    await _tokenService.SetTokenAsync(newToken);
-                    return newToken;
+                    await _tokenService.SetTokenAsync(newAccessToken);
+                    return true;
                 }
             }
-            //needs refactoring
-            return null;
+            return false;
         }
     }
 }

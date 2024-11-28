@@ -7,6 +7,7 @@ using MudBlazor.Services;
 using Blazr.RenderState.WASM;
 using ClinicaCare.Client.Services.Auth;
 using System.Net;
+using ClinicaCare.Client.Services.Middlewares;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -15,19 +16,26 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
+//builder.Services.AddHttpClient("RefreshClient", client =>
+//{
+//    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+//}).AddHttpMessageHandler<TokenHandler>();
+
 builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
-}).AddHttpMessageHandler<TokenHandler>();
+}).AddHttpMessageHandler<AddAuthorizationHeaderHandler>()
+.AddHttpMessageHandler<TokenHandler>();
 
-builder.Services.AddHttpClient("TokenClient", client =>
+builder.Services.AddHttpClient("RefreshClient", client =>
 {
     client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
-});
+}).AddHttpMessageHandler<AddAuthorizationHeaderHandler>();
 
 //builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<TokenHandler>();
+builder.Services.AddScoped<AddAuthorizationHeaderHandler>();
 
 //builder.Services.AddScoped(sp =>
 //{

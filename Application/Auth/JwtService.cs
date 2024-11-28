@@ -94,7 +94,9 @@ namespace Application.Auth
                 return Result.Fail("User id claim is missing or invalid.");
 
             var cleanUserId = patientIdClaim.Replace("UserId { Value = ", "").Replace(" }", "").Trim();
-            if (!Guid.TryParse(cleanUserId, out var userIdGuid)) return Result.Fail("Invalid user ID format");
+            if (!Guid.TryParse(cleanUserId, out var userIdGuid)) 
+                return Result.Fail("Invalid user ID format");
+
             return Result.Ok(userIdGuid);
         }
 
@@ -102,6 +104,11 @@ namespace Application.Auth
         {
             if (!refreshToken.Equals(user.RefreshToken))
                 return Result.Fail("Refresh token is not valid");
+
+            if (user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return Result.Fail("Refresh token has expired. Please Log in");
+            }
 
             return Result.Ok();
         }
@@ -117,7 +124,7 @@ namespace Application.Auth
             if (string.IsNullOrEmpty(accessToken))
                 return Result.Fail("Access token is missing.");
             return Result.Ok(accessToken);
-        }
+         }
 
         public Result<string> GetEmailFromToken(string accessToken)
         {
@@ -127,6 +134,21 @@ namespace Application.Auth
             if (string.IsNullOrEmpty(emailClaim))
                 return Result.Fail("User email claim is missing or invalid.");
             return Result.Ok(emailClaim);
+        }
+
+        public Result<Guid> GetUserIdFromToken(string accessToken)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(accessToken);
+            var idClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (string.IsNullOrEmpty(idClaim))
+                return Result.Fail("User id claim is missing or invalid.");
+
+            var cleanUserId = idClaim.Replace("UserId { Value = ", "").Replace(" }", "").Trim();
+            if (!Guid.TryParse(cleanUserId, out var userIdGuid)) 
+                return Result.Fail("Invalid user ID format");
+
+            return Result.Ok(userIdGuid);
         }
     }
 }

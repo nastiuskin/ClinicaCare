@@ -2,6 +2,6 @@
 {
     public interface IRefreshTokenService
     {
-        public Task<string?> RefreshTokenAsync();
+        public Task<bool> RefreshTokenAsync();
     }
 }
