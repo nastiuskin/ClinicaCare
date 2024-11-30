@@ -34,7 +34,7 @@ namespace API.Controllers
         [Authorize(Roles = "Patient")]
         [HttpGet]
         [Route("available-time-slots")]
-        public async Task<IActionResult> GetAvailableTimeSlots([FromQuery] Guid doctorId, [FromQuery] Guid medicalProcedureId, [FromQuery] string date)
+        public async Task<IActionResult> GetAvailableTimeSlots([FromQuery] string doctorId, [FromQuery] string medicalProcedureId, [FromQuery] string date)
         {
             var result = await _mediator.Send(new GenerateAvailableTimeSlotsQuery(doctorId, medicalProcedureId, date));
             if (result.IsSuccess)
@@ -53,7 +53,7 @@ namespace API.Controllers
             return BadRequest(result.Errors);
         }
 
-        [Authorize(Roles = "Patient")]
+        [Authorize(Roles = "Patient, Doctor")]
         [HttpPost]
         [Route("{id}/cancel")]
         public async Task<IActionResult> CancelAppointment(Guid id)

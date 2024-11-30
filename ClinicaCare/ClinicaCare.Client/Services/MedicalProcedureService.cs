@@ -1,4 +1,5 @@
-﻿using Application.Helpers.PaginationStuff;
+﻿using Application.AppointmentManagement.DTO;
+using Application.Helpers.PaginationStuff;
 using Application.MedicalProcedureManagement.DTO;
 using ClinicaCare.Client.Services.Interfaces;
 using ClinicaCare.Client.Services.Pagination;
@@ -131,5 +132,6 @@ namespace ClinicaCare.Client.Services
             }
 
         }
+
     }
 }

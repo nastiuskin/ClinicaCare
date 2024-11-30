@@ -53,12 +53,6 @@ namespace Persistence.Database.Users
         {
             var query = GetAll().OfType<Doctor>();
 
-            if (parameters.MedicalProcedureId.HasValue)
-            {
-                query = query
-                    .Where(d => d.MedicalProcedures.Any(mp => mp.Id.Equals(parameters.MedicalProcedureId.Value)));
-            }
-
             return PagedList<Doctor>
                 .ToPagedList(query, parameters.PageNumber, parameters.PageSize);
         }

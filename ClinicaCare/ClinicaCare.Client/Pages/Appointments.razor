@@ -5,8 +5,10 @@
 @using Application.UserAccountManagement.UserDtos
 @using ClinicaCare.Client.Pages.Dialogs
 @using ClinicaCare.Client.Services.Interfaces
+@using Domain.Appointments
 @using Domain.Helpers.PaginationStuff
 @using Domain.MedicalProcedures
+@using Microsoft.AspNetCore.Authorization
 @using MudBlazor
 @inject IAppointmentService AppointmentService
 @inject IUserService UserService
@@ -15,43 +17,83 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
 
-
 @rendermode InteractiveWebAssembly
+
+@attribute [Authorize(Roles = "Patient, Doctor")]
 
 <PageTitle>Services</PageTitle>
 <h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Your Appointments</h3>
 
 <MudGrid Justify="Justify.FlexStart" Spacing="3">
-
-    <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateAppointment">
-            Create New Appointment
-        </MudButton>
-    </MudItem>
+    <AuthorizeView Roles="Patient">
+        <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
+            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateAppointment">
+                Create New Appointment
+            </MudButton>
+        </MudItem>
+    </AuthorizeView>
 
     @if (appointments.Count > 0)
     {
         @foreach (var appointment in appointments)
         {
             <MudItem xs="12">
-                <MudCard Elevation="6" Class="pa-4 hover-card" Style="margin-bottom: 16px; max-width: 800px; margin-left: auto; margin-right: auto;">
-                    <!-- Two-column layout -->
+                <MudCard Elevation="4" Style="padding: 16px; max-width: 600px; margin: 0 auto;">
                     <MudGrid>
-                        <MudItem xs="8">
-                            <MudCardContent>
-                                <MudText Typo="Typo.h5" Class="mud-text-capitalize">@appointment.MedicalProcedureName</MudText>
-                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Doctor: @appointment.DoctorName</MudText>
-                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Date: @appointment.Date</MudText>
-                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Start Time: @appointment.StartTime</MudText>
-                                <MudText Typo="Typo.body2" Style="color: #1976D2;">End Time: @appointment.EndTime</MudText>
-                                <MudText Typo="Typo.body2" Style="color: #1976D2;">Status: @appointment.Status</MudText>
-                                @if(appointment.FeedBack != null)
-                                {
-                                    <MudText Typo="Typo.body2" Style="color: #1976D2;">Feedback: @appointment.FeedBack</MudText>
-                                }
+                        <MudItem xs="6"><strong>Medical Procedure:</strong></MudItem>
+                        <MudItem xs="6">@appointment.MedicalProcedureName</MudItem>
 
-                            </MudCardContent>
-                        </MudItem>
+                        <MudItem xs="6"><strong>Doctor:</strong></MudItem>
+                        <MudItem xs="6">@appointment.DoctorName</MudItem>
+
+                        <MudItem xs="6"><strong>Date:</strong></MudItem>
+                        <MudItem xs="6">@appointment.Date</MudItem>
+
+                        <MudItem xs="6"><strong>Start Time:</strong></MudItem>
+                        <MudItem xs="6">@appointment.StartTime</MudItem>
+
+                        <MudItem xs="6"><strong>End Time:</strong></MudItem>
+                        <MudItem xs="6">@appointment.EndTime</MudItem>
+
+                        <MudItem xs="6"><strong>Status:</strong></MudItem>
+                        <MudItem xs="6">@appointment.Status</MudItem>
+
+                        @if (appointment.Status.Equals(AppointmentStatus.COMPLETED))
+                        {
+                            <MudItem xs="6"><strong>Feedback:</strong></MudItem>
+                            <MudItem xs="6">@appointment.FeedBack</MudItem>
+                                @if (!string.IsNullOrEmpty(appointment.FeedBack))
+                                {
+                                    <AuthorizeView Roles="Doctor">
+                                        <Authorized>
+                                            <MudButton Variant="Variant.Filled" Size="Size.Small" Style="margin-left: 20px; width: auto;" Color="Color.Primary" OnClick="ToggleFeedbackInput">
+                                                Add feedback
+                                            </MudButton>
+
+                                            @if (ShowFeedbackInput)
+                                            {
+                                                <MudItem xs="12" Style="margin-top: 5px;">
+                                                    <MudTextField @bind-Value="Feedback" Label="Enter feedback" Variant="Variant.Outlined" Style="width: 100%;" Size="Size.Small" />
+                                                </MudItem>
+
+                                                <MudItem xs="12" Style="margin-top: 5px;">
+                                                    <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Success" OnClick="() => SubmitFeedback(appointment.Id)">
+                                                        Submit
+                                                    </MudButton>
+                                                </MudItem>
+
+                                                <MudItem xs="12" Style="margin-top: 5px;">
+                                                    <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Surface" OnClick="CancelAddingFeedback">
+                                                        Cancel
+                                                    </MudButton>
+                                                </MudItem>
+                                    }
+
+                                </Authorized>
+                            </AuthorizeView>
+                            }
+
+                        }
                     </MudGrid>
                 </MudCard>
             </MudItem>
@@ -76,6 +118,8 @@
     public MetaData MetaData { get; set; } = new MetaData();
     private AppointmentParameters _appointmentParameters = new();
 
+    private bool ShowFeedbackInput { get; set; } = false;
+    private string Feedback { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,19 +140,36 @@
         MetaData = pagingResponse.MetaData;
     }
 
-    private async void CreateAppointment()
+    private void CreateAppointment()
     {
         NavigationManager.NavigateTo("/create-appointment");
-
     }
-    private async void EditAppointment(Guid id)
+
+    private void ToggleFeedbackInput()
     {
-       
+        ShowFeedbackInput = !ShowFeedbackInput;
     }
 
+    public void CancelAddingFeedback()
+    {
+        ShowFeedbackInput = false;
+    }
 
     private async Task ScrollToTop()
     {
         await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
     }
+
+    private async Task SubmitFeedback(Guid appointmentId)
+    {
+        var resultMessage = await AppointmentService.AddFeedback(appointmentId, Feedback);
+        Snackbar.Add(resultMessage, resultMessage.Contains("successfully") ? Severity.Success : Severity.Error);
+
+        if (resultMessage.Contains("successfully"))
+        {
+            ShowFeedbackInput = false;
+            Feedback = string.Empty;
+        }
+    }
+
 }

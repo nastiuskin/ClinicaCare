@@ -1,6 +1,7 @@
 ﻿using ClinicaCare.Client.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using System.Net.Http;
 using System.Security.Claims;
 
 namespace ClinicaCare.Client.Services.Auth
@@ -23,15 +24,15 @@ namespace ClinicaCare.Client.Services.Auth
             if (!string.IsNullOrEmpty(token))
             {
                 var claims = _tokenService.ParseClaimsFromJwt(token);
-
                 foreach (var claim in claims)
                 {
-                    Console.WriteLine($"{claim.Type}: {claim.Value}");
+                    Console.WriteLine($"Claim Type: {claim.Type}, Value: {claim.Value}");
                 }
                 identity = new ClaimsIdentity(claims, "jwt");
             }
 
             var user = new ClaimsPrincipal(identity);
+           
 
             return new AuthenticationState(user);
         }

@@ -18,11 +18,14 @@
 
 
 <MudGrid Class="ma-4">
-    <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="ShowCreateDoctorDialog">
-           Add Doctor
-        </MudButton>
-    </MudItem>
+    <AuthorizeView Roles="Admin">
+            <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="ShowCreateDoctorDialog">
+                    Add Doctor
+                </MudButton>
+            </MudItem>
+    </AuthorizeView>
+   
     @if (doctors.Count > 0)
     {
         @foreach (var doctor in doctors)
@@ -46,10 +49,14 @@
                         <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="() => ViewProfile(doctor.Id)">
                             View Profile
                         </MudButton>
-                     
-                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Error" OnClick="() => DeleteDoctor(doctor.Id)">
-                            Delete
-                        </MudButton>
+
+                        <AuthorizeView Roles="Admin">
+                            <Authorized>
+                                <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Error" OnClick="() => DeleteDoctor(doctor.Id)">
+                                    Delete
+                                </MudButton>
+                            </Authorized>
+                        </AuthorizeView>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
@@ -78,7 +85,7 @@
 
     private async Task GetDoctors()
     {
-        var pagingResponse = await UserService.GetPagiantedDoctorsAsync(_doctorParameters);
+        var pagingResponse = await UserService.GetPaginatedDoctorsAsync(_doctorParameters);
         doctors = pagingResponse.Items;
         MetaData = pagingResponse.MetaData;
     }

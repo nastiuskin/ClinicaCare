@@ -4,7 +4,6 @@ using Domain.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Application.Auth.Login
 {
@@ -19,7 +18,7 @@ namespace Application.Auth.Login
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserLoginCommandHandler(
-            UserManager<User> userManager, 
+            UserManager<User> userManager,
             IJwtService jwtService,
             IHttpContextAccessor httpContextAccessor)
         {
@@ -39,7 +38,7 @@ namespace Application.Auth.Login
                 return Result.Fail("Invalid email or password.");
 
             var tokenResult = await _jwtService.GenerateTokensAsync(user);
-            if (!tokenResult.IsSuccess) 
+            if (!tokenResult.IsSuccess)
                 return Result.Fail(tokenResult.Errors);
 
             var cookieOptions = new CookieOptions

@@ -49,6 +49,9 @@ namespace ClinicaCare.Client.Services.Auth
 
             var claims = new List<Claim>();
 
+            if (keyValuePairs == null)
+                return claims;
+
             foreach (var kvp in keyValuePairs)
             {
                 if (kvp.Key == "sub" && kvp.Value is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Object)
@@ -56,7 +59,21 @@ namespace ClinicaCare.Client.Services.Auth
                     var subDict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonElement.GetRawText());
                     if (subDict != null && subDict.TryGetValue("Value", out var subValue))
                     {
-                        claims.Add(new Claim("sub", subValue)); 
+                        claims.Add(new Claim("sub", subValue));
+                    }
+                }
+                else if (kvp.Key == "role")
+                {
+                    if (kvp.Value is JsonElement roleElement && roleElement.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var role in roleElement.EnumerateArray())
+                        {
+                            claims.Add(new Claim(ClaimTypes.Role, role.GetString()));
+                        }
+                    }
+                    else
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, kvp.Value.ToString()));
                     }
                 }
                 else
@@ -67,5 +84,6 @@ namespace ClinicaCare.Client.Services.Auth
 
             return claims;
         }
-        }
+
     }
+}

@@ -15,10 +15,9 @@ namespace Application.AppointmentManagement.DTO
         [Required(ErrorMessage = "Please select a date")]
         public string Date { get; set; }
 
-        [Required(ErrorMessage = "Please select start time")]
-        public string StartTime { get; set; }
+       
+        public TimeSlotDto Duration { get; set; }
 
-        [Required(ErrorMessage = "Please select end time")]
-        public string EndTime { get; set; }
+     
     }
 }

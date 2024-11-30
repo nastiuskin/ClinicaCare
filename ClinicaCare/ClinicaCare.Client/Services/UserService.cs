@@ -4,7 +4,9 @@ using Application.UserAccountManagement.UserDtos;
 using ClinicaCare.Client.Services.Interfaces;
 using ClinicaCare.Client.Services.Pagination;
 using Domain.Helpers.PaginationStuff;
+using Domain.MedicalProcedures;
 using Shared.DTO.Users;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -14,8 +16,6 @@ namespace ClinicaCare.Client.Services
     {
         public async Task<(UserViewDto User, string ErrorMessage)> GetProfile()
         {
-            try
-            {
                 using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.GetAsync("api/account/profile");
 
@@ -33,16 +33,9 @@ namespace ClinicaCare.Client.Services
                     return (null, errorMessage);
                 }
             }
-            catch (Exception ex)
-            {
-                return (null, $"An error occurred: {ex.Message}");
-            }
-        }
 
         public async Task<(bool Success, string[] Errors)> UpdateAsync(UserViewDto userViewDto)
         {
-            try
-            {
                 using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.PutAsJsonAsync("api/account/profile/edit", userViewDto);
 
@@ -67,14 +60,10 @@ namespace ClinicaCare.Client.Services
                 {
                     return (false, new[] { "Failed to parse server response."});
                 }
-            }
-            catch (Exception ex)
-            {
-                return (false, new[] { $"An error occurred: {ex.Message}" });
-            }
+ 
         }
 
-        public async Task<PagingResponse<DoctorPartialInfoDto>> GetPagiantedDoctorsAsync(DoctorParameters parameters)
+        public async Task<PagingResponse<DoctorPartialInfoDto>> GetPaginatedDoctorsAsync(DoctorParameters parameters)
         {
             var queryStringParam = new Dictionary<string, string>
             {
@@ -104,10 +93,8 @@ namespace ClinicaCare.Client.Services
 
         public async Task<bool> DeleteUser(Guid id)
         {
-            try
-            {
-                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
-                var response = await _httpClient.DeleteAsync($"api/admin/users/{id}");
+            using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
+            var response = await _httpClient.DeleteAsync($"api/admin/users/{id}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -117,38 +104,26 @@ namespace ClinicaCare.Client.Services
 
                 return true;
             }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
+
 
         public async Task<(bool Success, List<DoctorPartialInfoDto>)> GetAllDoctorsAsync()
         {
-            try
-            {
-                using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
-                var response = await _httpClient.GetAsync("api/account/doctors-list");
+        using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
+        var response = await _httpClient.GetAsync("api/account/doctors-list");
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return (false, null);
-                }
+                return (false, new List<DoctorPartialInfoDto>());
+            }
 
-                var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync();
                 var doctors = JsonSerializer.Deserialize<List<DoctorPartialInfoDto>>(content);
                 return (true, doctors);
-            }
-            catch (Exception ex)
-            {
-                return (false, null);
-            }
         }
+
 
         public async Task<bool> CreateDoctorAsync(DoctorFormDto doctorFormDto)
         {
-            try
-            {
                 using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.PostAsJsonAsync("api/admin/doctors", doctorFormDto);
 
@@ -159,16 +134,9 @@ namespace ClinicaCare.Client.Services
 
                 return false;
             }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
 
         public async Task<(bool, DoctorViewDto)> GetDoctorByIdAsync(Guid id)
         {
-            try
-            {
                 using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
                 var response = await _httpClient.GetAsync($"api/account/{id}/doctor-profile");
 
@@ -186,13 +154,26 @@ namespace ClinicaCare.Client.Services
                     return (false, null);
                 }
             }
-            catch (Exception ex)
+
+        public async Task<(bool Success, List<DoctorPartialInfoDto>)> GetAllDoctorsAsync(Guid medicalProcedureId)
+        {
+            using HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
+            var response = await _httpClient.GetAsync($"api/account/doctors?{medicalProcedureId}");
+
+            if (!response.IsSuccessStatusCode)
             {
-                return (false, null);
+                return (false, new List<DoctorPartialInfoDto>());
             }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var doctors = JsonSerializer.Deserialize<List<DoctorPartialInfoDto>>(content);
+            return (true, doctors);
         }
 
     }
+
 }
+
+
 
 

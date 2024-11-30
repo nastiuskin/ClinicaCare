@@ -9,7 +9,6 @@ namespace ClinicaCare.Client.Services.Auth
 {
     public class AuthService(IHttpClientFactory _httpClientFactory, ITokenService _tokenService) : IAuthService
     {
-
         public async Task<(bool Success, string[] Errors)> LoginAsync(UserLoginDto userLoginDto)
         {
             using HttpClient client = _httpClientFactory.CreateClient("ApiClient");

@@ -11,6 +11,8 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveWebAssembly
 
+@attribute [Authorize(Roles = "Patient, Doctor")]
+ 
 <PageTitle>Profile</PageTitle>
 
 

@@ -47,7 +47,5 @@ namespace API.Controllers
             if (result.Errors.Any()) return BadRequest(result.Errors);
             return BadRequest(result.Errors);
         }
-
-
     }
 }

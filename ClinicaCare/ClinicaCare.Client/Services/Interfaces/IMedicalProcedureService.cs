@@ -1,4 +1,5 @@
-﻿using Application.Helpers.PaginationStuff;
+﻿using Application.AppointmentManagement.DTO;
+using Application.Helpers.PaginationStuff;
 using Application.MedicalProcedureManagement.DTO;
 using Application.UserAccountManagement.UserDtos;
 using ClinicaCare.Client.Services.Pagination;

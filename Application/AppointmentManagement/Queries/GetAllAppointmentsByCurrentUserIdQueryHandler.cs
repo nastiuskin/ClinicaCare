@@ -8,6 +8,7 @@ using Domain.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Security.Claims;
 
 namespace Application.AppointmentManagement.Queries
@@ -51,7 +52,9 @@ namespace Application.AppointmentManagement.Queries
             var appointments = _appointmentRepository.GetAppointmentsAsync(query.Parameters, roleClaim, userId);
 
             var appointmentDtos = _mapper.Map<ICollection<AppointmentInfoDto>>(appointments);
-     
+            _httpContextAccessor.HttpContext.Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(appointments.MetaData));
+
+
             return Result.Ok(appointmentDtos);
         }
     }

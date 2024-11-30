@@ -6,21 +6,28 @@
 @using ClinicaCare.Client.Services.Interfaces
 @using Domain.Helpers.PaginationStuff
 @using Domain.MedicalProcedures
+@using Microsoft.AspNetCore.Authorization
 @using MudBlazor
 @using Shared.DTO.Users
+
 
 @inject IMedicalProcedureService MedicalProcedureService
 @inject IAppointmentService AppointmentService
 @inject IUserService UserService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+
 <h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Create Appointment</h3>
 
+<PageTitle>Create Appointment</PageTitle>
 
 <MudPaper Style="width: 1000px; margin: auto; display: block; margin-top: 100px">
-    <MudStepper ShowResetButton>
-        <MudStep Title="Select medical procedure">
+    <MudStepper ShowResetButton OnPreviewInteraction="OnPreviewInteraction">
+        <MudStep Title="Select medical procedure" @bind-Value="_step1Complete">
         <MudItem xs="12">
-            <MudSelect @bind-Value="appointmentFormDto.MedicalProcedureId">
-                <MudSelectItem Value="Guid.Empty" Disabled="true" Hidden="true">Select Procedure</MudSelectItem>
+                <MudSelect T="Guid" Value="appointmentFormDto.MedicalProcedureId" ValueChanged="OnProcedureSelected">
+                    <MudSelectItem Value="Guid.Empty" Disabled="true" Hidden="true">Select Procedure</MudSelectItem>
                 @foreach (var procedure in medicalProcedures)
                 {
                     <MudSelectItem Value="@procedure.Id">@procedure.Name</MudSelectItem>
@@ -29,53 +36,223 @@
         </MudItem>
         </MudStep>
 
-        <MudStep Title="Select doctor">
+        <MudStep Title="Select doctor" @bind-Value="_step2Complete">
         <MudItem xs="12">
-            <MudSelect  @bind-Value="appointmentFormDto.DoctorId">
+            <MudSelect T="Guid" Value="appointmentFormDto.DoctorId" ValueChanged="OnDoctorSelected">
                 <MudSelectItem Value="Guid.Empty" Disabled="true" Hidden="true">Select Doctor</MudSelectItem>
                 @foreach (var doctor in doctors)
                 {
-                    <MudSelectItem Value="@doctor.Id">@doctor.FirstName + " " + @doctor.LastName</MudSelectItem>
+                    <MudSelectItem Value="@doctor.Id">@doctor.FirstName @doctor.LastName</MudSelectItem>
                 }
             </MudSelect>
         </MudItem>
         </MudStep>
-        <MudStep Title="Select date">Select date</MudStep>
-        <MudStep Title="Select time">Select time</MudStep>
 
+        <MudStep Title="Select date" @bind-Value="_step3Complete">
+            <MudDatePicker ImmediateText="true" Color="Color.Success" @bind-Date="selectedDate" Placeholder="Select Date" />
+        </MudStep>
+
+        <MudStep Title="Select time" @bind-Value="_step4Complete">
+            Select time
+        <MudItem xs="12">
+                <MudSelect T="TimeSlotDto" ValueChanged="OnTimeSelected">
+                    <MudSelectItem T="TimeSlotDto" Value="appointmentFormDto.Duration"></MudSelectItem>
+                @foreach (var timeSlot in timeSlots)
+                {
+                    <MudSelectItem Value="@timeSlot">@timeSlot.StartTime-@timeSlot.EndTime</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        </MudStep>
+
+        <MudStep Title="Confirm Appointment">
+            Confirm Appointment
+            <MudForm Model="appointmentFormDto">
+                <MudGrid Spacing="4">
+                    <!-- Appointment Info -->
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.body1" Class="mud-text-muted text-center">
+                            Medical procedure: @medicalProcedures.FirstOrDefault(m => m.Id == appointmentFormDto.MedicalProcedureId).Name
+                        </MudText>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.body1" Class="mud-text-muted text-center">
+                            Doctor: @doctors.FirstOrDefault(m => m.Id == appointmentFormDto.DoctorId).FirstName  @doctors.FirstOrDefault(m => m.Id == appointmentFormDto.DoctorId).LastName
+                        </MudText>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.body1" Class="mud-text-muted text-center">
+                            Duration: @appointmentFormDto.Duration
+                        </MudText>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.body1" Class="mud-text-muted text-center">
+                            Date: @appointmentFormDto.Date
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+            <MudButton Class="confirm-button" Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small" Style="margin-top: 20px" FullWidth="true" OnClick="ConfirmAppointment">
+                Confirm
+            </MudButton>
+        </MudStep>
 
     </MudStepper>
 </MudPaper>
 
 
 @code {
+
+    [Inject]
+    IDialogService DialogService { get; set; }
     private AppointmentFormDto appointmentFormDto = new();
     List<MedicalProcedureInfoDto> medicalProcedures = new();
     List<DoctorPartialInfoDto> doctors = new();
-
     private MedicalProcedureParameters _procedureParameters = new();
-    private DoctorParameters _doctorParameters = new();
 
+    private List<TimeSlotDto> timeSlots = new();
+    private bool isEditMode = false;
+
+
+    private bool _step1Complete = false;
+    private bool _step2Complete = false;
+    private bool _step3Complete = false;
+    private bool _step4Complete = false;
+
+
+    private DateTime? _selectedDate;
+
+    private DateTime? selectedDate
+    {
+        get => _selectedDate;
+        set
+        {
+            _selectedDate = value;
+            OnDateSelected();  
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
         await GetProcedures();
+    }
+
+    private async Task OnPreviewInteraction(StepperInteractionEventArgs arg)
+    {
+        if (arg.Action == StepAction.Complete)
+        {
+            await ControlStepCompletion(arg);
+        }
+    }
+
+    private async Task ControlStepCompletion(StepperInteractionEventArgs arg)
+    {
+        switch (arg.StepIndex)
+        {
+            case 0:
+                if (_step1Complete != true)
+                {
+                    await DialogService.ShowMessageBox("Error", "You have not completed step 1");
+                    arg.Cancel = true;
+                }
+                else
+                {
+                    await GetDoctors();
+
+                }
+                break;
+
+            case 1:
+                if (_step2Complete != true)
+                {
+                    await DialogService.ShowMessageBox("Error", "You have not completed step 2");
+                    arg.Cancel = true;
+                }
+                break;
+
+            case 2:
+                if (_step3Complete != true)
+                {
+                    await DialogService.ShowMessageBox("Error", "You have not completed step 3");
+                    arg.Cancel = true;
+                }
+                else
+                    await GetTimeSlots();
+                break;
+
+            case 3:
+                if (_step4Complete != true)
+                {
+                    await DialogService.ShowMessageBox("Error", "You have not completed step 4");
+                    arg.Cancel = true;
+                }
+                break;
+        }
     }
 
     private async Task GetProcedures()
     {
         var response = await MedicalProcedureService.GetAllMedicalProceduresAsync(_procedureParameters);
         medicalProcedures = response.Items;
-        // appointmentFormDto.MedicalProcedureId = medicalProcedures.First().Id;
     }
 
-    private async Task GetDoctors(Guid medicalProcedureId)
+    private async Task GetTimeSlots()
     {
-        // _doctorParameters.MedicalProcedureId = medicalProcedureId;
-        // var response = await UserService.GetAllDoctorsAsync();
+        timeSlots = await AppointmentService.GetAvailableTimeSlots(appointmentFormDto.DoctorId, appointmentFormDto.MedicalProcedureId, appointmentFormDto.Date);
     }
 
-    public async Task OnProcedureSelected(Guid medicalProcedureId)
+    private async Task GetDoctors()
     {
-        await GetDoctors(medicalProcedureId);
+        (var success, doctors) = await UserService.GetAllDoctorsAsync(appointmentFormDto.MedicalProcedureId);
     }
+
+    private void OnProcedureSelected(Guid procedureId)
+    {
+        appointmentFormDto.MedicalProcedureId = procedureId;
+        _step1Complete = procedureId != Guid.Empty;
+    }
+
+    private void OnDoctorSelected(Guid doctorId)
+    {
+        appointmentFormDto.DoctorId = doctorId;
+        _step2Complete = doctorId != Guid.Empty;
+    }
+
+    private void OnDateSelected()
+    {
+        _step3Complete = true;
+        appointmentFormDto.Date = _selectedDate.ToString().Split(' ')[0];
+    }
+
+    private void OnTimeSelected(TimeSlotDto duration)
+    {
+        _step4Complete = true;
+        appointmentFormDto.Duration = duration;
+    }
+
+    public async Task ConfirmAppointment()
+    {
+        try
+        {
+            bool result = await AppointmentService.CreateAppointment(appointmentFormDto);
+
+            if (result)
+            {
+                Snackbar.Add("Appointment successfully created.", Severity.Success);
+                Navigation.NavigateTo("/appointments");
+            }
+            else
+            {
+                Snackbar.Add("Failed to create appointment.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"An error occurred: {ex.Message}", Severity.Error);
+        }
+    }
+
 }

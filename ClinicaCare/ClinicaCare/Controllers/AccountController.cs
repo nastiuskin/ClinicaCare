@@ -56,7 +56,6 @@ namespace API.Controllers
             return Ok();
         }
 
-        //[Authorize]
         [HttpPost]
         [Route("refresh")]
         public async Task<IActionResult> RefreshToken()
@@ -92,7 +91,7 @@ namespace API.Controllers
             return BadRequest(result.Errors);
         }
 
-        [Authorize]
+        [Authorize(Roles ="Patient,Doctor")]
         [HttpGet]
         [Route("profile")]
         public async Task<ActionResult> GetUserProfile()
@@ -120,6 +119,15 @@ namespace API.Controllers
         {
             var result = await _mediator.Send(new GetDoctorProfileQuery(id));
             if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GetDoctorsByMedicalProcedure([FromQuery] Guid medicalProcedureId)
+        {
+            var result = await _mediator.Send(new GetDoctorsByMedicalProcedureQuery(medicalProcedureId));
+            if(result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);
         }

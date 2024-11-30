@@ -13,7 +13,6 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-
 @rendermode InteractiveWebAssembly
 
 <PageTitle>Services</PageTitle>
@@ -36,13 +35,18 @@
             Apply Filter
         </MudButton>
     </MudItem>
-
-    <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateProcedure">
-            Create New Procedure
-        </MudButton>
-    </MudItem>
-
+    
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+        <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
+            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateProcedure">
+                Create New Procedure
+            </MudButton>
+        </MudItem>
+        </Authorized>
+    </AuthorizeView>
+    
+    
     @if (medicalProcedures.Count > 0)
     {
         @foreach (var procedure in medicalProcedures)
@@ -65,9 +69,15 @@
                              @* <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info" OnClick="() => EditProcedure(procedure.Id)" Style="margin-top: 8px;">
                                  Edit
                              </MudButton> *@
-                            <MudButton Variant="Variant.Outlined" Color="Color.Warning" Style="margin-top: 8px;" OnClick="() => DeleteProcedure(procedure.Id)">
-                                Delete
-                            </MudButton>
+
+                             <AuthorizeView Roles="Admin">
+                                 <Authorized>
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Style="margin-top: 8px;" OnClick="() => DeleteProcedure(procedure.Id)">
+                                        Delete
+                                    </MudButton>
+                                 </Authorized>
+                             </AuthorizeView>
+                            
                         </MudItem>
                     </MudGrid>
                 </MudCard>
@@ -181,34 +191,6 @@
         _procedureParameters.PageNumber = 1;  
         await GetProcedures();
     }
-
-    private async void EditProcedure(Guid id)
-    {
-    //     var procedure = await MedicalProcedureService.GetMedicalProcedureAsync(id);
-
-    //     var parameters = new DialogParameters
-    // {
-    //     { "ProcedureUpdateDto", new MedicalProcedureInfoWithDoctorsDto
-    //         {
-    //             Name = procedure.Name,
-    //             Type = procedure.Type,
-    //             Duration = procedure.Duration,
-    //             Price = procedure.Price
-    //         }
-    //     }
-    // };
-
-    //     var options = new DialogOptions { CloseOnEscapeKey = true };
-    //     var dialog = DialogService.Show<ServiceUpdateDialog>("Edit Procedure", parameters, options);
-
-    //     var result = await dialog.Result;
-
-    //     if (!result.Canceled)
-    //     {
-    //         await GetProcedures();
-    //     }
-    }
-
 
     private async Task ScrollToTop()
     {

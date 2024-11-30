@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.AppointmentManagement.Commands.Create
 {
-    public record GenerateAvailableTimeSlotsQuery(Guid DoctorId, Guid MedicalProcedureId, string Date)
+    public record GenerateAvailableTimeSlotsQuery(string DoctorId, string MedicalProcedureId, string Date)
         : IQuery<Result<List<TimeSlotDto>>>;
 
     public class GenerateAvailableTimeSlotsQueryHandler
@@ -29,15 +29,15 @@ namespace Application.AppointmentManagement.Commands.Create
         public async Task<Result<List<TimeSlotDto>>> Handle(GenerateAvailableTimeSlotsQuery request, CancellationToken cancellationToken)
         {
             var medicalProcedure = await _medicalProcedureRepository
-                .GetByIdAsync(new MedicalProcedureId(request.MedicalProcedureId));
+                .GetByIdAsync(new MedicalProcedureId(Guid.Parse(request.MedicalProcedureId)));
             if (medicalProcedure == null) 
-                return Result.Fail(ResponseError.NotFound(nameof(medicalProcedure), request.MedicalProcedureId));
+                return Result.Fail(new FluentResults.Error("Medical Procedure not found"));
 
             var doctor = await _userRepository.GetByIdWithAppointmentsOnSpecificDayAsync(
-                new UserId(request.DoctorId), DateOnly.Parse(request.Date)).FirstOrDefaultAsync();
+                new UserId(Guid.Parse(request.DoctorId)), DateOnly.Parse(request.Date)).FirstOrDefaultAsync();
 
-            if (doctor == null) 
-                return Result.Fail(ResponseError.NotFound(nameof(doctor), request.DoctorId));
+            if (doctor == null)
+                return Result.Fail(new FluentResults.Error("Doctor not found"));
 
             var availableTimeSlots = AvailableTimeSlotService.GetAvailableTimeSlotsForDay(
                 doctor, medicalProcedure, DateOnly.Parse(request.Date)).Value;

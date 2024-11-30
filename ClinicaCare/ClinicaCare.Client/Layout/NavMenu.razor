@@ -9,8 +9,6 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-
-
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">ClinicaCare</a>
@@ -26,44 +24,6 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="profile">
-                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Profile
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="appointments">
-                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Appointments
-            </NavLink>
-        </div>
-
-        <!-- Authorized User Links -->
-
-            <AuthorizeView>
-                <Authorized>
-                  @*  <div class="nav-item px-3">
-                     <NavLink class="nav-link" href="profile">
-                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Profile
-                     </NavLink>
-                 </div> *@
-
-                   <div class="nav-item px-3">
-                    <NavLink class="nav-link" @onclick="ShowLogoutConfirmation">
-                        <span class="bi bi-box-arrow-right-fill-nav-menu" aria-hidden="true"></span> Logout
-                    </NavLink>  
-                </div>
-                </Authorized>
-
-            <!-- Unauthorized User Links -->
-                <NotAuthorized>
-                     <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="login">
-                            <span class="bi bi-door-open-fill-nav-menu" aria-hidden="true"></span> Login
-                        </NavLink>
-                     </div>
-                </NotAuthorized>
-            </AuthorizeView>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="services">
@@ -71,11 +31,50 @@
             </NavLink>
         </div>
 
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="doctors">
                 <span class="bi bi bi-list-nested-nav-menu" aria-hidden="true"></span> Doctors
             </NavLink>
         </div>
+
+        <!-- Authorized User Links -->
+
+        <AuthorizeView Roles="Patient, Doctor"> 
+            <Authorized>                
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="profile">
+                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Profile
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="appointments">
+                        <span class="bi bi bi-list-nested-nav-menu" aria-hidden="true"></span> Appointments
+                    </NavLink>
+                </div>
+                </Authorized>
+            </AuthorizeView>
+
+        <AuthorizeView>
+                <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" @onclick="ShowLogoutConfirmation">
+                        <span class="bi bi-box-arrow-right-fill-nav-menu" aria-hidden="true"></span> Logout
+                    </NavLink>
+                </div>
+                </Authorized>
+
+                <!-- Unauthorized User Links -->
+                <NotAuthorized>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="login">
+                            <span class="bi bi-door-open-fill-nav-menu" aria-hidden="true"></span> Login
+                        </NavLink>
+                    </div>
+                </NotAuthorized>
+                </AuthorizeView>
+                            
     </nav>
  </div>
 

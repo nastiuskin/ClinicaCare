@@ -79,11 +79,18 @@ namespace Persistence.Database.Appointments
 
             if (roleClaim == "Doctor")
             {
-                query = query.Where(a => a.DoctorId == userId);
+                query = query.Where(a => a.DoctorId == userId)
+                    .Include(a => a.Doctor)   
+                    .Include(a => a.Patient)
+                    .Include(a => a.MedicalProcedure);
             }
             else
             {
-                query = query.Where(a => a.PatientId == userId);
+                query = query.Where(a => a.PatientId == userId)
+                    .Include(a => a.Doctor)
+                    .Include(a => a.Patient)
+                    .Include(a => a.MedicalProcedure);
+
             }
 
             return PagedList<Appointment>
