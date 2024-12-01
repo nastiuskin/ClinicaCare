@@ -1,175 +1,216 @@
-﻿@page "/appointments"
-@using Application.AppointmentManagement.DTO
-@using Application.Helpers.PaginationStuff
-@using Application.MedicalProcedureManagement.DTO
-@using Application.UserAccountManagement.UserDtos
-@using ClinicaCare.Client.Pages.Dialogs
-@using ClinicaCare.Client.Services.Interfaces
-@using Domain.Appointments
-@using Domain.Helpers.PaginationStuff
-@using Domain.MedicalProcedures
-@using Microsoft.AspNetCore.Authorization
-@using MudBlazor
-@inject IAppointmentService AppointmentService
-@inject IUserService UserService
-@inject IJSRuntime JsRuntime
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject NavigationManager NavigationManager
+﻿    @page "/appointments"
+    @using Application.AppointmentManagement.DTO
+    @using Application.Helpers.PaginationStuff
+    @using Application.MedicalProcedureManagement.DTO
+    @using Application.UserAccountManagement.UserDtos
+    @using ClinicaCare.Client.Pages.Dialogs
+    @using ClinicaCare.Client.Services.Interfaces
+    @using Domain.Appointments
+    @using Domain.Helpers.PaginationStuff
+    @using Domain.MedicalProcedures
+    @using Microsoft.AspNetCore.Authorization
+    @using MudBlazor
+    @inject IAppointmentService AppointmentService
+    @inject IUserService UserService
+    @inject IJSRuntime JsRuntime
+    @inject IDialogService DialogService
+    @inject ISnackbar Snackbar
+    @inject NavigationManager NavigationManager
 
-@rendermode InteractiveWebAssembly
+    @rendermode InteractiveWebAssembly
 
-@attribute [Authorize(Roles = "Patient, Doctor")]
+    @attribute [Authorize(Roles = "Patient, Doctor")]
 
-<PageTitle>Services</PageTitle>
-<h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Your Appointments</h3>
+    <PageTitle>Services</PageTitle>
+    <h3 class="mud-typography-display1" style="text-align: center; margin-bottom: 24px;">Your Appointments</h3>
 
-<MudGrid Justify="Justify.FlexStart" Spacing="3">
-    <AuthorizeView Roles="Patient">
-        <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
-            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateAppointment">
-                Create New Appointment
-            </MudButton>
-        </MudItem>
-    </AuthorizeView>
+    <MudGrid Justify="Justify.FlexStart" Spacing="3">
+        <AuthorizeView Roles="Patient">
+            <MudItem xs="12" Style="text-align: right; margin-bottom: 16px; margin-right: 200px;">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateAppointment">
+                    Create New Appointment
+                </MudButton>
+            </MudItem>
+        </AuthorizeView>
 
-    @if (appointments.Count > 0)
-    {
-        @foreach (var appointment in appointments)
+        @if (appointments.Count > 0)
         {
-            <MudItem xs="12">
-                <MudCard Elevation="4" Style="padding: 16px; max-width: 600px; margin: 0 auto;">
-                    <MudGrid>
-                        <MudItem xs="6"><strong>Medical Procedure:</strong></MudItem>
-                        <MudItem xs="6">@appointment.MedicalProcedureName</MudItem>
+            @foreach (var appointment in appointments)
+            {
+                <MudItem xs="12">
+                    <MudCard Elevation="4" Style="padding: 16px; max-width: 600px; margin: 0 auto;">
+                        <MudGrid>
+                            <MudItem xs="6"><strong>Medical Procedure:</strong></MudItem>
+                            <MudItem xs="6">@appointment.MedicalProcedureName</MudItem>
 
-                        <MudItem xs="6"><strong>Doctor:</strong></MudItem>
-                        <MudItem xs="6">@appointment.DoctorName</MudItem>
+                            <MudItem xs="6"><strong>Doctor:</strong></MudItem>
+                            <MudItem xs="6">@appointment.DoctorName</MudItem>
 
-                        <MudItem xs="6"><strong>Date:</strong></MudItem>
-                        <MudItem xs="6">@appointment.Date</MudItem>
+                            <MudItem xs="6"><strong>Date:</strong></MudItem>
+                            <MudItem xs="6">@appointment.Date</MudItem>
 
-                        <MudItem xs="6"><strong>Start Time:</strong></MudItem>
-                        <MudItem xs="6">@appointment.StartTime</MudItem>
+                            <MudItem xs="6"><strong>Start Time:</strong></MudItem>
+                            <MudItem xs="6">@appointment.StartTime</MudItem>
 
-                        <MudItem xs="6"><strong>End Time:</strong></MudItem>
-                        <MudItem xs="6">@appointment.EndTime</MudItem>
+                            <MudItem xs="6"><strong>End Time:</strong></MudItem>
+                            <MudItem xs="6">@appointment.EndTime</MudItem>
+                                
+                            <MudItem xs="6"><strong>Status:</strong></MudItem>
+                            <MudItem xs="6">@appointment.Status</MudItem>
 
-                        <MudItem xs="6"><strong>Status:</strong></MudItem>
-                        <MudItem xs="6">@appointment.Status</MudItem>
+                            @if (!string.IsNullOrEmpty(appointment.FeedBack))
+                            {
 
-                        @if (appointment.Status.Equals(AppointmentStatus.COMPLETED))
-                        {
-                            <MudItem xs="6"><strong>Feedback:</strong></MudItem>
-                            <MudItem xs="6">@appointment.FeedBack</MudItem>
-                                @if (!string.IsNullOrEmpty(appointment.FeedBack))
-                                {
-                                    <AuthorizeView Roles="Doctor">
-                                        <Authorized>
-                                            <MudButton Variant="Variant.Filled" Size="Size.Small" Style="margin-left: 20px; width: auto;" Color="Color.Primary" OnClick="ToggleFeedbackInput">
-                                                Add feedback
-                                            </MudButton>
-
-                                            @if (ShowFeedbackInput)
-                                            {
-                                                <MudItem xs="12" Style="margin-top: 5px;">
-                                                    <MudTextField @bind-Value="Feedback" Label="Enter feedback" Variant="Variant.Outlined" Style="width: 100%;" Size="Size.Small" />
-                                                </MudItem>
-
-                                                <MudItem xs="12" Style="margin-top: 5px;">
-                                                    <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Success" OnClick="() => SubmitFeedback(appointment.Id)">
-                                                        Submit
-                                                    </MudButton>
-                                                </MudItem>
-
-                                                <MudItem xs="12" Style="margin-top: 5px;">
-                                                    <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Surface" OnClick="CancelAddingFeedback">
-                                                        Cancel
-                                                    </MudButton>
-                                                </MudItem>
-                                    }
-
-                                </Authorized>
-                            </AuthorizeView>
+                                <MudItem xs="6"><strong>Feedback:</strong></MudItem>
+                                <MudItem xs="6">@appointment.FeedBack</MudItem>
                             }
 
+                        @if (appointment.Status == "Canceled")
+                        {
                         }
-                    </MudGrid>
-                </MudCard>
+
+                        else @if (appointment.Status == "SCHEDULED")
+                        {
+                            <AuthorizeView Roles="Doctor">
+                                <MudButton Variant="Variant.Filled" Size="Size.Small" Style="margin-left: 20px; width: auto;" Color="Color.Primary" OnClick="() => EditStatus(appointment.Id, AppointmentStatus.COMPLETED)">
+                                    Complete
+                                </MudButton>
+                            </AuthorizeView>
+                           
+                            <AuthorizeView Roles="Doctor, Patient">
+                                <MudButton Variant="Variant.Filled" Size="Size.Small" Style="margin-left: 20px; width: auto;" Color="Color.Primary" OnClick="() => EditStatus(appointment.Id, AppointmentStatus.CANCELED)">
+                                    Cancel
+                                </MudButton>
+                            </AuthorizeView>
+                            
+                        }
+
+                        else @if (appointment.Status == "COMPLETED")
+                            {
+                                    @if (string.IsNullOrEmpty(appointment.FeedBack))
+                                    {
+                                        <AuthorizeView Roles="Doctor">
+                                            <Authorized>
+                                                <MudButton Variant="Variant.Filled" Size="Size.Small" Style="margin-left: 20px; width: auto;" Color="Color.Primary" OnClick="ToggleFeedbackInput">
+                                                    Add feedback
+                                                </MudButton>
+
+                                                @if (ShowFeedbackInput)
+                                                {
+                                                    <MudItem xs="12" Style="margin-top: 5px;">
+                                                        <MudTextField @bind-Value="Feedback" Label="Enter feedback" Variant="Variant.Outlined" Style="width: 100%"/>
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" Style="margin-top: 5px;">
+                                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Success" OnClick="() => SubmitFeedback(appointment.Id)">
+                                                            Submit
+                                                        </MudButton>
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" Style="margin-top: 5px;">
+                                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Surface" OnClick="CancelAddingFeedback">
+                                                            Cancel
+                                                        </MudButton>
+                                                    </MudItem>
+                                        }
+
+                                    </Authorized>
+                                </AuthorizeView>
+                                }
+
+                             }
+                        </MudGrid>
+                    </MudCard>
+                </MudItem>
+            }
+        }
+        else
+        {
+            <MudItem xs="12" Style="text-align: center;">
+                <MudText Typo="Typo.subtitle1" Color="Color.Secondary">No appointments available.</MudText>
             </MudItem>
         }
-    }
-    else
-    {
-        <MudItem xs="12" Style="text-align: center;">
-            <MudText Typo="Typo.subtitle1" Color="Color.Secondary">No appointments available.</MudText>
-        </MudItem>
-    }
-</MudGrid>
+    </MudGrid>
 
-<div class="row">
-    <div class="col">
-        <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+    <div class="row">
+        <div class="col">
+            <Pagination MetaData="MetaData" Spread="2" SelectedPage="SelectedPage" />
+        </div>
     </div>
-</div>
 
-@code {
-    public List<AppointmentInfoDto> appointments { get; set; } = new();
-    public MetaData MetaData { get; set; } = new MetaData();
-    private AppointmentParameters _appointmentParameters = new();
+    @code {
+        public List<AppointmentInfoDto> appointments { get; set; } = new();
+        public MetaData MetaData { get; set; } = new MetaData();
+        private AppointmentParameters _appointmentParameters = new();
 
-    private bool ShowFeedbackInput { get; set; } = false;
-    private string Feedback { get; set; } = string.Empty;
+        private bool ShowFeedbackInput { get; set; } = false;
+        private string Feedback { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await GetAppointments();
-    }
+        protected override async Task OnInitializedAsync()
+        {
+            await GetAppointments();
+        }
 
-    private async Task SelectedPage(int page)
-    {
-        _appointmentParameters.PageNumber = page;
-        await GetAppointments();
-        await ScrollToTop();
-    }
+        private async Task SelectedPage(int page)
+        {
+            _appointmentParameters.PageNumber = page;
+            await GetAppointments();
+            await ScrollToTop();
+        }
 
-    private async Task GetAppointments()
-    {
-        var pagingResponse = await AppointmentService.GetAllAppontmentsAsync(_appointmentParameters);
-        appointments = pagingResponse.Items;
-        MetaData = pagingResponse.MetaData;
-    }
+        private async Task GetAppointments()
+        {
+            var pagingResponse = await AppointmentService.GetAllAppontmentsAsync(_appointmentParameters);
+            appointments = pagingResponse.Items;
+            MetaData = pagingResponse.MetaData;
+        }
 
-    private void CreateAppointment()
-    {
-        NavigationManager.NavigateTo("/create-appointment");
-    }
+        private async Task CreateAppointment()
+        {
+            NavigationManager.NavigateTo("/create-appointment");
+            await GetAppointments();
+        }
 
-    private void ToggleFeedbackInput()
-    {
-        ShowFeedbackInput = !ShowFeedbackInput;
-    }
+        private void ToggleFeedbackInput()
+        {
+            ShowFeedbackInput = !ShowFeedbackInput;
+        }
 
-    public void CancelAddingFeedback()
-    {
-        ShowFeedbackInput = false;
-    }
-
-    private async Task ScrollToTop()
-    {
-        await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
-    }
-
-    private async Task SubmitFeedback(Guid appointmentId)
-    {
-        var resultMessage = await AppointmentService.AddFeedback(appointmentId, Feedback);
-        Snackbar.Add(resultMessage, resultMessage.Contains("successfully") ? Severity.Success : Severity.Error);
-
-        if (resultMessage.Contains("successfully"))
+        public void CancelAddingFeedback()
         {
             ShowFeedbackInput = false;
-            Feedback = string.Empty;
+        }
+
+        private async Task ScrollToTop()
+        {
+            await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
+        }
+
+        private async Task SubmitFeedback(Guid appointmentId)
+        {
+            var resultMessage = await AppointmentService.AddFeedback(appointmentId, Feedback);
+            Snackbar.Add(resultMessage, resultMessage.Contains("successfully") ? Severity.Success : Severity.Error);
+
+            if (resultMessage.Contains("successfully"))
+            {
+                ShowFeedbackInput = false;
+                Feedback = string.Empty;
+            }
+            StateHasChanged();
+            await GetAppointments();
+
+        }
+
+        public async Task EditStatus(Guid id, AppointmentStatus status)
+        {
+            var response = await AppointmentService.EditAppointmentStatus(id, status);
+            if(response)
+                Snackbar.Add($"Appointment {status}.", Severity.Success);
+            else
+                Snackbar.Add("Failed to edit appointment status.", Severity.Error);
+
+        StateHasChanged();
+        await GetAppointments();
+
         }
     }
-
-}

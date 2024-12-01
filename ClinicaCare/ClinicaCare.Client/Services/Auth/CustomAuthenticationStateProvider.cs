@@ -1,7 +1,5 @@
 ﻿using ClinicaCare.Client.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
-using System.Net.Http;
 using System.Security.Claims;
 
 namespace ClinicaCare.Client.Services.Auth
@@ -32,7 +30,7 @@ namespace ClinicaCare.Client.Services.Auth
             }
 
             var user = new ClaimsPrincipal(identity);
-           
+
 
             return new AuthenticationState(user);
         }

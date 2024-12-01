@@ -15,7 +15,6 @@ namespace Application.AppointmentManagement.DTO
         [Required(ErrorMessage = "Please select a date")]
         public string Date { get; set; }
 
-       
         public TimeSlotDto Duration { get; set; }
 
      

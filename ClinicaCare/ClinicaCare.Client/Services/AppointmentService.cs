@@ -100,18 +100,25 @@ namespace ClinicaCare.Client.Services
             }
         }
 
-        //public async Task<bool> EditAppointmentStatus(Guid appointmentId, string status)
-        //{
-        //    using HttpClient httpClient = httpClientFactory.CreateClient("ApiClient");
-        //    if(status.Equals(AppointmentStatus.CANCELED))
-        //    {
-        //        var response = httpClient.PutAsJsonAsync($"api/appointments/{appointmentId}/cancel"), status);
-        //    }
-        //    else
-        //    {
-        //        var response = httpClient.PutAsJsonAsync($"api/appointments/{appointmentId}/cancel").Result];
-        //    }
-        //}
+        public async Task<bool> EditAppointmentStatus(Guid appointmentId, AppointmentStatus status)
+        {
+            using HttpClient httpClient = httpClientFactory.CreateClient("ApiClient");
+
+            HttpResponseMessage response;
+
+            if (status.Equals(AppointmentStatus.CANCELED))
+            {
+                response = await httpClient.PostAsJsonAsync($"api/appointments/{appointmentId}/cancel", status);
+            }
+            else
+            {
+                response = await httpClient.PostAsJsonAsync($"api/appointments/{appointmentId}/complete", status);
+            }
+
+            if (response.IsSuccessStatusCode)
+                return true;
+            else return false;
+        }
 
     }
 

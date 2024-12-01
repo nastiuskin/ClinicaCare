@@ -11,6 +11,8 @@ namespace Application.UserAccountManagement.Doctors.DTO
         public string Biography { get; set; }
 
         [Required(ErrorMessage = "Cabinet number is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Cabinet number must be greater than zero.")]
+
         public int CabinetNumber { get; set; }
 
         [Required(ErrorMessage = "Working hours start is required.")]

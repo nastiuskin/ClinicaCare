@@ -1,5 +1,6 @@
 ﻿using Application.AppointmentManagement.DTO;
 using ClinicaCare.Client.Services.Pagination;
+using Domain.Appointments;
 using Domain.Helpers.PaginationStuff;
 
 namespace ClinicaCare.Client.Services.Interfaces
@@ -10,7 +11,6 @@ namespace ClinicaCare.Client.Services.Interfaces
         public Task<List<TimeSlotDto>> GetAvailableTimeSlots(Guid doctorId, Guid medicalProcedureId, string date);
         public Task<bool> CreateAppointment(AppointmentFormDto appointmentFormDto);
         public Task<string> AddFeedback(Guid appointmentId, string feedback);
-
-        //public Task<bool> EditAppointmentStatus(Guid appointmentId, string status);
+        public Task<bool> EditAppointmentStatus(Guid appointmentId, AppointmentStatus status);
     }
 }
