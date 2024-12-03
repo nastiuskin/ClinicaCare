@@ -23,7 +23,7 @@ namespace Application.AppointmentManagement.Commands.Cancel
             CancellationToken cancellationToken)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(new AppointmentId(command.Id));
-            if (appointment == null) return Result.Fail(ResponseError.NotFound(nameof(appointment), command.Id));
+            if (appointment == null) return Result.Fail(new FluentResults.Error("Appointment not found"));
 
             var result = appointment.Cancel();
             if (!result.IsSuccess)

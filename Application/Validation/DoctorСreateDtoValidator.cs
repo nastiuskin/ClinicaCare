@@ -7,16 +7,12 @@ namespace Domain.Validation
     {
         public DoctorСreateDtoValidator()
         {
-            Include(new UserCreateDtoValidator()); 
+            Include(new UserCreateDtoValidator());
 
             RuleFor(doctor => doctor.Specialization)
                 .NotEmpty().WithMessage("Specialization is required.");
-
-            RuleFor(doctor => doctor.Biography)
-                .NotEmpty().WithMessage("Biography is required")
-                    .MaximumLength(500).WithMessage("Biography cannot exceed 500 characters.");
-
             RuleFor(doctor => doctor.CabinetNumber)
+
                 .NotEmpty().WithMessage("Cabinet number is required.")
                     .GreaterThan(0).WithMessage("Cabinet number must be greater than zero.");
 

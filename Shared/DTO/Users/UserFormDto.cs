@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace Application.UserAccountManagement.UserDtos
 {
@@ -24,8 +25,9 @@ namespace Application.UserAccountManagement.UserDtos
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Phone number is required.")]
-        [Phone(ErrorMessage = "Invalid phone number format.")]
+        [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Phone number invalid format.")]
         public string PhoneNumber { get; set; }
+
 
         [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; }
