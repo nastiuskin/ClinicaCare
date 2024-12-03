@@ -1,6 +1,7 @@
 using API.Extensions;
 using Blazr.RenderState.Server;
 using ClinicaCare.Components;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +49,7 @@ app.ConfigureMiddleware();
 app.UseAntiforgery();
 app.MapControllers();
 
+StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
