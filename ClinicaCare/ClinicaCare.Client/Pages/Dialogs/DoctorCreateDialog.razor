@@ -4,6 +4,7 @@
 @using Domain.Users.Doctors
 @using MudBlazor
 @inject IUserService UserService
+@inject ISnackbar Snackbar
 
 <MudDialog>
     <DialogContent>
@@ -122,9 +123,6 @@ else if (success)
     private DoctorFormDto DoctorData = new();
     private bool success;
     private string[] errors = { };
-
-    [Inject]
-    private ISnackbar Snackbar { get; set; }
 
     private async Task Save()
     {

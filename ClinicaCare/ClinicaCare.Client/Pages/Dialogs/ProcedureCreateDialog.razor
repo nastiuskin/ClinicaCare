@@ -111,7 +111,7 @@
         var result = await MedicalProcedureService.CreateMedicalProcedureAsync(procedureFormDto);
         if (result)
         {
-            MudDialog.Close(DialogResult.Ok(true));
+            MudDialog.Close(DialogResult.Ok(procedureFormDto));
             Snackbar.Add("Medical procedure successfully created.", Severity.Success);
         }
         else

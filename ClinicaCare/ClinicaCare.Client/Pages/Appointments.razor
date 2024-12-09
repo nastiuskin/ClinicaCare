@@ -66,11 +66,6 @@
                                 <MudItem xs="6"><strong>Feedback:</strong></MudItem>
                                 <MudItem xs="6">@appointment.FeedBack</MudItem>
                             }
-
-                        @if (appointment.Status == "Canceled")
-                        {
-                        }
-
                         else @if (appointment.Status == "SCHEDULED")
                         {
                             <AuthorizeView Roles="Doctor">
@@ -93,11 +88,11 @@
                                     {
                                         <AuthorizeView Roles="Doctor">
                                             <Authorized>
-                                                <MudButton Variant="Variant.Filled" Size="Size.Small" Style="margin-left: 20px; width: auto;" Color="Color.Primary" OnClick="ToggleFeedbackInput">
+                                                <MudButton Variant="Variant.Filled" Size="Size.Small" Style="margin-left: 20px; width: auto;" Color="Color.Primary" OnClick="() => ToggleFeedbackInput(appointment.Id)">
                                                     Add feedback
                                                 </MudButton>
 
-                                                @if (ShowFeedbackInput)
+                                                @if (appointment.ShowFeedbackInput)
                                                 {
                                                     <MudItem xs="12" Style="margin-top: 5px;">
                                                         <MudTextField @bind-Value="Feedback" Label="Enter feedback" Variant="Variant.Outlined" Style="width: 100%"/>
@@ -110,7 +105,7 @@
                                                     </MudItem>
 
                                                     <MudItem xs="12" Style="margin-top: 5px;">
-                                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Surface" OnClick="CancelAddingFeedback">
+                                                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Surface" OnClick="() => CancelAddingFeedback(appointment.Id)">
                                                             Cancel
                                                         </MudButton>
                                                     </MudItem>
@@ -140,80 +135,96 @@
         </div>
     </div>
 
-    @code {
-        [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+@code {
+    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-        public List<AppointmentInfoDto> appointments { get; set; } = new();
-        public MetaData MetaData { get; set; } = new MetaData();
-        private AppointmentParameters _appointmentParameters = new();
+    public List<AppointmentInfoDto> appointments { get; set; } = new();
+    public MetaData MetaData { get; set; } = new MetaData();
+    private AppointmentParameters _appointmentParameters = new();
 
-        private bool ShowFeedbackInput { get; set; } = false;
-        private string Feedback { get; set; } = string.Empty;
+    // private bool ShowFeedbackInput { get; set; } = false;
 
-        protected override async Task OnInitializedAsync()
+    // private Dictionary<Guid, bool> FeedBackInputStates = new();
+
+    private string Feedback { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAppointments();
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        _appointmentParameters.PageNumber = page;
+        await GetAppointments();
+        await ScrollToTop();
+    }
+
+    private async Task GetAppointments()
+    {
+        var pagingResponse = await AppointmentService.GetAllAppontmentsAsync(_appointmentParameters);
+        appointments = pagingResponse.Items;
+        MetaData = pagingResponse.MetaData;
+    }
+
+    private async Task CreateAppointment()
+    {
+        NavigationManager.NavigateTo("/create-appointment");
+        await GetAppointments();
+    }
+
+    private void ToggleFeedbackInput(Guid id)
+    {
+        AppointmentInfoDto appointmentToUpdate = appointments.FirstOrDefault(a => a.Id == id);
+        appointmentToUpdate.ShowFeedbackInput = true;
+        StateHasChanged();
+    }
+
+    public void CancelAddingFeedback(Guid id)
+    {
+        AppointmentInfoDto appointmentToUpdate = appointments.FirstOrDefault(a => a.Id == id);
+        appointmentToUpdate.ShowFeedbackInput = false;
+        StateHasChanged();
+    }
+
+    private async Task ScrollToTop()
+    {
+        await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
+    }
+
+    private async Task SubmitFeedback(Guid appointmentId)
+    {
+        var resultMessage = await AppointmentService.AddFeedback(appointmentId, Feedback);
+        Snackbar.Add(resultMessage, resultMessage.Contains("successfully") ? Severity.Success : Severity.Error);
+
+        if (resultMessage.Contains("successfully"))
         {
-            await GetAppointments();
+            AppointmentInfoDto appointmentToUpdate = appointments.FirstOrDefault(a => a.Id == appointmentId);
+            appointmentToUpdate.FeedBack = Feedback;
+            appointmentToUpdate.ShowFeedbackInput = false;
+            StateHasChanged();
+            Feedback = string.Empty;
         }
+    }
 
-        private async Task SelectedPage(int page)
+    public async Task EditStatus(Guid id, AppointmentStatus status)
+    {
+        var response = await AppointmentService.EditAppointmentStatus(id, status);
+        if(response)
+            Snackbar.Add($"Appointment {status}.", Severity.Success);
+        else
+            Snackbar.Add("Failed to edit appointment status.", Severity.Error);
+
+        var appointmentToUpdate = appointments.FirstOrDefault(a => a.Id == id);
+        if (appointmentToUpdate != null)
         {
-            _appointmentParameters.PageNumber = page;
-            await GetAppointments();
-            await ScrollToTop();
-        }
-
-        private async Task GetAppointments()
-        {
-            var pagingResponse = await AppointmentService.GetAllAppontmentsAsync(_appointmentParameters);
-            appointments = pagingResponse.Items;
-            MetaData = pagingResponse.MetaData;
-        }
-
-        private async Task CreateAppointment()
-        {
-            NavigationManager.NavigateTo("/create-appointment");
-            await GetAppointments();
-        }
-
-        private void ToggleFeedbackInput()
-        {
-            ShowFeedbackInput = !ShowFeedbackInput;
-        }
-
-        public void CancelAddingFeedback()
-        {
-            ShowFeedbackInput = false;
-        }
-
-        private async Task ScrollToTop()
-        {
-            await JsRuntime.InvokeVoidAsync("window.scrollTo", 0, 0);
-        }
-
-        private async Task SubmitFeedback(Guid appointmentId)
-        {
-            var resultMessage = await AppointmentService.AddFeedback(appointmentId, Feedback);
-            Snackbar.Add(resultMessage, resultMessage.Contains("successfully") ? Severity.Success : Severity.Error);
-
-            if (resultMessage.Contains("successfully"))
-            {
-                ShowFeedbackInput = false;
-                Feedback = string.Empty;
+            appointmentToUpdate.Status = status.ToString();
+            if (status == AppointmentStatus.COMPLETED)
+                appointmentToUpdate.ShowFeedbackInput = true;
+            StateHasChanged();
             }
-            StateHasChanged();
-            await GetAppointments();
 
-        }
-
-        public async Task EditStatus(Guid id, AppointmentStatus status)
-        {
-            var response = await AppointmentService.EditAppointmentStatus(id, status);
-            if(response)
-                Snackbar.Add($"Appointment {status}.", Severity.Success);
-            else
-                Snackbar.Add("Failed to edit appointment status.", Severity.Error);
-
-            StateHasChanged();
-            await GetAppointments();
+            // StateHasChanged();
+            // await GetAppointments();
         }
     }

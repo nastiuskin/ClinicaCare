@@ -31,5 +31,7 @@ namespace Application.AppointmentManagement.DTO
 
         [JsonPropertyName("feedback")]
         public string? FeedBack { get; set; }
+
+        public bool ShowFeedbackInput = false;
     }
 }
