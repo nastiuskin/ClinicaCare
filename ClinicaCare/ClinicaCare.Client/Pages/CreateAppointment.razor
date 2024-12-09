@@ -7,6 +7,7 @@
 @using Domain.Helpers.PaginationStuff
 @using Domain.MedicalProcedures
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.SignalR.Client
 @using MudBlazor
 @using Shared.DTO.Users
 
@@ -126,7 +127,7 @@
 
     private DateTime? _selectedDate;
 
-    private DateTime? selectedDate
+    public DateTime? selectedDate
     {
         get => _selectedDate;
         set

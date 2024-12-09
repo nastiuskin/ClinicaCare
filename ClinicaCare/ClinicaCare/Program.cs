@@ -1,10 +1,32 @@
 using API.Extensions;
 using Blazr.RenderState.Server;
+using ClinicaCare.Client.Services;
 using ClinicaCare.Components;
+using ClinicaCare.Hubs;
+using ClinicaCare.SignalR;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.ResponseCompression;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        ["application/octet-stream"]);
+});
+
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -24,8 +46,11 @@ builder.Services.ConfigureSwagger();
 
 builder.Services.AddAuthorizationCore();
 
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 await app.SeedDataAsync();
 
@@ -55,4 +80,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(ClinicaCare.Client._Imports).Assembly);
 
+app.UseCors("CorsPolicy");
+app.MapHub<NotificationHub>("/notificationHub");
 app.Run();

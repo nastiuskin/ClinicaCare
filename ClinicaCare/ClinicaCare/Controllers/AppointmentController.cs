@@ -3,6 +3,7 @@ using Application.AppointmentManagement.Commands.Complete;
 using Application.AppointmentManagement.Commands.Create;
 using Application.AppointmentManagement.DTO;
 using Application.AppointmentManagement.Queries;
+using ClinicaCare.Hubs;
 using Domain.Helpers.PaginationStuff;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -16,18 +17,27 @@ namespace API.Controllers
     public class AppointmentController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public AppointmentController(IMediator mediator)
+        private readonly INotificationService _notificationService;
+
+        public AppointmentController(IMediator mediator, INotificationService notificationService)
         {
             _mediator = mediator;
+            _notificationService = notificationService;
         }
-
+        
         [Authorize(Roles = "Patient")]
         [HttpPost]
         public async Task<IActionResult> CreateAppointment([FromBody] AppointmentFormDto appointmentCreateDto)
         {
             var result = await _mediator.Send(new AppointmentCreateCommand(appointmentCreateDto));
             if (result.IsSuccess)
+            {
+                var doctorId = appointmentCreateDto.DoctorId.ToString();
+                var notificationMessage = $"New appointment scheduled for {appointmentCreateDto.Date} at {appointmentCreateDto.Duration.StartTime}";
+                await _notificationService.NotifyDoctorAsync(doctorId,notificationMessage);
                 return Ok();
+            }
+                
             return BadRequest(result.Errors);
         }
 

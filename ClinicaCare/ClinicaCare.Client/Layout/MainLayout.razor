@@ -1,4 +1,19 @@
-﻿@using MudBlazor
+﻿@using ClinicaCare.Client.Services
+@using ClinicaCare.Client.Services.Interfaces
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Authorization
+@using MudBlazor
+@using Blazored.Toast
+@using System.Security.Claims
+
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider CustomAuthenticationStateProvider
+@inject ITokenService TokenService
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+
+@rendermode InteractiveWebAssembly
+
 @inherits LayoutComponentBase
 
 <div class="page">
@@ -18,8 +33,69 @@
         @* Needed for snackbars *@
         <MudSnackbarProvider />
         
+
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+<MudSnackbarProvider />
+
+@code {
+    private HubConnection? _hubConnection;
+    private readonly List<string> _messages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // var authenticationState = await CustomAuthenticationStateProvider.GetAuthenticationStateAsync();
+        // var user = authenticationState.User;
+        // var userId = authenticationState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var token = await TokenService.GetTokenAsync();
+
+
+        _hubConnection = new HubConnectionBuilder()
+               .WithUrl(NavigationManager.ToAbsoluteUri("/notificationHub"), options =>
+        {
+            options.AccessTokenProvider = () => Task.FromResult(token);
+        })
+        .Build();
+
+        // _hubConnection.On<string>("ReceiveNotification", message =>
+        // {
+        //     Console.WriteLine($"Notification received: {message}");
+
+        //     _messages.Add(message);
+
+        //     InvokeAsync(StateHasChanged);
+
+        //     foreach(var msg in _messages)
+        //     {
+        //         ShowNotification(msg);
+        //     }
+        // });
+
+        _hubConnection.On<string>("ReceiveNotification", message =>
+        {
+            Console.WriteLine($"Notification received: {message}");
+            Snackbar.Add(message, Severity.Info);
+        });
+
+        await _hubConnection.StartAsync();
+        Console.WriteLine("Hub connection established");
+    }
+
+    private void ShowNotification(string message)
+    {
+        Snackbar.Add(message, Severity.Info);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if(_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+}

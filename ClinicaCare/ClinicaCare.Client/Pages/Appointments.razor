@@ -9,6 +9,8 @@
     @using Domain.Helpers.PaginationStuff
     @using Domain.MedicalProcedures
     @using Microsoft.AspNetCore.Authorization
+    @using Microsoft.AspNetCore.SignalR.Client
+    @using Microsoft.EntityFrameworkCore.Metadata.Internal
     @using MudBlazor
     @inject IAppointmentService AppointmentService
     @inject IUserService UserService
@@ -139,6 +141,8 @@
     </div>
 
     @code {
+        [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+
         public List<AppointmentInfoDto> appointments { get; set; } = new();
         public MetaData MetaData { get; set; } = new MetaData();
         private AppointmentParameters _appointmentParameters = new();
@@ -209,8 +213,7 @@
             else
                 Snackbar.Add("Failed to edit appointment status.", Severity.Error);
 
-        StateHasChanged();
-        await GetAppointments();
-
+            StateHasChanged();
+            await GetAppointments();
         }
     }

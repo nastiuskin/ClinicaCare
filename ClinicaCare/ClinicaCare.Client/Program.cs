@@ -8,6 +8,8 @@ using Blazr.RenderState.WASM;
 using ClinicaCare.Client.Services.Auth;
 using System.Net;
 using ClinicaCare.Client.Services.Middlewares;
+using Microsoft.AspNetCore.SignalR.Client;
+using Blazored.Toast;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

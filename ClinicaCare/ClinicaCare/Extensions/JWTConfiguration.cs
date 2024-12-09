@@ -27,6 +27,18 @@ namespace API.Extensions
                     ValidAudience = configuration["ApplicationSettings:JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:JWT:SigningKey"]))
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (context.Request.Query.ContainsKey("access_token"))
+                        {
+                            context.Token = context.Request.Query["access_token"];
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
             return services;
         }

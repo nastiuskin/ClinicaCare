@@ -29,7 +29,7 @@ namespace ClinicaCareTests.Appointments.Application.Tests.AppointmentHandlerTest
                 _appointmentRepositoryMock.Object,
                 _mapperMock.Object,
                 _httpContextAccessorMock.Object,
-                _jwtServiceMock.Object );
+                _jwtServiceMock.Object);
         }
 
         [Fact]
@@ -49,24 +49,21 @@ namespace ClinicaCareTests.Appointments.Application.Tests.AppointmentHandlerTest
         [Fact]
         public async Task Handle_ShouldReturnFail_WhenRoleClaimIsNotFoundInToken()
         {
-            //var query = new GetAllAppointmentsByCurrentUserIdQuery(new AppointmentParameters());
-            //var roleClaim = "Patient";
+            var query = new GetAllAppointmentsByCurrentUserIdQuery(new AppointmentParameters());
 
-            //_jwtServiceMock.Setup(jwt => jwt.GetUserIdFromTokenAsync(It.IsAny<IHttpContextAccessor>()))
-            //    .Returns(Guid.NewGuid());
+            _jwtServiceMock.Setup(jwt => jwt.GetUserIdFromTokenAsync(It.IsAny<IHttpContextAccessor>()))
+                .Returns(Guid.NewGuid());
 
-            //_httpContextAccessorMock
-            //.Setup(a => a.HttpContext.User.FindFirst(ClaimTypes.Role))
-            //    .Returns(new Claim(ClaimTypes.Role, roleClaim));
+            _httpContextAccessorMock
+            .Setup(a => a.HttpContext.User.FindFirst(ClaimTypes.Role))
+                .Returns(new Claim(ClaimTypes.Role, ""));
 
-            //_httpContextAccessorMock
-            //    .Setup(a => a.HttpContext.Response.Headers)
-            //        .Returns(new HeaderDictionary());
+            var result = await _handler.Handle(query, default);
 
-            //var result = await _handler.Handle(query, default);
-
-            //Assert.False(result.IsSuccess);
-            //Assert.Contains("User role claim is missing or invalid.", result.Errors[0].Message);
+            Assert.False(result.IsSuccess);
+            Assert.Contains("User role claim is missing or invalid.", result.Errors[0].Message);
         }
+
+
     }
 }

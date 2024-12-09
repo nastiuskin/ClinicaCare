@@ -54,7 +54,6 @@ namespace Application.AppointmentManagement.Queries
             var appointmentDtos = _mapper.Map<ICollection<AppointmentInfoDto>>(appointments);
             _httpContextAccessor.HttpContext.Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(appointments.MetaData));
 
-
             return Result.Ok(appointmentDtos);
         }
     }
